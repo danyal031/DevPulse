@@ -2,7 +2,7 @@ export type Language = "en" | "fa";
 
 export const translations = {
   en: {
-    appName: "Kaarbox",
+    appName: "DevPulse",
     appSubtitle: "Developer Swiss Army Knife",
     langToggle: "فارسی",
 
@@ -103,7 +103,7 @@ export const translations = {
     regenerateMock: "Generate New Test Data",
   },
   fa: {
-    appName: "کارباکس",
+    appName: "دِوپالس (DevPulse)",
     appSubtitle: "جعبه‌ابزار همه‌کاره توسعه‌دهنده",
     langToggle: "English",
 

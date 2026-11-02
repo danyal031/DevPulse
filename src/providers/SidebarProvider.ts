@@ -3,7 +3,7 @@ import * as crypto from 'crypto';
 import { scanListeningPorts, killProcessByPid } from '../utils/portManager';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'kaarbox.sidebarView';
+  public static readonly viewType = 'devpulse.sidebarView';
   private _view?: vscode.WebviewView;
 
   constructor(
@@ -35,7 +35,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
               editBuilder.replace(selection, data.text);
             });
           } else {
-            vscode.window.showInformationMessage('Kaarbox: No active text editor found to insert text.');
+            vscode.window.showInformationMessage('DevPulse: No active text editor found to insert text.');
           }
           break;
         }
@@ -46,7 +46,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             this.postMessage({ type: 'portsList', ports });
           } catch (err: any) {
             this.postMessage({ type: 'portsList', ports: [] });
-            vscode.window.showErrorMessage(`Kaarbox Port Scan Error: ${err.message}`);
+            vscode.window.showErrorMessage(`DevPulse Port Scan Error: ${err.message}`);
           }
           break;
         }
@@ -64,25 +64,25 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             });
 
             if (result.success) {
-              vscode.window.showInformationMessage(`Kaarbox: Terminated process on port :${port} (PID: ${pid})`);
+              vscode.window.showInformationMessage(`DevPulse: Terminated process on port :${port} (PID: ${pid})`);
             } else {
-              vscode.window.showErrorMessage(`Kaarbox: Failed to kill process: ${result.message}`);
+              vscode.window.showErrorMessage(`DevPulse: Failed to kill process: ${result.message}`);
             }
           } catch (err: any) {
-            vscode.window.showErrorMessage(`Kaarbox: Error killing process: ${err.message}`);
+            vscode.window.showErrorMessage(`DevPulse: Error killing process: ${err.message}`);
           }
           break;
         }
 
         case 'languageChanged': {
-          await this._context.globalState.update('kaarbox.language', data.lang);
+          await this._context.globalState.update('devpulse.language', data.lang);
           break;
         }
       }
     });
 
     // Send initial saved language if exists
-    const savedLang = this._context.globalState.get<string>('kaarbox.language');
+    const savedLang = this._context.globalState.get<string>('devpulse.language');
     if (savedLang) {
       this.postMessage({ type: 'setLanguage', lang: savedLang });
     }
@@ -110,7 +110,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     );
 
     const nonce = crypto.randomBytes(16).toString('base64');
-    const savedLang = this._context.globalState.get<string>('kaarbox.language', 'en');
+    const savedLang = this._context.globalState.get<string>('devpulse.language', 'en');
     const isFa = savedLang === 'fa';
 
     return `<!DOCTYPE html>
@@ -120,7 +120,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; font-src ${webview.cspSource}; img-src ${webview.cspSource} https: data:;" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" type="text/css" href="${styleUri}" />
-  <title>Kaarbox</title>
+  <title>DevPulse</title>
 </head>
 <body>
   <div id="app-root"></div>

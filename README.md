@@ -1,6 +1,6 @@
-# Kaarbox (کارباکس) — Developer Swiss Army Knife
+# DevPulse (دِوپالس) — Developer Swiss Army Knife
 
-**Kaarbox** is an offline-first, zero-bloat developer utility belt built natively for Visual Studio Code. It provides essential developer utilities right in your VS Code sidebar, with seamless bilingual support for **English (`LTR`)** and **Persian / فارسی (`RTL`)**.
+**DevPulse** is an offline-first, zero-bloat developer utility belt built natively for Visual Studio Code. It provides essential developer utilities right in your VS Code sidebar, with seamless bilingual support for **English (`LTR`)** and **Persian / فارسی (`RTL`)**.
 
 ---
 
@@ -32,12 +32,12 @@
   - Converts Persian/Arabic digits (`۱۲۳` / `١٢٣`) to English (`123`) and vice versa.
   - Normalizes Arabic `ي` / `ك` to Persian `ی` / `ک`.
   - Fixes Zero-Width Non-Joiner (ZWNJ / نیم‌فاصله) for prefixes (`می‌`, `نمی‌`) and suffixes (`‌ها`, `‌های`, `‌تر`, `‌ترین`, `‌ام`, etc.).
-  - Right-click editor context menu command: **`Kaarbox: Normalize Persian Text & Digits in Selection`**.
+  - Right-click editor context menu command: **`DevPulse: Normalize Persian Text & Digits in Selection`**.
 
 ### 4. Local Port Manager (Port Killer)
 - **Cross-Platform TCP Detection:** Communicates with the extension host to inspect active listening TCP ports on Windows (`netstat`), macOS (`lsof`), and Linux (`ss`/`lsof`).
 - **Process Identification:** Displays port number, PID, and executable process name (e.g., `node.exe`, `python`, `dockerd`).
-- **One-Click Process Termination:** Terminate hanging dev servers directly from the sidebar or via Command Palette: **`Kaarbox: Kill Process on Port...`**.
+- **One-Click Process Termination:** Terminate hanging dev servers directly from the sidebar or via Command Palette: **`DevPulse: Kill Process on Port...`**.
 
 ### 5. Crypto, ID & Mock Data Generator
 - **Identifier Generators:** Cryptographically secure UUID v4 (RFC 4122) and 26-character sortable ULID (Crockford Base32).
@@ -55,13 +55,13 @@
 
 | Command | Title | Context |
 | :--- | :--- | :--- |
-| `kaarbox.openSidebar` | `Kaarbox: Open Developer Swiss Army Knife` | Command Palette |
-| `kaarbox.normalizePersianSelection` | `Kaarbox: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
-| `kaarbox.convertToJalali` | `Kaarbox: Convert Date or Timestamp to Jalali` | Editor Context Menu & Command Palette |
-| `kaarbox.jsonToTypescript` | `Kaarbox: Convert Selected JSON to TypeScript & Zod` | Editor Context Menu & Command Palette |
-| `kaarbox.killPort` | `Kaarbox: Kill Process on Port...` | Command Palette |
-| `kaarbox.generateUuid` | `Kaarbox: Generate UUID v4 at Cursor` | Command Palette |
-| `kaarbox.generateSecret` | `Kaarbox: Generate 64-Byte Secure Secret` | Command Palette |
+| `devpulse.openSidebar` | `DevPulse: Open Developer Swiss Army Knife` | Command Palette |
+| `devpulse.normalizePersianSelection` | `DevPulse: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
+| `devpulse.convertToJalali` | `DevPulse: Convert Date or Timestamp to Jalali` | Editor Context Menu & Command Palette |
+| `devpulse.jsonToTypescript` | `DevPulse: Convert Selected JSON to TypeScript & Zod` | Editor Context Menu & Command Palette |
+| `devpulse.killPort` | `DevPulse: Kill Process on Port...` | Command Palette |
+| `devpulse.generateUuid` | `DevPulse: Generate UUID v4 at Cursor` | Command Palette |
+| `devpulse.generateSecret` | `DevPulse: Generate 64-Byte Secure Secret` | Command Palette |
 
 ---
 
@@ -73,7 +73,7 @@
 │   ├── tasks.json               # Build automation tasks
 │   └── settings.json            # Editor visual customizations
 ├── media/
-│   └── kaarbox-icon.svg         # Monochromatic Activity Bar icon
+│   └── devpulse-icon.svg        # Monochromatic Activity Bar icon
 ├── src/
 │   ├── extension.ts             # Extension Host entry point & command registrations
 │   ├── providers/
@@ -82,7 +82,7 @@
 │   │   ├── jalali.ts            # Pure astronomical Jalali calendar math
 │   │   ├── persianSanitizer.ts  # Persian/Arabic char & ZWNJ normalizer
 │   │   ├── jwt.ts               # Offline JWT parser & expiration engine
-│   │   ├── jsonToTsZod.ts       # Recursive JSON to TS and Zod generator
+│   │   ├── jsonToTsZod.ts       # Recursive AST generator for TS types & Zod schemas
 │   │   ├── portManager.ts       # Cross-platform port scanner & process killer
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
@@ -96,7 +96,7 @@
 ├── esbuild.js                   # Zero-bloat fast bundler config
 ├── package.json                 # Extension manifest & contributions
 ├── tsconfig.json                # Strict TypeScript configuration
-└── README.md
+└── README.md                    # Documentation and usage guide
 ```
 
 ---

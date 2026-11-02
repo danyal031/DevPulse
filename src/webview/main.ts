@@ -14,7 +14,7 @@ declare function acquireVsCodeApi(): {
 
 const vscode = acquireVsCodeApi();
 
-class KaarboxApp {
+class DevPulseApp {
   private currentLang: Language = 'en';
   private activeTab: string = 'json';
 
@@ -227,5 +227,5 @@ class KaarboxApp {
 
 // Bootstrap
 window.addEventListener('DOMContentLoaded', () => {
-  new KaarboxApp();
+  new DevPulseApp();
 });

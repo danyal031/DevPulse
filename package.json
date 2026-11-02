@@ -1,9 +1,9 @@
 {
-  "name": "kaarbox",
-  "displayName": "Kaarbox (کارباکس)",
+  "name": "devpulse",
+  "displayName": "DevPulse (دِوپالس)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
   "version": "1.0.0",
-  "publisher": "kaarbox",
+  "publisher": "devpulse",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -20,93 +20,94 @@
     "port-killer",
     "offline",
     "farsi",
-    "json-to-typescript"
+    "json-to-typescript",
+    "devpulse"
   ],
   "main": "./dist/extension.js",
-  "icon": "media/kaarbox-icon.svg",
+  "icon": "media/devpulse-icon.svg",
   "activationEvents": [
-    "onView:kaarbox.sidebarView",
-    "onCommand:kaarbox.openSidebar",
-    "onCommand:kaarbox.normalizePersianSelection",
-    "onCommand:kaarbox.convertToJalali",
-    "onCommand:kaarbox.generateUuid",
-    "onCommand:kaarbox.generateSecret",
-    "onCommand:kaarbox.jsonToTypescript",
-    "onCommand:kaarbox.killPort"
+    "onView:devpulse.sidebarView",
+    "onCommand:devpulse.openSidebar",
+    "onCommand:devpulse.normalizePersianSelection",
+    "onCommand:devpulse.convertToJalali",
+    "onCommand:devpulse.generateUuid",
+    "onCommand:devpulse.generateSecret",
+    "onCommand:devpulse.jsonToTypescript",
+    "onCommand:devpulse.killPort"
   ],
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "kaarbox-activitybar",
-          "title": "Kaarbox (کارباکس)",
-          "icon": "media/kaarbox-icon.svg"
+          "id": "devpulse-activitybar",
+          "title": "DevPulse (دِوپالس)",
+          "icon": "media/devpulse-icon.svg"
         }
       ]
     },
     "views": {
-      "kaarbox-activitybar": [
+      "devpulse-activitybar": [
         {
           "type": "webview",
-          "id": "kaarbox.sidebarView",
-          "name": "Kaarbox",
-          "icon": "media/kaarbox-icon.svg"
+          "id": "devpulse.sidebarView",
+          "name": "DevPulse",
+          "icon": "media/devpulse-icon.svg"
         }
       ]
     },
     "commands": [
       {
-        "command": "kaarbox.openSidebar",
+        "command": "devpulse.openSidebar",
         "title": "Open Developer Swiss Army Knife",
-        "category": "Kaarbox"
+        "category": "DevPulse"
       },
       {
-        "command": "kaarbox.normalizePersianSelection",
+        "command": "devpulse.normalizePersianSelection",
         "title": "Normalize Persian Text & Digits in Selection",
-        "category": "Kaarbox"
+        "category": "DevPulse"
       },
       {
-        "command": "kaarbox.convertToJalali",
+        "command": "devpulse.convertToJalali",
         "title": "Convert Date or Timestamp to Jalali",
-        "category": "Kaarbox"
+        "category": "DevPulse"
       },
       {
-        "command": "kaarbox.generateUuid",
+        "command": "devpulse.generateUuid",
         "title": "Generate UUID v4 at Cursor",
-        "category": "Kaarbox"
+        "category": "DevPulse"
       },
       {
-        "command": "kaarbox.generateSecret",
+        "command": "devpulse.generateSecret",
         "title": "Generate 64-Byte Secure Secret",
-        "category": "Kaarbox"
+        "category": "DevPulse"
       },
       {
-        "command": "kaarbox.jsonToTypescript",
+        "command": "devpulse.jsonToTypescript",
         "title": "Convert Selected JSON to TypeScript & Zod",
-        "category": "Kaarbox"
+        "category": "DevPulse"
       },
       {
-        "command": "kaarbox.killPort",
+        "command": "devpulse.killPort",
         "title": "Kill Process on Port...",
-        "category": "Kaarbox"
+        "category": "DevPulse"
       }
     ],
     "menus": {
       "editor/context": [
         {
-          "command": "kaarbox.normalizePersianSelection",
+          "command": "devpulse.normalizePersianSelection",
           "when": "editorHasSelection",
-          "group": "kaarbox@1"
+          "group": "devpulse@1"
         },
         {
-          "command": "kaarbox.jsonToTypescript",
+          "command": "devpulse.jsonToTypescript",
           "when": "editorHasSelection",
-          "group": "kaarbox@2"
+          "group": "devpulse@2"
         },
         {
-          "command": "kaarbox.convertToJalali",
+          "command": "devpulse.convertToJalali",
           "when": "editorHasSelection",
-          "group": "kaarbox@3"
+          "group": "devpulse@3"
         }
       ]
     }
