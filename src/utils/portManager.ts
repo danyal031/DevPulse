@@ -19,26 +19,135 @@ export function scanListeningPorts(): Promise<ListeningPortInfo[]> {
   }
 }
 
-export function killProcessByPid(pid: number): Promise<{ success: boolean; message: string }> {
+export async function killProcessByPid(pid: number, port?: number): Promise<{ success: boolean; message: string }> {
+  if (pid <= 4) {
+    return { success: false, message: 'Cannot kill system kernel process.' };
+  }
+
+  const platform = os.platform();
+
+  if (platform === 'win32') {
+    return killWindowsProcess(pid, port);
+  } else {
+    return killUnixProcess(pid, port);
+  }
+}
+
+function killWindowsProcess(pid: number, port?: number): Promise<{ success: boolean; message: string }> {
   return new Promise((resolve) => {
-    if (pid <= 4) {
-      resolve({ success: false, message: 'Cannot kill system kernel process.' });
-      return;
-    }
-
-    const platform = os.platform();
-    const command = platform === 'win32' ? `taskkill /F /PID ${pid}` : `kill -9 ${pid}`;
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
+    // /T terminates specified process and any child processes started by it
+    // /F forcefully terminates
+    exec(`taskkill /F /T /PID ${pid}`, (error, stdout, stderr) => {
+      if (!error) {
         resolve({
-          success: false,
-          message: stderr.trim() || error.message
+          success: true,
+          message: stdout.trim() || `Process ${pid} terminated successfully.`
         });
-      } else {
+        return;
+      }
+
+      // Fallback 1: PowerShell Stop-Process
+      exec(`powershell -NoProfile -Command "Stop-Process -Id ${pid} -Force -ErrorAction SilentlyContinue"`, (psErr) => {
+        if (!psErr) {
+          resolve({
+            success: true,
+            message: `Process ${pid} terminated via PowerShell.`
+          });
+          return;
+        }
+
+        // Fallback 2: If port is provided, find any remaining PIDs on that port
+        if (port) {
+          exec(`netstat -ano -p tcp | findstr :${port}`, (netErr, netStdout) => {
+            if (!netErr && netStdout) {
+              const lines = netStdout.trim().split(/\r?\n/);
+              const foundPids = new Set<number>();
+              for (const line of lines) {
+                if (line.includes('LISTENING')) {
+                  const parts = line.trim().split(/\s+/);
+                  const p = parseInt(parts[parts.length - 1], 10);
+                  if (!isNaN(p) && p > 4 && p !== pid) {
+                    foundPids.add(p);
+                  }
+                }
+              }
+
+              if (foundPids.size > 0) {
+                const pidList = Array.from(foundPids).join(' ');
+                exec(`taskkill /F /T /PID ${Array.from(foundPids).join(' /PID ')}`, (killExtraErr) => {
+                  if (!killExtraErr) {
+                    resolve({
+                      success: true,
+                      message: `Freed port ${port} by terminating associated processes (PID: ${pidList}).`
+                    });
+                    return;
+                  }
+                  resolve({
+                    success: false,
+                    message: stderr.trim() || error.message
+                  });
+                });
+                return;
+              }
+            }
+
+            resolve({
+              success: false,
+              message: stderr.trim() || error.message
+            });
+          });
+        } else {
+          resolve({
+            success: false,
+            message: stderr.trim() || error.message
+          });
+        }
+      });
+    });
+  });
+}
+
+function killUnixProcess(pid: number, port?: number): Promise<{ success: boolean; message: string }> {
+  return new Promise((resolve) => {
+    exec(`kill -9 ${pid}`, (error, stdout, stderr) => {
+      if (!error) {
         resolve({
           success: true,
           message: stdout.trim() || `Process ${pid} terminated.`
+        });
+        return;
+      }
+
+      // Fallback: If port is provided, try fuser or lsof
+      if (port) {
+        exec(`lsof -ti:${port} | xargs kill -9`, (lsofErr) => {
+          if (!lsofErr) {
+            resolve({
+              success: true,
+              message: `Freed port ${port} via lsof kill.`
+            });
+            return;
+          }
+
+          exec(`fuser -k -9 ${port}/tcp`, (fuserErr) => {
+            if (!fuserErr) {
+              resolve({
+                success: true,
+                message: `Freed port ${port} via fuser.`
+              });
+              return;
+            }
+
+            resolve({
+              success: false,
+              message: stderr.trim() || error.message
+            });
+          });
+        });
+      } else {
+        resolve({
+          success: false,
+          message: stderr.trim() || error.message
         });
       }
     });
@@ -47,7 +156,6 @@ export function killProcessByPid(pid: number): Promise<{ success: boolean; messa
 
 function scanWindowsPorts(): Promise<ListeningPortInfo[]> {
   return new Promise((resolve) => {
-    // 1. Fetch process map (PID -> Image Name)
     exec('tasklist /FO CSV /NH', { maxBuffer: 10 * 1024 * 1024 }, (errProcesses, stdoutProcesses) => {
       const pidToName = new Map<number, string>();
 
@@ -63,7 +171,6 @@ function scanWindowsPorts(): Promise<ListeningPortInfo[]> {
         }
       }
 
-      // 2. Fetch listening TCP ports
       exec('netstat -ano -p tcp', { maxBuffer: 10 * 1024 * 1024 }, (errNetstat, stdoutNetstat) => {
         if (errNetstat || !stdoutNetstat) {
           resolve([]);
@@ -85,7 +192,6 @@ function scanWindowsPorts(): Promise<ListeningPortInfo[]> {
             const localAddr = parts[1];
             const pid = parseInt(parts[4], 10);
 
-            // Extract port from local address (e.g. 0.0.0.0:3000, [::]:8080, 127.0.0.1:5432)
             const lastColonIndex = localAddr.lastIndexOf(':');
             if (lastColonIndex !== -1) {
               const portStr = localAddr.slice(lastColonIndex + 1);
@@ -93,7 +199,6 @@ function scanWindowsPorts(): Promise<ListeningPortInfo[]> {
 
               if (!isNaN(port) && !isNaN(pid) && port > 0) {
                 const processName = pidToName.get(pid) ?? `PID ${pid}`;
-                // Deduplicate by port number
                 if (!map.has(port)) {
                   map.set(port, {
                     port,
@@ -117,7 +222,6 @@ function scanWindowsPorts(): Promise<ListeningPortInfo[]> {
 
 function scanUnixPorts(): Promise<ListeningPortInfo[]> {
   return new Promise((resolve) => {
-    // Try lsof first (standard on macOS and most Linux distros)
     exec('lsof -iTCP -sTCP:LISTEN -n -P', { maxBuffer: 10 * 1024 * 1024 }, (error, stdout) => {
       if (!error && stdout) {
         const lines = stdout.split('\n');
@@ -128,7 +232,6 @@ function scanUnixPorts(): Promise<ListeningPortInfo[]> {
           if (!line) continue;
 
           const parts = line.split(/\s+/);
-          // Typical output: COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
           if (parts.length >= 9) {
             const processName = parts[0];
             const pid = parseInt(parts[1], 10);
@@ -158,7 +261,6 @@ function scanUnixPorts(): Promise<ListeningPortInfo[]> {
         return;
       }
 
-      // Fallback for Linux ss command
       exec('ss -tulpn', { maxBuffer: 10 * 1024 * 1024 }, (ssErr, ssStdout) => {
         if (ssErr || !ssStdout) {
           resolve([]);
@@ -171,7 +273,6 @@ function scanUnixPorts(): Promise<ListeningPortInfo[]> {
         for (const line of lines) {
           if (!line.includes('LISTEN')) continue;
 
-          // Look for port in format e.g. 127.0.0.1:3000 or *:8080
           const portMatch = line.match(/(?:(?::|\*|\[::\]|0\.0\.0\.0):)(\d+)/);
           const pidMatch = line.match(/users:\(\("([^"]+)",pid=(\d+)/);
 

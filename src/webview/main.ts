@@ -139,6 +139,12 @@ class DevShelfApp {
         case 'portsList':
           this.portView.setPorts(message.ports || []);
           break;
+        case 'networkInfo':
+          this.portView.setNetworkInfo(message.data);
+          break;
+        case 'publicIp':
+          this.portView.setPublicIp(message.ip);
+          break;
         case 'portKilled':
           this.portView.handlePortKilled(message);
           break;

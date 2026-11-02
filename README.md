@@ -16,10 +16,11 @@
 
 ## Core Modules
 
-### 1. JSON to TypeScript & Zod Schema Generator
+### 1. JSON Suite (Formatter, Minifier & TS/Zod Generator)
+- **JSON Beautifier & Minifier:** Format JSON with 2 spaces, 4 spaces, or minify into a single compact line. Includes alphabetical key sorting and auto-repair for common syntax errors (unquoted keys, single quotes, trailing commas).
 - **Instant AST Inference:** Converts raw JSON objects, nested entities, and complex arrays into clean TypeScript `interface` / `type` definitions and corresponding `zod` validation schemas.
-- **Smart Date Detection:** Automatically identifies ISO-8601 timestamps and outputs `z.string().datetime()`.
-- **Editor Integration:** One-click copy or direct insertion at the cursor into the active editor (`Insert TS`, `Insert Zod`, or `Insert Both`).
+- **Live Syntax Validation:** Real-time syntax validation badge displaying exact error line and column.
+- **Editor Integration:** One-click copy or direct insertion at the cursor into the active editor (`Format in Selection`, `Insert TS`, `Insert Zod`, or `Insert JSON`).
 
 ### 2. Offline JWT Inspector
 - **Local Decryption & Validation:** Inspects and parses standard 3-part JSON Web Tokens (`header.payload.signature`) locally without sending sensitive credentials to third-party web tools.
@@ -34,12 +35,19 @@
   - Fixes Zero-Width Non-Joiner (ZWNJ / نیم‌فاصله) for prefixes (`می‌`, `نمی‌`) and suffixes (`‌ها`, `‌های`, `‌تر`, `‌ترین`, `‌ام`, etc.).
   - Right-click editor context menu command: **`DevShelf: Normalize Persian Text & Digits in Selection`**.
 
-### 4. Local Port Manager (Port Killer)
-- **Cross-Platform TCP Detection:** Communicates with the extension host to inspect active listening TCP ports on Windows (`netstat`), macOS (`lsof`), and Linux (`ss`/`lsof`).
-- **Process Identification:** Displays port number, PID, and executable process name (e.g., `node.exe`, `python`, `dockerd`).
-- **One-Click Process Termination:** Terminate hanging dev servers directly from the sidebar or via Command Palette: **`DevShelf: Kill Process on Port...`**.
+### 4. Local Port Manager & System IP Inspector (Port Killer & Network)
+- **System IP & Network Info:** Instantly displays your local IPv4 address (LAN / Wi-Fi IP), Hostname, and all network interfaces with 1-click copy buttons. Optional check for public IP address.
+- **Cross-Platform TCP Detection:** Inspects active listening TCP ports on Windows (`netstat`), macOS (`lsof`), and Linux (`ss`/`lsof`).
+- **Reliable Process Termination (Tree Kill):** Uses process tree termination (`taskkill /F /T` on Windows with PowerShell fallback, and `kill -9` / `fuser` on Unix) to guarantee ports are fully freed.
+- **Inline Safe Confirmation:** Two-step confirmation button right inside the Webview to eliminate blocked modal dialogs.
+- **Command Palette Action:** Terminate processes on any port via **`DevShelf: Kill Process on Port...`**.
 
-### 5. Crypto, ID & Mock Data Generator
+### 5. Git Conventional Commit Message Generator
+- **SCM Integration:** Adds a dedicated button in the VS Code Source Control (SCM) view and commit input box.
+- **Intelligent Diff Analysis:** Scans staged and working tree changes, determines type (`feat`, `fix`, `docs`, `style`, `refactor`, `chore`, `test`) and scope, and generates a standards-compliant Conventional Commit message.
+- **Direct Input Box Injection:** Automatically places the generated message directly into the VS Code commit input box with a single click.
+
+### 6. Crypto, ID & Mock Data Generator
 - **Identifier Generators:** Cryptographically secure UUID v4 (RFC 4122) and 26-character sortable ULID (Crockford Base32).
 - **Secure Secrets:** Generate 32-byte and 64-byte Hex and Base64 secrets for `.env` files (`AUTH_SECRET`, `JWT_SECRET`, etc.).
 - **Live Hasher & Codecs:** Real-time SHA-256 hash generation and Unicode-safe Base64 / URL encoder-decoder.
@@ -55,7 +63,10 @@
 
 | Command | Title | Context |
 | :--- | :--- | :--- |
+| `devshelf.generateCommitMessage` | `DevShelf: Generate Conventional Commit Message` | SCM Toolbar, Commit Input Box & Palette |
 | `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
+| `devshelf.copySystemIp` | `DevShelf: Copy Local System IP` | Command Palette |
+| `devshelf.formatJson` | `DevShelf: Format JSON in Selection` | Editor Context Menu & Command Palette |
 | `devshelf.normalizePersianSelection` | `DevShelf: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
 | `devshelf.convertToJalali` | `DevShelf: Convert Date or Timestamp to Jalali` | Editor Context Menu & Command Palette |
 | `devshelf.jsonToTypescript` | `DevShelf: Convert Selected JSON to TypeScript & Zod` | Editor Context Menu & Command Palette |
@@ -73,30 +84,34 @@
 │   ├── tasks.json               # Build automation tasks
 │   └── settings.json            # Editor visual customizations
 ├── media/
-│   └── devshelf-icon.svg        # Monochromatic Activity Bar icon
+│   ├── commit-icon.svg          # SCM commit toolbar icon
+│   └── devshelf-icon.svg        # Activity Bar icon
 ├── src/
-│   ├── extension.ts             # Extension Host entry point & command registrations
+│   ├── extension.ts             # Host entry point, commands & SCM commit hook
 │   ├── providers/
 │   │   └── SidebarProvider.ts   # WebviewViewProvider with strict CSP
 │   ├── utils/
 │   │   ├── jalali.ts            # Pure astronomical Jalali calendar math
 │   │   ├── persianSanitizer.ts  # Persian/Arabic char & ZWNJ normalizer
 │   │   ├── jwt.ts               # Offline JWT parser & expiration engine
-│   │   ├── jsonToTsZod.ts       # Recursive AST generator for TS types & Zod schemas
-│   │   ├── portManager.ts       # Cross-platform port scanner & process killer
+│   │   ├── jsonToTsZod.ts       # Recursive AST generator for TS & Zod
+│   │   ├── jsonFormatter.ts     # JSON formatter, minifier & syntax validator
+│   │   ├── portManager.ts       # Process tree killer & TCP port scanner
+│   │   ├── networkInfo.ts       # System IP, hostname & interfaces info
+│   │   ├── gitCommit.ts         # Conventional commit message generator
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
-│       ├── main.ts              # Webview state manager & tab router
+│       ├── main.ts              # Webview state coordinator & message dispatcher
 │       ├── i18n.ts              # Full English & Persian dictionary
 │       ├── icons.ts             # Clean inline SVG Codicons
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   └── testRunner.ts            # Comprehensive unit test suite
-├── esbuild.js                   # Zero-bloat fast bundler config
+│   └── testRunner.ts            # 8 unit test suites
+├── esbuild.js                   # Fast bundler config
 ├── package.json                 # Extension manifest & contributions
 ├── tsconfig.json                # Strict TypeScript configuration
-└── README.md                    # Documentation and usage guide
+└── README.md                    # Documentation
 ```
 
 ---
@@ -107,17 +122,13 @@
    ```bash
    npm run compile
    ```
-2. **Watch Mode:**
-   ```bash
-   npm run watch
-   ```
-3. **Run Unit Tests:**
+2. **Run Unit Tests:**
    ```bash
    npm run test
    ```
-4. **Debug in VS Code:**
+3. **Debug in VS Code:**
    Press `F5` in VS Code to launch the Extension Development Host window.
-5. **Package VSIX:**
+4. **Package VSIX:**
    ```bash
    npx vsce package
    ```

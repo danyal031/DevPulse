@@ -9,7 +9,10 @@ import {
 } from './utils/jalali';
 import { generateUuidV4, generateSecret } from './utils/cryptoMock';
 import { generateTsAndZod } from './utils/jsonToTsZod';
+import { formatJson } from './utils/jsonFormatter';
 import { scanListeningPorts, killProcessByPid } from './utils/portManager';
+import { getSystemNetworkInfo } from './utils/networkInfo';
+import { getGitChanges, generateConventionalCommit } from './utils/gitCommit';
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
@@ -94,7 +97,6 @@ export function activate(context: vscode.ExtensionContext) {
 
       let result = '';
 
-      // Check if input is a numeric timestamp
       if (/^\d+$/.test(input)) {
         const num = parseInt(input, 10);
         const ms = input.length <= 10 ? num * 1000 : num;
@@ -104,7 +106,6 @@ export function activate(context: vscode.ExtensionContext) {
           result = `${details.formatted} (${details.weekdayFa}، ${details.dayStr} ${details.monthNameFa} ${details.yearStr})`;
         }
       } else {
-        // Assume Gregorian date
         const parts = input.split(/[\-\/\.]/);
         if (parts.length === 3) {
           const y = parseInt(parts[0], 10);
@@ -250,11 +251,120 @@ export function activate(context: vscode.ExtensionContext) {
         );
 
         if (confirm === 'Kill Process') {
-          const result = await killProcessByPid(selected.pid);
+          const result = await killProcessByPid(selected.pid, selected.port);
           if (result.success) {
             vscode.window.showInformationMessage(`DevShelf: Successfully killed :${selected.port} (${selected.name})`);
           } else {
             vscode.window.showErrorMessage(`DevShelf: Failed to kill process: ${result.message}`);
+          }
+        }
+      }
+    })
+  );
+
+  // Command 8: Format JSON in Selection or Document
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.formatJson', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showInformationMessage('DevShelf: No active editor found.');
+        return;
+      }
+
+      const selection = editor.selection;
+      const text = editor.document.getText(selection.isEmpty ? undefined : selection).trim();
+
+      if (!text) {
+        vscode.window.showInformationMessage('DevShelf: Please open or select JSON text to format.');
+        return;
+      }
+
+      const res = formatJson(text, 2);
+      if (res.isValid) {
+        await editor.edit((editBuilder) => {
+          if (selection.isEmpty) {
+            const fullRange = new vscode.Range(
+              editor.document.positionAt(0),
+              editor.document.positionAt(editor.document.getText().length)
+            );
+            editBuilder.replace(fullRange, res.output);
+          } else {
+            editBuilder.replace(selection, res.output);
+          }
+        });
+        vscode.window.showInformationMessage('DevShelf: JSON formatted successfully.');
+      } else {
+        vscode.window.showErrorMessage(`DevShelf: Invalid JSON format: ${res.error}`);
+      }
+    })
+  );
+
+  // Command 9: Copy System Local IP
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.copySystemIp', async () => {
+      const netInfo = getSystemNetworkInfo();
+      await vscode.env.clipboard.writeText(netInfo.primaryIpv4);
+      vscode.window.showInformationMessage(`DevShelf: Copied Local IP to clipboard: ${netInfo.primaryIpv4} (${netInfo.hostname})`);
+    })
+  );
+
+  // Command 10: Generate Conventional Commit Message (SCM Integration)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.generateCommitMessage', async (uri?: vscode.SourceControl | vscode.SourceControlResourceGroup) => {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      if (!workspaceFolders || workspaceFolders.length === 0) {
+        vscode.window.showInformationMessage('DevShelf: No open workspace folder detected for git.');
+        return;
+      }
+
+      const rootPath = workspaceFolders[0].uri.fsPath;
+      const changes = await getGitChanges(rootPath);
+
+      if (changes.length === 0) {
+        vscode.window.showInformationMessage('DevShelf: No git changes detected in this repository.');
+        return;
+      }
+
+      const commit = generateConventionalCommit(changes);
+
+      // 1. Try to set commit message in VS Code Git Source Control input box directly
+      let insertedIntoScm = false;
+      try {
+        const gitExtension = vscode.extensions.getExtension('vscode.git');
+        if (gitExtension) {
+          const gitApi = gitExtension.isActive ? gitExtension.exports.getAPI(1) : (await gitExtension.activate())?.getAPI(1);
+          if (gitApi && gitApi.repositories && gitApi.repositories.length > 0) {
+            const repo = gitApi.repositories[0];
+            repo.inputBox.value = commit.fullMessage;
+            insertedIntoScm = true;
+          }
+        }
+      } catch {}
+
+      // 2. Also copy to clipboard for convenience
+      await vscode.env.clipboard.writeText(commit.fullMessage);
+
+      if (insertedIntoScm) {
+        vscode.window.showInformationMessage(
+          `DevShelf: Commit message inserted: "${commit.type}(${commit.scope}): ${commit.subject}"`,
+          'View SCM'
+        ).then((action) => {
+          if (action === 'View SCM') {
+            vscode.commands.executeCommand('workbench.view.scm');
+          }
+        });
+      } else {
+        const action = await vscode.window.showInformationMessage(
+          `Generated Commit: "${commit.type}(${commit.scope}): ${commit.subject}" (Copied to clipboard)`,
+          'Paste in Editor',
+          'Open SCM'
+        );
+        if (action === 'Open SCM') {
+          vscode.commands.executeCommand('workbench.view.scm');
+        } else if (action === 'Paste in Editor') {
+          const editor = vscode.window.activeTextEditor;
+          if (editor) {
+            editor.edit((eb) => eb.insert(editor.selection.active, commit.fullMessage));
           }
         }
       }

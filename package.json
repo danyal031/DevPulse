@@ -1,9 +1,9 @@
 {
   "name": "devshelf",
-  "displayName": "DevShelf",
+  "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
   "version": "1.0.0",
-  "publisher": "danial031",
+  "publisher": "danyal031",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,6 +31,8 @@
     "offline",
     "farsi",
     "json-to-typescript",
+    "json-formatter",
+    "commit-generator",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -42,7 +44,10 @@
     "onCommand:devshelf.generateUuid",
     "onCommand:devshelf.generateSecret",
     "onCommand:devshelf.jsonToTypescript",
-    "onCommand:devshelf.killPort"
+    "onCommand:devshelf.formatJson",
+    "onCommand:devshelf.killPort",
+    "onCommand:devshelf.copySystemIp",
+    "onCommand:devshelf.generateCommitMessage"
   ],
   "contributes": {
     "viewsContainers": {
@@ -96,12 +101,42 @@
         "category": "DevShelf"
       },
       {
+        "command": "devshelf.formatJson",
+        "title": "Format JSON in Selection",
+        "category": "DevShelf"
+      },
+      {
         "command": "devshelf.killPort",
         "title": "Kill Process on Port...",
         "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.copySystemIp",
+        "title": "Copy Local System IP",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.generateCommitMessage",
+        "title": "Generate Conventional Commit Message",
+        "category": "DevShelf",
+        "icon": "media/commit-icon.svg"
       }
     ],
     "menus": {
+      "scm/title": [
+        {
+          "command": "devshelf.generateCommitMessage",
+          "when": "scmProvider == git",
+          "group": "navigation"
+        }
+      ],
+      "scm/inputBox": [
+        {
+          "command": "devshelf.generateCommitMessage",
+          "when": "scmProvider == git",
+          "group": "inline"
+        }
+      ],
       "editor/context": [
         {
           "command": "devshelf.normalizePersianSelection",
@@ -109,14 +144,19 @@
           "group": "devshelf@1"
         },
         {
-          "command": "devshelf.jsonToTypescript",
+          "command": "devshelf.formatJson",
           "when": "editorHasSelection",
           "group": "devshelf@2"
         },
         {
-          "command": "devshelf.convertToJalali",
+          "command": "devshelf.jsonToTypescript",
           "when": "editorHasSelection",
           "group": "devshelf@3"
+        },
+        {
+          "command": "devshelf.convertToJalali",
+          "when": "editorHasSelection",
+          "group": "devshelf@4"
         }
       ]
     }

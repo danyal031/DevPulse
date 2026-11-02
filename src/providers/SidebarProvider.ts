@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as crypto from 'crypto';
 import { scanListeningPorts, killProcessByPid } from '../utils/portManager';
+import { getSystemNetworkInfo, fetchPublicIp } from '../utils/networkInfo';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'devshelf.sidebarView';
@@ -51,10 +52,30 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
 
+        case 'getNetworkInfo': {
+          try {
+            const netInfo = getSystemNetworkInfo();
+            this.postMessage({ type: 'networkInfo', data: netInfo });
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Network Info Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'getPublicIp': {
+          try {
+            const ip = await fetchPublicIp();
+            this.postMessage({ type: 'publicIp', ip });
+          } catch (err: any) {
+            this.postMessage({ type: 'publicIp', ip: null });
+          }
+          break;
+        }
+
         case 'killPort': {
           try {
-            const { pid, port } = data;
-            const result = await killProcessByPid(pid);
+            const { pid, port, name } = data;
+            const result = await killProcessByPid(pid, port);
             this.postMessage({
               type: 'portKilled',
               success: result.success,
@@ -64,7 +85,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             });
 
             if (result.success) {
-              vscode.window.showInformationMessage(`DevShelf: Terminated process on port :${port} (PID: ${pid})`);
+              const info = name ? ` (${name})` : '';
+              vscode.window.showInformationMessage(`DevShelf: Terminated port :${port}${info} (PID: ${pid})`);
             } else {
               vscode.window.showErrorMessage(`DevShelf: Failed to kill process: ${result.message}`);
             }
@@ -86,6 +108,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     if (savedLang) {
       this.postMessage({ type: 'setLanguage', lang: savedLang });
     }
+
+    // Send initial network info
+    try {
+      const netInfo = getSystemNetworkInfo();
+      this.postMessage({ type: 'networkInfo', data: netInfo });
+    } catch {}
   }
 
   public postMessage(message: unknown) {

@@ -1,4 +1,5 @@
 import { generateTsAndZod } from '../../utils/jsonToTsZod';
+import { formatJson, minifyJson, repairCommonJson, validateJson } from '../../utils/jsonFormatter';
 import { translations, Language, t } from '../i18n';
 import { ICONS } from '../icons';
 
@@ -14,6 +15,7 @@ export class JsonTsZodView {
   private tsContainer!: HTMLElement;
   private zodContainer!: HTMLElement;
   private errorMsg!: HTMLElement;
+  private statusBadge!: HTMLElement;
 
   private latestTs: string = '';
   private latestZod: string = '';
@@ -45,7 +47,7 @@ export class JsonTsZodView {
       this.rootInput.value = state.rootName;
     }
     if (state.input) {
-      this.processConversion();
+      this.validateLive();
     }
   }
 
@@ -54,19 +56,51 @@ export class JsonTsZodView {
     const savedRoot = this.rootInput ? this.rootInput.value : 'Root';
 
     this.container.innerHTML = `
+      <!-- Formatter & Action Toolbar -->
+      <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+        <button id="json-fmt-2" class="btn btn-secondary" style="font-size: 10px; padding: 3px 6px;">
+          ${t('format2Spaces', this.currentLang)}
+        </button>
+        <button id="json-fmt-4" class="btn btn-secondary" style="font-size: 10px; padding: 3px 6px;">
+          ${t('format4Spaces', this.currentLang)}
+        </button>
+        <button id="json-minify" class="btn btn-secondary" style="font-size: 10px; padding: 3px 6px;">
+          ${t('minifyJson', this.currentLang)}
+        </button>
+        <button id="json-sort" class="btn btn-secondary" style="font-size: 10px; padding: 3px 6px;">
+          ${t('sortKeys', this.currentLang)}
+        </button>
+        <button id="json-autofix" class="btn btn-secondary" style="font-size: 10px; padding: 3px 6px;">
+          ${t('repairJson', this.currentLang)}
+        </button>
+      </div>
+
       <div class="form-group">
-        <div class="input-row" style="margin-bottom: 6px;">
-          <label class="form-label" style="margin: 0; white-space: nowrap;">${t('jsonRootNameLabel', this.currentLang)}</label>
-          <input type="text" id="json-root-name" class="input-text" value="${savedRoot}" style="max-width: 140px;" />
-          <button id="json-clear-btn" class="btn btn-secondary btn-icon-only" title="${t('clear', this.currentLang)}">
-            ${ICONS.clear}
-          </button>
+        <div class="input-row" style="margin-bottom: 6px; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label class="form-label" style="margin: 0; white-space: nowrap;">${t('jsonRootNameLabel', this.currentLang)}</label>
+            <input type="text" id="json-root-name" class="input-text" value="${savedRoot}" style="max-width: 100px; padding: 2px 5px;" />
+          </div>
+          <div style="display: flex; gap: 4px; align-items: center;">
+            <span id="json-status-badge" class="status-pill status-neutral" style="font-size: 10px; display: none;"></span>
+            <button id="json-clear-btn" class="btn btn-secondary btn-icon-only" title="${t('clear', this.currentLang)}">
+              ${ICONS.clear}
+            </button>
+          </div>
         </div>
-        <textarea id="json-input" class="input-textarea" placeholder="${t('jsonInputPlaceholder', this.currentLang)}" style="height: 110px;">${savedInput}</textarea>
+
+        <textarea id="json-input" class="input-textarea" placeholder="${t('jsonInputPlaceholder', this.currentLang)}" style="height: 120px;">${savedInput}</textarea>
         <div id="json-error" style="color: #f85149; font-size: 11px; margin-top: 4px; display: none;"></div>
-        <div class="btn-group">
+
+        <div class="btn-group" style="margin-top: 6px;">
           <button id="json-convert-btn" class="btn">
-            ${ICONS.sync} ${t('convert', this.currentLang)}
+            ${ICONS.sync} ${t('generate', this.currentLang)} TS & Zod
+          </button>
+          <button id="copy-json-btn" class="btn btn-secondary">
+            ${ICONS.copy} ${t('copy', this.currentLang)} JSON
+          </button>
+          <button id="insert-json-btn" class="btn btn-secondary" title="${t('insertAtCursor', this.currentLang)}">
+            ${ICONS.insert} ${t('insertAtCursor', this.currentLang)}
           </button>
           <button id="copy-both-btn" class="btn btn-secondary" style="display: none;">
             ${ICONS.copy} ${t('copyBoth', this.currentLang)}
@@ -74,6 +108,7 @@ export class JsonTsZodView {
         </div>
       </div>
 
+      <!-- Generated TypeScript Block -->
       <div id="ts-output-container" class="code-container" style="display: none;">
         <div class="code-header">
           <span>${t('jsonOutputTs', this.currentLang)}</span>
@@ -89,6 +124,7 @@ export class JsonTsZodView {
         <pre class="code-block" id="ts-code"></pre>
       </div>
 
+      <!-- Generated Zod Block -->
       <div id="zod-output-container" class="code-container" style="display: none;">
         <div class="code-header">
           <span>${t('jsonOutputZod', this.currentLang)}</span>
@@ -112,6 +148,7 @@ export class JsonTsZodView {
     this.tsContainer = this.container.querySelector('#ts-output-container') as HTMLElement;
     this.zodContainer = this.container.querySelector('#zod-output-container') as HTMLElement;
     this.errorMsg = this.container.querySelector('#json-error') as HTMLElement;
+    this.statusBadge = this.container.querySelector('#json-status-badge') as HTMLElement;
 
     this.attachEvents();
   }
@@ -124,20 +161,38 @@ export class JsonTsZodView {
     const copyZodBtn = this.container.querySelector('#copy-zod-btn') as HTMLButtonElement;
     const insertTsBtn = this.container.querySelector('#insert-ts-btn') as HTMLButtonElement;
     const insertZodBtn = this.container.querySelector('#insert-zod-btn') as HTMLButtonElement;
+    const copyJsonBtn = this.container.querySelector('#copy-json-btn') as HTMLButtonElement;
+    const insertJsonBtn = this.container.querySelector('#insert-json-btn') as HTMLButtonElement;
+
+    // Formatter toolbar buttons
+    this.container.querySelector('#json-fmt-2')?.addEventListener('click', () => this.applyFormat(2));
+    this.container.querySelector('#json-fmt-4')?.addEventListener('click', () => this.applyFormat(4));
+    this.container.querySelector('#json-minify')?.addEventListener('click', () => this.applyMinify());
+    this.container.querySelector('#json-sort')?.addEventListener('click', () => this.applySortKeys());
+    this.container.querySelector('#json-autofix')?.addEventListener('click', () => this.applyAutoFix());
 
     convertBtn?.addEventListener('click', () => this.processConversion());
-    this.inputArea?.addEventListener('input', () => {
-      if (this.inputArea.value.trim().length > 0) {
-        this.processConversion();
-      }
-    });
+    this.inputArea?.addEventListener('input', () => this.validateLive());
 
     clearBtn?.addEventListener('click', () => {
       this.inputArea.value = '';
       this.tsContainer.style.display = 'none';
       this.zodContainer.style.display = 'none';
       this.errorMsg.style.display = 'none';
+      this.statusBadge.style.display = 'none';
       if (copyBothBtn) copyBothBtn.style.display = 'none';
+    });
+
+    copyJsonBtn?.addEventListener('click', () => {
+      if (this.inputArea.value) {
+        this.copyText(this.inputArea.value, copyJsonBtn);
+      }
+    });
+
+    insertJsonBtn?.addEventListener('click', () => {
+      if (this.inputArea.value) {
+        this.onMessage({ type: 'insertText', text: this.inputArea.value });
+      }
     });
 
     copyTsBtn?.addEventListener('click', () => {
@@ -160,6 +215,84 @@ export class JsonTsZodView {
     insertZodBtn?.addEventListener('click', () => {
       this.onMessage({ type: 'insertText', text: this.latestZod });
     });
+  }
+
+  private validateLive() {
+    const raw = this.inputArea.value.trim();
+    if (!raw) {
+      this.statusBadge.style.display = 'none';
+      this.errorMsg.style.display = 'none';
+      return;
+    }
+
+    const res = validateJson(raw);
+    this.statusBadge.style.display = 'inline-flex';
+
+    if (res.isValid) {
+      this.statusBadge.className = 'status-pill status-valid';
+      this.statusBadge.textContent = t('jsonValidBadge', this.currentLang);
+      this.errorMsg.style.display = 'none';
+    } else {
+      this.statusBadge.className = 'status-pill status-expired';
+      this.statusBadge.textContent = t('jsonInvalidBadge', this.currentLang);
+      const loc = res.line && res.column ? ` (Line ${res.line}, Col ${res.column})` : '';
+      this.errorMsg.textContent = `${res.error}${loc}`;
+      this.errorMsg.style.display = 'block';
+    }
+  }
+
+  private applyFormat(spaces: number) {
+    const raw = this.inputArea.value.trim();
+    if (!raw) return;
+
+    const res = formatJson(raw, spaces);
+    if (res.isValid) {
+      this.inputArea.value = res.output;
+      this.validateLive();
+    } else {
+      this.errorMsg.textContent = res.error || t('invalidJson', this.currentLang);
+      this.errorMsg.style.display = 'block';
+    }
+  }
+
+  private applyMinify() {
+    const raw = this.inputArea.value.trim();
+    if (!raw) return;
+
+    const res = minifyJson(raw);
+    if (res.isValid) {
+      this.inputArea.value = res.output;
+      this.validateLive();
+    } else {
+      this.errorMsg.textContent = res.error || t('invalidJson', this.currentLang);
+      this.errorMsg.style.display = 'block';
+    }
+  }
+
+  private applySortKeys() {
+    const raw = this.inputArea.value.trim();
+    if (!raw) return;
+
+    const res = formatJson(raw, 2, true);
+    if (res.isValid) {
+      this.inputArea.value = res.output;
+      this.validateLive();
+    }
+  }
+
+  private applyAutoFix() {
+    const raw = this.inputArea.value.trim();
+    if (!raw) return;
+
+    const repaired = repairCommonJson(raw);
+    const res = formatJson(repaired, 2);
+    if (res.isValid) {
+      this.inputArea.value = res.output;
+      this.validateLive();
+    } else {
+      this.inputArea.value = repaired;
+      this.validateLive();
+    }
   }
 
   private processConversion() {

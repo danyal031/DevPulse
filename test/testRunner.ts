@@ -15,6 +15,9 @@ import {
 } from '../src/utils/persianSanitizer';
 import { parseJwt, formatTimeSpan } from '../src/utils/jwt';
 import { generateTsAndZod } from '../src/utils/jsonToTsZod';
+import { formatJson, minifyJson, repairCommonJson, validateJson } from '../src/utils/jsonFormatter';
+import { getSystemNetworkInfo } from '../src/utils/networkInfo';
+import { generateConventionalCommit } from '../src/utils/gitCommit';
 import {
   generateUuidV4,
   generateUlid,
@@ -31,29 +34,24 @@ function runTests() {
 
   // 1. JALALI TESTS
   console.log('[Test 1] Jalali Mathematical Conversion');
-  // 2026-11-02 -> 1405/08/11
   const jDate = gregorianToJalali(2026, 11, 2);
   assert.strictEqual(jDate.jy, 1405);
   assert.strictEqual(jDate.jm, 8);
   assert.strictEqual(jDate.jd, 11);
 
-  // Reverse: 1405/08/11 -> 2026-11-02
   const gDate = jalaliToGregorian(1405, 8, 11);
   assert.strictEqual(gDate.gy, 2026);
   assert.strictEqual(gDate.gm, 11);
   assert.strictEqual(gDate.gd, 2);
 
-  // Now test Norooz (1 Farvardin 1403 = 20 March 2024 - leap year)
   const norooz = gregorianToJalali(2024, 3, 20);
   assert.strictEqual(norooz.jy, 1403);
   assert.strictEqual(norooz.jm, 1);
   assert.strictEqual(norooz.jd, 1);
 
-  // Leap year check
   assert.strictEqual(isJalaliLeapYear(1403), true);
   assert.strictEqual(isJalaliLeapYear(1404), false);
 
-  // Parse Jalali string
   const parsed = parseJalaliString('1405/08/11');
   assert.ok(parsed);
   assert.strictEqual(parsed.jy, 1405);
@@ -79,7 +77,6 @@ function runTests() {
 
   // 3. JWT PARSER TESTS
   console.log('[Test 3] JWT Inspector');
-  // Sample JWT: { "alg": "HS256", "typ": "JWT" } . { "sub": "1234567890", "name": "Ali Reza", "iat": 1516239022, "exp": 1516242622 }
   const sampleJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFsaSBSZXphIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyNDI2MjJ9.4z7kR377v4zJ4T0vD9y8q1K8K8K8K8K8K8K8K8K8K8K';
   const decoded = parseJwt(sampleJwt);
   assert.strictEqual(decoded.header.alg, 'HS256');
@@ -123,14 +120,12 @@ function runTests() {
   const sec32 = generateSecret(32, 'hex');
   assert.strictEqual(sec32.length, 64);
 
-  // Generate 100 Iranian National Codes and verify 100% pass modulo 11 validation!
   for (let i = 0; i < 100; i++) {
     const code = generateIranianNationalCode();
     assert.strictEqual(code.length, 10);
     assert.strictEqual(isValidIranianNationalCode(code), true, `Code ${code} failed validation`);
   }
 
-  // Verify invalid national codes fail
   assert.strictEqual(isValidIranianNationalCode('1111111111'), false);
   assert.strictEqual(isValidIranianNationalCode('1234567890'), false);
 
@@ -144,6 +139,48 @@ function runTests() {
   const sheba = generateIranianSheba();
   assert.ok(sheba.startsWith('IR'));
   assert.strictEqual(sheba.length, 26);
+
+  // 6. JSON FORMATTER, MINIFIER & VALIDATOR TESTS
+  console.log('[Test 6] JSON Formatter, Minifier & Validator');
+  const unformatted = '{"b":2,"a":1}';
+  const fmt2 = formatJson(unformatted, 2);
+  assert.strictEqual(fmt2.isValid, true);
+  assert.ok(fmt2.output.includes('  "b": 2'));
+
+  const sorted = formatJson(unformatted, 2, true);
+  assert.ok(sorted.output.indexOf('"a"') < sorted.output.indexOf('"b"'));
+
+  const min = minifyJson('{\n  "name": "DevShelf"\n}');
+  assert.strictEqual(min.output, '{"name":"DevShelf"}');
+
+  const invalidVal = validateJson('{ bad: json }');
+  assert.strictEqual(invalidVal.isValid, false);
+  assert.ok(invalidVal.error);
+
+  const repaired = repairCommonJson("{ name: 'DevShelf', count: 10, }");
+  const parsedRepaired = JSON.parse(repaired);
+  assert.strictEqual(parsedRepaired.name, 'DevShelf');
+  assert.strictEqual(parsedRepaired.count, 10);
+
+  // 7. SYSTEM NETWORK INFO TESTS
+  console.log('[Test 7] System Network Info');
+  const netInfo = getSystemNetworkInfo();
+  assert.ok(netInfo.hostname);
+  assert.ok(netInfo.primaryIpv4);
+  assert.match(netInfo.primaryIpv4, /^\d+\.\d+\.\d+\.\d+$/);
+
+  // 8. GIT CONVENTIONAL COMMIT GENERATOR TESTS
+  console.log('[Test 8] Git Conventional Commit Generator');
+  const sampleChanges = [
+    { status: 'M' as const, filePath: 'src/utils/portManager.ts' },
+    { status: 'A' as const, filePath: 'src/utils/networkInfo.ts' }
+  ];
+  const commit = generateConventionalCommit(sampleChanges);
+  assert.strictEqual(commit.type, 'feat');
+  assert.strictEqual(commit.scope, 'network');
+  assert.ok(commit.fullMessage.startsWith('feat(network):'));
+  assert.ok(commit.fullMessage.includes('- update src/utils/portManager.ts'));
+  assert.ok(commit.fullMessage.includes('- add src/utils/networkInfo.ts'));
 
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');
 }
