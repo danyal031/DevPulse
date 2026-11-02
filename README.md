@@ -47,7 +47,22 @@
 - **Intelligent Diff Analysis:** Scans staged and working tree changes, determines type (`feat`, `fix`, `docs`, `style`, `refactor`, `chore`, `test`) and scope, and generates a standards-compliant Conventional Commit message.
 - **Direct Input Box Injection:** Automatically places the generated message directly into the VS Code commit input box with a single click.
 
-### 6. Crypto, ID & Mock Data Generator
+### 6. Git Command Wizard & Rescue Kit (جادوگر دستورات گیت)
+- **Interactive Scenario Builder:** Provides dynamic forms for 10 common and complex Git workflows:
+  - Modify last commit (`--amend`) with/without editing message.
+  - Undo local commits with exact target (`--soft`, `--mixed`, `--hard`).
+  - Stash changes including untracked new files (`git stash push -u`).
+  - Squash recent N commits into one clean commit.
+  - Create, switch, and base new branches.
+  - Delete local and/or remote branches safely or forcefully.
+  - Discard uncommitted changes or unstage specific files.
+  - Cherry-pick commits with or without auto-committing.
+  - Recover lost commits or deleted branches via `reflog`.
+  - Remote sync with lease (`--force-with-lease`) and fetch pruning.
+- **Live Command Preview & Terminal Dispatch:** Instantly renders the terminal-ready command and allows 1-click **Copy Command** or **Run in VS Code Terminal** directly inside the active workspace.
+- **Searchable Rescue Cheat Sheet:** Searchable, categorized emergency toolkit for everyday, undo, branching, remote, and advanced rescue operations.
+
+### 7. Crypto, ID & Mock Data Generator
 - **Identifier Generators:** Cryptographically secure UUID v4 (RFC 4122) and 26-character sortable ULID (Crockford Base32).
 - **Secure Secrets:** Generate 32-byte and 64-byte Hex and Base64 secrets for `.env` files (`AUTH_SECRET`, `JWT_SECRET`, etc.).
 - **Live Hasher & Codecs:** Real-time SHA-256 hash generation and Unicode-safe Base64 / URL encoder-decoder.
@@ -65,6 +80,8 @@
 | :--- | :--- | :--- |
 | `devshelf.generateCommitMessage` | `DevShelf: Generate Conventional Commit Message` | SCM Toolbar, Commit Input Box & Palette |
 | `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
+| `devshelf.openGitWizard` | `DevShelf: Open Git Command Wizard` | Command Palette |
+| `devshelf.gitCheatSheet` | `DevShelf: Git Rescue Cheat Sheet` | Command Palette |
 | `devshelf.copySystemIp` | `DevShelf: Copy Local System IP` | Command Palette |
 | `devshelf.formatJson` | `DevShelf: Format JSON in Selection` | Editor Context Menu & Command Palette |
 | `devshelf.normalizePersianSelection` | `DevShelf: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
@@ -99,6 +116,7 @@
 │   │   ├── portManager.ts       # Process tree killer & TCP port scanner
 │   │   ├── networkInfo.ts       # System IP, hostname & interfaces info
 │   │   ├── gitCommit.ts         # Conventional commit message generator
+│   │   ├── gitScenarios.ts      # Git Wizard interactive scenarios & rescue cheat sheet
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
@@ -107,7 +125,7 @@
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   └── testRunner.ts            # 8 unit test suites
+│   └── testRunner.ts            # 9 unit test suites
 ├── esbuild.js                   # Fast bundler config
 ├── package.json                 # Extension manifest & contributions
 ├── tsconfig.json                # Strict TypeScript configuration

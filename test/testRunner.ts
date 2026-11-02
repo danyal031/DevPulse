@@ -18,6 +18,8 @@ import { generateTsAndZod } from '../src/utils/jsonToTsZod';
 import { formatJson, minifyJson, repairCommonJson, validateJson } from '../src/utils/jsonFormatter';
 import { getSystemNetworkInfo } from '../src/utils/networkInfo';
 import { generateConventionalCommit } from '../src/utils/gitCommit';
+import { GIT_SCENARIOS, GIT_CHEAT_SHEET } from '../src/utils/gitScenarios';
+import { translations } from '../src/webview/i18n';
 import {
   generateUuidV4,
   generateUlid,
@@ -181,6 +183,88 @@ function runTests() {
   assert.ok(commit.fullMessage.startsWith('feat(network):'));
   assert.ok(commit.fullMessage.includes('- update src/utils/portManager.ts'));
   assert.ok(commit.fullMessage.includes('- add src/utils/networkInfo.ts'));
+
+  // 9. GIT COMMAND WIZARD & CHEAT SHEET TESTS
+  console.log('[Test 9] Git Command Wizard & Rescue Cheat Sheet');
+  assert.ok(GIT_SCENARIOS.length >= 10, 'Expected at least 10 git scenarios');
+  assert.ok(GIT_CHEAT_SHEET.length >= 10, 'Expected at least 10 cheat sheet items');
+
+  // Verify scenario generator outputs
+  const amendScen = GIT_SCENARIOS.find((s) => s.id === 'amend_commit');
+  assert.ok(amendScen);
+  assert.strictEqual(
+    amendScen.generate({ mode: 'no-edit', includeAll: true }),
+    'git add -A && git commit --amend --no-edit'
+  );
+  assert.strictEqual(
+    amendScen.generate({ mode: 'new-msg', newMessage: 'fix: edge case', includeAll: false }),
+    'git commit --amend -m "fix: edge case"'
+  );
+
+  const undoScen = GIT_SCENARIOS.find((s) => s.id === 'undo_commits');
+  assert.ok(undoScen);
+  assert.strictEqual(
+    undoScen.generate({ resetType: 'soft', count: 2 }),
+    'git reset --soft HEAD~2'
+  );
+  assert.strictEqual(
+    undoScen.generate({ resetType: 'hard', count: 1 }),
+    'git reset --hard HEAD~1'
+  );
+
+  const stashScen = GIT_SCENARIOS.find((s) => s.id === 'stash_save');
+  assert.ok(stashScen);
+  assert.strictEqual(
+    stashScen.generate({ action: 'push', includeUntracked: true, message: 'WIP task' }),
+    'git stash push -u -m "WIP task"'
+  );
+
+  const squashScen = GIT_SCENARIOS.find((s) => s.id === 'squash_commits');
+  assert.ok(squashScen);
+  assert.strictEqual(
+    squashScen.generate({ count: 4, newMessage: 'refactor: cleanup' }),
+    'git reset --soft HEAD~4 && git commit -m "refactor: cleanup"'
+  );
+
+  const reflogScen = GIT_SCENARIOS.find((s) => s.id === 'reflog_recover');
+  assert.ok(reflogScen);
+  assert.strictEqual(
+    reflogScen.generate({ step: 'recover', commitHash: 'd7a12b9', recoveredBranch: 'feature-login' }),
+    'git branch feature-login d7a12b9 && git checkout feature-login'
+  );
+
+  // Verify complete i18n dictionary coverage for scenarios
+  for (const scen of GIT_SCENARIOS) {
+    assert.ok(scen.id, 'Scenario must have id');
+    assert.ok((translations.en as any)[scen.titleKey], `Missing EN titleKey: ${scen.titleKey}`);
+    assert.ok((translations.fa as any)[scen.titleKey], `Missing FA titleKey: ${scen.titleKey}`);
+    assert.ok((translations.en as any)[scen.descKey], `Missing EN descKey: ${scen.descKey}`);
+    assert.ok((translations.fa as any)[scen.descKey], `Missing FA descKey: ${scen.descKey}`);
+
+    for (const input of scen.inputs) {
+      assert.ok((translations.en as any)[input.labelKey], `Missing EN labelKey: ${input.labelKey}`);
+      assert.ok((translations.fa as any)[input.labelKey], `Missing FA labelKey: ${input.labelKey}`);
+      if (input.placeholderKey) {
+        assert.ok((translations.en as any)[input.placeholderKey], `Missing EN placeholderKey: ${input.placeholderKey}`);
+        assert.ok((translations.fa as any)[input.placeholderKey], `Missing FA placeholderKey: ${input.placeholderKey}`);
+      }
+      if (input.options) {
+        for (const opt of input.options) {
+          assert.ok((translations.en as any)[opt.labelKey], `Missing EN option labelKey: ${opt.labelKey}`);
+          assert.ok((translations.fa as any)[opt.labelKey], `Missing FA option labelKey: ${opt.labelKey}`);
+        }
+      }
+    }
+  }
+
+  // Verify complete i18n dictionary coverage for cheat sheet
+  for (const cs of GIT_CHEAT_SHEET) {
+    assert.ok(cs.command, 'Cheat sheet must have a command');
+    assert.ok((translations.en as any)[cs.titleKey], `Missing EN titleKey: ${cs.titleKey}`);
+    assert.ok((translations.fa as any)[cs.titleKey], `Missing FA titleKey: ${cs.titleKey}`);
+    assert.ok((translations.en as any)[cs.descKey], `Missing EN descKey: ${cs.descKey}`);
+    assert.ok((translations.fa as any)[cs.descKey], `Missing FA descKey: ${cs.descKey}`);
+  }
 
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');
 }

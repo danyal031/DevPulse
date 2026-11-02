@@ -96,6 +96,25 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
 
+        case 'runTerminalCommand': {
+          try {
+            const cwd = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+            let terminal = vscode.window.terminals.find((t) => t.name === 'DevShelf Terminal') || vscode.window.activeTerminal;
+            if (!terminal) {
+              terminal = vscode.window.createTerminal({
+                name: 'DevShelf Terminal',
+                cwd
+              });
+            }
+            terminal.show(true);
+            terminal.sendText(data.command);
+            vscode.window.showInformationMessage(`DevShelf: Executing in terminal: ${data.command}`);
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Terminal Error: ${err.message}`);
+          }
+          break;
+        }
+
         case 'languageChanged': {
           await this._context.globalState.update('devshelf.language', data.lang);
           break;

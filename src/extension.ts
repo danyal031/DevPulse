@@ -13,6 +13,8 @@ import { formatJson } from './utils/jsonFormatter';
 import { scanListeningPorts, killProcessByPid } from './utils/portManager';
 import { getSystemNetworkInfo } from './utils/networkInfo';
 import { getGitChanges, generateConventionalCommit } from './utils/gitCommit';
+import { GIT_CHEAT_SHEET } from './utils/gitScenarios';
+import { translations } from './webview/i18n';
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
@@ -365,6 +367,67 @@ export function activate(context: vscode.ExtensionContext) {
           const editor = vscode.window.activeTextEditor;
           if (editor) {
             editor.edit((eb) => eb.insert(editor.selection.active, commit.fullMessage));
+          }
+        }
+      }
+    })
+  );
+
+  // Command 11: Open Git Command Wizard
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openGitWizard', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('git');
+    })
+  );
+
+  // Command 12: Git Rescue Cheat Sheet QuickPick
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.gitCheatSheet', async () => {
+      const savedLang = context.globalState.get<string>('devshelf.language', 'en');
+      const isFa = savedLang === 'fa';
+      const dict = isFa ? translations.fa : translations.en;
+
+      const items = GIT_CHEAT_SHEET.map((item) => {
+        const title = (dict as any)[item.titleKey] || item.id;
+        const desc = (dict as any)[item.descKey] || '';
+        return {
+          label: item.command,
+          description: title,
+          detail: desc,
+          command: item.command
+        };
+      });
+
+      const selected = await vscode.window.showQuickPick(items, {
+        placeHolder: isFa ? 'جستجو و انتخاب دستور گیت:' : 'Search and select a Git rescue command:',
+        matchOnDescription: true,
+        matchOnDetail: true
+      });
+
+      if (selected) {
+        const action = await vscode.window.showInformationMessage(
+          `DevShelf Git: ${selected.command}`,
+          'Run in Terminal',
+          'Copy Command',
+          'Insert in Editor'
+        );
+
+        if (action === 'Run in Terminal') {
+          const cwd = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+          let terminal = vscode.window.terminals.find((t) => t.name === 'DevShelf Terminal') || vscode.window.activeTerminal;
+          if (!terminal) {
+            terminal = vscode.window.createTerminal({ name: 'DevShelf Terminal', cwd });
+          }
+          terminal.show(true);
+          terminal.sendText(selected.command);
+        } else if (action === 'Copy Command') {
+          await vscode.env.clipboard.writeText(selected.command);
+          vscode.window.showInformationMessage(`DevShelf: Copied "${selected.command}" to clipboard.`);
+        } else if (action === 'Insert in Editor') {
+          const editor = vscode.window.activeTextEditor;
+          if (editor) {
+            editor.edit((eb) => eb.insert(editor.selection.active, selected.command));
           }
         }
       }

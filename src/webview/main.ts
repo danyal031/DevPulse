@@ -4,6 +4,7 @@ import { JsonTsZodView } from './components/JsonTsZodView';
 import { JwtView } from './components/JwtView';
 import { PersianJalaliView } from './components/PersianJalaliView';
 import { PortManagerView } from './components/PortManagerView';
+import { GitWizardView } from './components/GitWizardView';
 import { CryptoMockView } from './components/CryptoMockView';
 
 declare function acquireVsCodeApi(): {
@@ -22,6 +23,7 @@ class DevShelfApp {
   private jwtView!: JwtView;
   private persianView!: PersianJalaliView;
   private portView!: PortManagerView;
+  private gitView!: GitWizardView;
   private cryptoView!: CryptoMockView;
 
   constructor() {
@@ -52,6 +54,7 @@ class DevShelfApp {
       jsonState: this.jsonView ? this.jsonView.getState() : undefined,
       jwtState: this.jwtView ? this.jwtView.getState() : undefined,
       persianState: this.persianView ? this.persianView.getState() : undefined,
+      gitState: this.gitView ? this.gitView.getState() : undefined,
       cryptoState: this.cryptoView ? this.cryptoView.getState() : undefined
     });
   }
@@ -74,6 +77,7 @@ class DevShelfApp {
         <button class="tab-btn" data-tab="jwt" id="tab-nav-jwt">${t('tabJwt', this.currentLang)}</button>
         <button class="tab-btn" data-tab="persian" id="tab-nav-persian">${t('tabPersian', this.currentLang)}</button>
         <button class="tab-btn" data-tab="ports" id="tab-nav-ports">${t('tabPorts', this.currentLang)}</button>
+        <button class="tab-btn" data-tab="git" id="tab-nav-git">${t('tabGit', this.currentLang)}</button>
         <button class="tab-btn" data-tab="crypto" id="tab-nav-crypto">${t('tabCrypto', this.currentLang)}</button>
       </nav>
 
@@ -82,6 +86,7 @@ class DevShelfApp {
         <div id="view-jwt" class="view-panel"></div>
         <div id="view-persian" class="view-panel"></div>
         <div id="view-ports" class="view-panel"></div>
+        <div id="view-git" class="view-panel"></div>
         <div id="view-crypto" class="view-panel"></div>
       </main>
     `;
@@ -94,12 +99,14 @@ class DevShelfApp {
     const jwtContainer = document.getElementById('view-jwt')!;
     const persianContainer = document.getElementById('view-persian')!;
     const portsContainer = document.getElementById('view-ports')!;
+    const gitContainer = document.getElementById('view-git')!;
     const cryptoContainer = document.getElementById('view-crypto')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
     this.jwtView = new JwtView(jwtContainer, this.currentLang, postToHost);
     this.persianView = new PersianJalaliView(persianContainer, this.currentLang, postToHost);
     this.portView = new PortManagerView(portsContainer, this.currentLang, postToHost);
+    this.gitView = new GitWizardView(gitContainer, this.currentLang, postToHost);
     this.cryptoView = new CryptoMockView(cryptoContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
@@ -107,6 +114,7 @@ class DevShelfApp {
       if (state.jsonState) this.jsonView.restoreState(state.jsonState);
       if (state.jwtState) this.jwtView.restoreState(state.jwtState);
       if (state.persianState) this.persianView.restoreState(state.persianState);
+      if (state.gitState) this.gitView.restoreState(state.gitState);
       if (state.cryptoState) this.cryptoView.restoreState(state.cryptoState);
     }
   }
@@ -192,6 +200,9 @@ class DevShelfApp {
     const tabPorts = document.getElementById('tab-nav-ports');
     if (tabPorts) tabPorts.textContent = t('tabPorts', this.currentLang);
 
+    const tabGit = document.getElementById('tab-nav-git');
+    if (tabGit) tabGit.textContent = t('tabGit', this.currentLang);
+
     const tabCrypto = document.getElementById('tab-nav-crypto');
     if (tabCrypto) tabCrypto.textContent = t('tabCrypto', this.currentLang);
 
@@ -199,6 +210,7 @@ class DevShelfApp {
     this.jwtView.setLanguage(this.currentLang);
     this.persianView.setLanguage(this.currentLang);
     this.portView.setLanguage(this.currentLang);
+    this.gitView.setLanguage(this.currentLang);
     this.cryptoView.setLanguage(this.currentLang);
   }
 

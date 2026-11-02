@@ -33,6 +33,8 @@
     "json-to-typescript",
     "json-formatter",
     "commit-generator",
+    "git-wizard",
+    "git-cheat-sheet",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -47,7 +49,9 @@
     "onCommand:devshelf.formatJson",
     "onCommand:devshelf.killPort",
     "onCommand:devshelf.copySystemIp",
-    "onCommand:devshelf.generateCommitMessage"
+    "onCommand:devshelf.generateCommitMessage",
+    "onCommand:devshelf.openGitWizard",
+    "onCommand:devshelf.gitCheatSheet"
   ],
   "contributes": {
     "viewsContainers": {
@@ -120,6 +124,16 @@
         "title": "Generate Conventional Commit Message",
         "category": "DevShelf",
         "icon": "media/commit-icon.svg"
+      },
+      {
+        "command": "devshelf.openGitWizard",
+        "title": "Open Git Command Wizard",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.gitCheatSheet",
+        "title": "Git Rescue Cheat Sheet",
+        "category": "DevShelf"
       }
     ],
     "menus": {
