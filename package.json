@@ -1,0 +1,127 @@
+{
+  "name": "kaarbox",
+  "displayName": "Kaarbox (کارباکس)",
+  "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
+  "version": "1.0.0",
+  "publisher": "kaarbox",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Formatters",
+    "Snippets"
+  ],
+  "keywords": [
+    "persian",
+    "jalali",
+    "jwt",
+    "zod",
+    "port-killer",
+    "offline",
+    "farsi",
+    "json-to-typescript"
+  ],
+  "main": "./dist/extension.js",
+  "icon": "media/kaarbox-icon.svg",
+  "activationEvents": [
+    "onView:kaarbox.sidebarView",
+    "onCommand:kaarbox.openSidebar",
+    "onCommand:kaarbox.normalizePersianSelection",
+    "onCommand:kaarbox.convertToJalali",
+    "onCommand:kaarbox.generateUuid",
+    "onCommand:kaarbox.generateSecret",
+    "onCommand:kaarbox.jsonToTypescript",
+    "onCommand:kaarbox.killPort"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "kaarbox-activitybar",
+          "title": "Kaarbox (کارباکس)",
+          "icon": "media/kaarbox-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "kaarbox-activitybar": [
+        {
+          "type": "webview",
+          "id": "kaarbox.sidebarView",
+          "name": "Kaarbox",
+          "icon": "media/kaarbox-icon.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "kaarbox.openSidebar",
+        "title": "Open Developer Swiss Army Knife",
+        "category": "Kaarbox"
+      },
+      {
+        "command": "kaarbox.normalizePersianSelection",
+        "title": "Normalize Persian Text & Digits in Selection",
+        "category": "Kaarbox"
+      },
+      {
+        "command": "kaarbox.convertToJalali",
+        "title": "Convert Date or Timestamp to Jalali",
+        "category": "Kaarbox"
+      },
+      {
+        "command": "kaarbox.generateUuid",
+        "title": "Generate UUID v4 at Cursor",
+        "category": "Kaarbox"
+      },
+      {
+        "command": "kaarbox.generateSecret",
+        "title": "Generate 64-Byte Secure Secret",
+        "category": "Kaarbox"
+      },
+      {
+        "command": "kaarbox.jsonToTypescript",
+        "title": "Convert Selected JSON to TypeScript & Zod",
+        "category": "Kaarbox"
+      },
+      {
+        "command": "kaarbox.killPort",
+        "title": "Kill Process on Port...",
+        "category": "Kaarbox"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "kaarbox.normalizePersianSelection",
+          "when": "editorHasSelection",
+          "group": "kaarbox@1"
+        },
+        {
+          "command": "kaarbox.jsonToTypescript",
+          "when": "editorHasSelection",
+          "group": "kaarbox@2"
+        },
+        {
+          "command": "kaarbox.convertToJalali",
+          "when": "editorHasSelection",
+          "group": "kaarbox@3"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "build": "node esbuild.js --production",
+    "test": "node -e \"require('esbuild').buildSync({entryPoints: ['test/testRunner.ts'], outfile: 'test/testBundle.tmp.js', bundle: true, platform: 'node', format: 'cjs'}); require('./test/testBundle.tmp.js'); require('fs').unlinkSync('./test/testBundle.tmp.js');\""
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.20.1",
+    "typescript": "^5.3.3"
+  }
+}
