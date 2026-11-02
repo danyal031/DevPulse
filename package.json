@@ -7,12 +7,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/danyal031/DevShelf"
+    "url": "https://github.com/danyal031/DevPulse"
   },
   "bugs": {
-    "url": "https://github.com/danyal031/DevShelf/issues"
+    "url": "https://github.com/danyal031/DevPulse/issues"
   },
-  "homepage": "https://github.com/danyal031/DevShelf#readme",
+  "homepage": "https://github.com/danyal031/DevPulse#readme",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
