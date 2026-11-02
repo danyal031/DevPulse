@@ -1,9 +1,9 @@
 {
   "name": "devshelf",
-  "displayName": "DevShelf (دِوشلف)",
+  "displayName": "DevShelf",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
   "version": "1.0.0",
-  "publisher": "danyal031",
+  "publisher": "danial031",
   "license": "MIT",
   "repository": {
     "type": "git",
