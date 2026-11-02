@@ -3,7 +3,17 @@
   "displayName": "DevPulse (دِوپالس)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
   "version": "1.0.0",
-  "publisher": "devpulse",
+  "publisher": "danyal031",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danyal031/DevPulse"
+  },
+  "bugs": {
+    "url": "https://github.com/danyal031/DevPulse/issues"
+  },
+  "homepage": "https://github.com/danyal031/DevPulse#readme",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -24,7 +34,6 @@
     "devpulse"
   ],
   "main": "./dist/extension.js",
-  "icon": "media/devpulse-icon.svg",
   "activationEvents": [
     "onView:devpulse.sidebarView",
     "onCommand:devpulse.openSidebar",
@@ -117,11 +126,13 @@
     "compile": "node esbuild.js",
     "watch": "node esbuild.js --watch",
     "build": "node esbuild.js --production",
-    "test": "node -e \"require('esbuild').buildSync({entryPoints: ['test/testRunner.ts'], outfile: 'test/testBundle.tmp.js', bundle: true, platform: 'node', format: 'cjs'}); require('./test/testBundle.tmp.js'); require('fs').unlinkSync('./test/testBundle.tmp.js');\""
+    "test": "node -e \"require('esbuild').buildSync({entryPoints: ['test/testRunner.ts'], outfile: 'test/testBundle.tmp.js', bundle: true, platform: 'node', format: 'cjs'}); require('./test/testBundle.tmp.js'); require('fs').unlinkSync('./test/testBundle.tmp.js');\"",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
     "esbuild": "^0.20.1",
     "typescript": "^5.3.3"
   }
