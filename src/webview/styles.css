@@ -374,3 +374,424 @@ body {
   color: var(--vscode-descriptionForeground);
   font-size: 11px;
 }
+
+/* Docker Quick Deck Styles */
+.docker-view-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.docker-containers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docker-card {
+  background-color: var(--devshelf-editor-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s ease;
+}
+
+.docker-card.is-running {
+  border-inline-start: 3px solid var(--vscode-testing-iconPassed, #3fb950);
+}
+
+.docker-card.is-stopped {
+  border-inline-start: 3px solid var(--vscode-disabledForeground, #8b949e);
+}
+
+.docker-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.docker-name-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.docker-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-running {
+  background-color: var(--vscode-testing-iconPassed, #3fb950);
+  box-shadow: 0 0 5px rgba(63, 185, 80, 0.4);
+}
+
+.dot-stopped {
+  background-color: var(--vscode-disabledForeground, #8b949e);
+}
+
+.docker-container-name {
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.docker-container-id {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  direction: ltr;
+}
+
+.docker-status-text {
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  white-space: nowrap;
+}
+
+.docker-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 2px;
+}
+
+.docker-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.docker-meta-label {
+  color: var(--vscode-descriptionForeground);
+  font-size: 10px;
+  min-width: 42px;
+}
+
+.docker-meta-val {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+}
+
+.docker-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--devshelf-border);
+}
+
+.btn-xs {
+  padding: 2px 7px;
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Docker Logs Modal / Panel */
+.docker-logs-panel {
+  border: 1px solid var(--vscode-focusBorder, var(--devshelf-border));
+  background-color: var(--devshelf-editor-bg);
+  border-radius: 4px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.logs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--devshelf-border);
+  background-color: var(--devshelf-panel-bg);
+}
+
+.logs-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logs-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logs-viewer-body {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.logs-content {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+  user-select: text;
+}
+
+/* API Tester Styles */
+.api-tester-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.api-request-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.api-method-select {
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--devshelf-border);
+  background-color: var(--vscode-dropdown-background);
+  color: var(--vscode-dropdown-foreground);
+  cursor: pointer;
+  width: 82px;
+  flex-shrink: 0;
+}
+
+.method-get { color: #58a6ff; }
+.method-post { color: #3fb950; }
+.method-put { color: #d29922; }
+.method-patch { color: #bc8cff; }
+.method-delete { color: #f85149; }
+
+.api-url-input {
+  flex: 1;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  direction: ltr;
+  text-align: left;
+}
+
+.api-send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.api-subtabs-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--devshelf-border);
+  padding-bottom: 4px;
+}
+
+.subtab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.subtab-btn:hover {
+  color: var(--vscode-foreground);
+}
+
+.subtab-btn.active {
+  background-color: var(--vscode-list-activeSelectionBackground);
+  color: var(--vscode-list-activeSelectionForeground);
+}
+
+.headers-editor-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.headers-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-enable-check {
+  cursor: pointer;
+}
+
+.header-key-input,
+.header-val-input {
+  flex: 1;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  direction: ltr;
+  text-align: left;
+}
+
+.body-editor-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.body-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* API Response Styles */
+.api-response-container {
+  margin-top: 6px;
+}
+
+.response-card {
+  border: 1px solid var(--devshelf-border);
+  border-radius: 4px;
+  background-color: var(--devshelf-editor-bg);
+  padding: 8px 10px;
+}
+
+.response-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--devshelf-border);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.status-2xx {
+  background-color: rgba(63, 185, 80, 0.15);
+  color: var(--vscode-testing-iconPassed, #3fb950);
+  border: 1px solid rgba(63, 185, 80, 0.3);
+}
+
+.status-3xx {
+  background-color: rgba(210, 153, 34, 0.15);
+  color: #d29922;
+  border: 1px solid rgba(210, 153, 34, 0.3);
+}
+
+.status-error {
+  background-color: rgba(248, 81, 73, 0.15);
+  color: var(--vscode-testing-iconFailed, #f85149);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+}
+
+.meta-item {
+  display: inline-flex;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.meta-label {
+  color: var(--vscode-descriptionForeground);
+}
+
+.meta-val {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-weight: 500;
+  direction: ltr;
+}
+
+.resp-body-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.resp-body-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resp-code-view {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  line-height: 1.4;
+  max-height: 260px;
+  overflow-y: auto;
+  background-color: var(--devshelf-panel-bg);
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid var(--devshelf-border);
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+  user-select: text;
+}
+
+.headers-display-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+.headers-display-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--devshelf-border);
+}
+
+.headers-display-table .header-name {
+  color: var(--vscode-descriptionForeground);
+  font-weight: 500;
+  width: 40%;
+  direction: ltr;
+  text-align: left;
+}
+
+.headers-display-table .header-val {
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+}
+

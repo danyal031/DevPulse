@@ -72,6 +72,17 @@
   - Valid 10-digit Iranian Postal Code.
   - Valid Iranian IBAN / Sheba (`IR...`) with ISO 7064 Modulo 97-10 check digits.
 
+### 8. Docker Quick Deck (مدیریت کانتینرها و سرویس‌های داکر)
+- **Container Lifecycle Management:** Real-time inspection of active and stopped local containers (Name, Image, Ports, Status) with graceful status handling when daemon is offline.
+- **One-Click Actions:** Start, Stop, and Restart containers directly from the sidebar without terminal switching.
+- **Live Log Streamer:** Monospace viewer fetching recent 50 container log lines with instant reload and auto-scroll.
+- **Instant Search Filter:** Real-time container filtering by name, image, or port.
+
+### 9. Mini API Tester / cURL Lite (تست و پینگ سریع اندپوینت‌ها)
+- **Zero-CORS Request Runner:** Dispatches HTTP requests (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`) directly via Node.js native `fetch` from the Extension Host, completely bypassing browser CORS restrictions.
+- **Headers & JSON Body Editor:** Dynamic key-value headers table with row toggle, plus formatted JSON payload editor with syntax helper.
+- **Rich Response Inspector:** Color-coded status badges (2xx/3xx/4xx/5xx), millisecond response time, byte payload size, formatted JSON viewer, response headers table, and 1-click clipboard copy.
+
 ---
 
 ## Command Palette & Context Menu Contributions
@@ -82,6 +93,8 @@
 | `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
 | `devshelf.openGitWizard` | `DevShelf: Open Git Command Wizard` | Command Palette |
 | `devshelf.gitCheatSheet` | `DevShelf: Git Rescue Cheat Sheet` | Command Palette |
+| `devshelf.openDockerDeck` | `DevShelf: Open Docker Quick Deck` | Command Palette |
+| `devshelf.openApiTester` | `DevShelf: Open Mini API Tester` | Command Palette |
 | `devshelf.copySystemIp` | `DevShelf: Copy Local System IP` | Command Palette |
 | `devshelf.formatJson` | `DevShelf: Format JSON in Selection` | Editor Context Menu & Command Palette |
 | `devshelf.normalizePersianSelection` | `DevShelf: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
@@ -117,6 +130,8 @@
 │   │   ├── networkInfo.ts       # System IP, hostname & interfaces info
 │   │   ├── gitCommit.ts         # Conventional commit message generator
 │   │   ├── gitScenarios.ts      # Git Wizard interactive scenarios & rescue cheat sheet
+│   │   ├── dockerManager.ts     # Docker container lifecycle & log inspector
+│   │   ├── apiTester.ts         # Zero-CORS Node.js HTTP request client
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
@@ -125,7 +140,7 @@
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   └── testRunner.ts            # 9 unit test suites
+│   └── testRunner.ts            # 11 unit test suites
 ├── esbuild.js                   # Fast bundler config
 ├── package.json                 # Extension manifest & contributions
 ├── tsconfig.json                # Strict TypeScript configuration

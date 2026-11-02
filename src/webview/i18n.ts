@@ -12,6 +12,8 @@ export const translations = {
     tabPersian: 'Jalali / Text',
     tabPorts: 'Ports & Network',
     tabGit: 'Git Wizard',
+    tabDocker: 'Docker',
+    tabApi: 'API Tester',
     tabCrypto: 'Crypto / Mock',
 
     // Common Actions
@@ -235,7 +237,49 @@ export const translations = {
     mobileNumberLabel: 'Mobile Number (شماره موبایل)',
     postalCodeLabel: 'Postal Code (کد پستی)',
     shebaLabel: 'Sheba / IBAN (شماره شبا)',
-    regenerateMock: 'Generate New Test Data'
+    regenerateMock: 'Generate New Test Data',
+
+    // Docker Quick Deck
+    dockerTitle: 'Docker Quick Deck',
+    dockerSubtitle: 'Local container lifecycle & log inspector',
+    dockerNotInstalled: 'Docker CLI was not found in system PATH. Please install Docker.',
+    dockerDaemonNotRunning: 'Docker daemon is not running or unreachable. Please start Docker Desktop or daemon.',
+    dockerNoContainers: 'No local containers found.',
+    dockerFilterPlaceholder: 'Filter by name, image, or ports...',
+    dockerStart: 'Start',
+    dockerStop: 'Stop',
+    dockerRestart: 'Restart',
+    dockerLogs: 'Logs',
+    dockerLogsTitle: 'Container Logs',
+    dockerCloseLogs: 'Close Logs',
+    dockerRefreshing: 'Scanning containers...',
+    dockerImage: 'Image:',
+    dockerPorts: 'Ports:',
+    dockerStatus: 'Status:',
+    dockerRunningBadge: 'Running',
+    dockerExitedBadge: 'Exited',
+
+    // API Tester
+    apiTitle: 'Mini API Tester (cURL Lite)',
+    apiSubtitle: 'Zero-CORS HTTP client powered by extension host',
+    apiMethod: 'Method',
+    apiUrlPlaceholder: 'https://api.example.com/v1/resource or localhost:3000',
+    apiSend: 'Send Request',
+    apiSending: 'Sending...',
+    apiTabHeaders: 'Headers',
+    apiTabBody: 'Body (JSON)',
+    apiAddHeader: 'Add Header',
+    apiHeaderKey: 'Key',
+    apiHeaderValue: 'Value',
+    apiBodyPlaceholder: '{\n  "name": "DevShelf"\n}',
+    apiFormatJson: 'Format JSON',
+    apiResponseStatus: 'Status',
+    apiResponseTime: 'Time',
+    apiResponseSize: 'Size',
+    apiTabRespBody: 'Response Body',
+    apiTabRespHeaders: 'Response Headers',
+    apiNoResponseYet: 'Hit "Send Request" to test an endpoint.',
+    apiCopyResponse: 'Copy Response'
   },
   fa: {
     appName: 'دِوشلف (DevShelf)',
@@ -248,6 +292,8 @@ export const translations = {
     tabPersian: 'جلالی / متن',
     tabPorts: 'پورت‌ها و شبکه',
     tabGit: 'جادوگر گیت',
+    tabDocker: 'داکر',
+    tabApi: 'تست API',
     tabCrypto: 'رمزنگاری / داده تستی',
 
     // Common Actions
@@ -471,7 +517,49 @@ export const translations = {
     mobileNumberLabel: 'Mobile Number (شماره موبایل)',
     postalCodeLabel: 'Postal Code (کد پستی)',
     shebaLabel: 'Sheba / IBAN (شماره شبا)',
-    regenerateMock: 'Generate New Test Data'
+    regenerateMock: 'Generate New Test Data',
+
+    // Docker Quick Deck
+    dockerTitle: 'مدیریت سریع داکر (Docker Quick Deck)',
+    dockerSubtitle: 'مدیریت و مانیتورینگ زنده کانتینرهای لوکال',
+    dockerNotInstalled: 'ابزار داکر (Docker CLI) روی سیستم یافت نشد. لطفاً داکر را نصب کنید.',
+    dockerDaemonNotRunning: 'سرویس داکر در حال اجرا نیست یا در دسترس نمی‌باشد. لطفاً Docker Desktop یا دیمن داکر را اجرا کنید.',
+    dockerNoContainers: 'هیچ کانتینری روی موتور داکر یافت نشد.',
+    dockerFilterPlaceholder: 'فیلتر بر اساس نام، ایمیج یا پورت...',
+    dockerStart: 'شروع',
+    dockerStop: 'توقف',
+    dockerRestart: 'راه‌اندازی مجدد',
+    dockerLogs: 'لاگ‌ها',
+    dockerLogsTitle: 'لاگ‌های زنده کانتینر',
+    dockerCloseLogs: 'بستن لاگ',
+    dockerRefreshing: 'در حال بررسی کانتینرها...',
+    dockerImage: 'ایمیج:',
+    dockerPorts: 'پورت‌ها:',
+    dockerStatus: 'وضعیت:',
+    dockerRunningBadge: 'فعال',
+    dockerExitedBadge: 'متوقف',
+
+    // API Tester
+    apiTitle: 'تستر سریع API (cURL Lite)',
+    apiSubtitle: 'ارسال مستقیم درخواست‌های HTTP بدون محدودیت CORS',
+    apiMethod: 'متد',
+    apiUrlPlaceholder: 'https://api.example.com/v1/resource یا localhost:3000',
+    apiSend: 'ارسال درخواست',
+    apiSending: 'در حال ارسال...',
+    apiTabHeaders: 'هدرها (Headers)',
+    apiTabBody: 'بدنه (Body / JSON)',
+    apiAddHeader: 'افزودن هدر',
+    apiHeaderKey: 'نام هدر',
+    apiHeaderValue: 'مقدار',
+    apiBodyPlaceholder: '{\n  "name": "DevShelf"\n}',
+    apiFormatJson: 'مرتب‌سازی JSON',
+    apiResponseStatus: 'وضعیت',
+    apiResponseTime: 'زمان',
+    apiResponseSize: 'حجم',
+    apiTabRespBody: 'بدنه پاسخ',
+    apiTabRespHeaders: 'هدرهای دریافتی',
+    apiNoResponseYet: 'برای تست اندپوینت، روی «ارسال درخواست» کلیک کنید.',
+    apiCopyResponse: 'کپی پاسخ'
   }
 } as const;
 

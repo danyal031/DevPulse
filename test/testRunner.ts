@@ -19,6 +19,8 @@ import { formatJson, minifyJson, repairCommonJson, validateJson } from '../src/u
 import { getSystemNetworkInfo } from '../src/utils/networkInfo';
 import { generateConventionalCommit } from '../src/utils/gitCommit';
 import { GIT_SCENARIOS, GIT_CHEAT_SHEET } from '../src/utils/gitScenarios';
+import { parseDockerContainersOutput, isSafeContainerIdentifier } from '../src/utils/dockerManager';
+import { normalizeUrl, formatPayloadSize, executeApiRequest } from '../src/utils/apiTester';
 import { translations } from '../src/webview/i18n';
 import {
   generateUuidV4,
@@ -31,7 +33,7 @@ import {
   generateIranianSheba
 } from '../src/utils/cryptoMock';
 
-function runTests() {
+async function runTests() {
   console.log('--- RUNNING DEVSHELF UNIT TESTS ---');
 
   // 1. JALALI TESTS
@@ -266,7 +268,100 @@ function runTests() {
     assert.ok((translations.fa as any)[cs.descKey], `Missing FA descKey: ${cs.descKey}`);
   }
 
+  // 10. DOCKER QUICK DECK TESTS
+  console.log('[Test 10] Docker Quick Deck Manager');
+  // JSON lines output parsing
+  const mockJsonLines = `{"ID":"a1b2c3d4e5f6","Names":"postgres-db","Image":"postgres:15-alpine","State":"running","Status":"Up 3 hours","Ports":"0.0.0.0:5432->5432/tcp"}
+{"ID":"9876543210ab","Names":"/redis-cache","Image":"redis:7","State":"exited","Status":"Exited (0) 10 minutes ago","Ports":""}`;
+  
+  const parsedContainers = parseDockerContainersOutput(mockJsonLines);
+  assert.strictEqual(parsedContainers.length, 2);
+  assert.strictEqual(parsedContainers[0].id, 'a1b2c3d4e5f6');
+  assert.strictEqual(parsedContainers[0].name, 'postgres-db');
+  assert.strictEqual(parsedContainers[0].image, 'postgres:15-alpine');
+  assert.strictEqual(parsedContainers[0].state, 'running');
+  assert.strictEqual(parsedContainers[0].ports, '0.0.0.0:5432->5432/tcp');
+
+  assert.strictEqual(parsedContainers[1].id, '9876543210ab');
+  assert.strictEqual(parsedContainers[1].name, 'redis-cache'); // leading slash removed
+  assert.strictEqual(parsedContainers[1].state, 'exited');
+
+  // JSON Array parsing
+  const mockArray = JSON.stringify([
+    { ID: 'c1d2e3f4', Names: 'web-nginx', Image: 'nginx:alpine', State: 'running', Status: 'Up 1 hour' }
+  ]);
+  const parsedFromArray = parseDockerContainersOutput(mockArray);
+  assert.strictEqual(parsedFromArray.length, 1);
+  assert.strictEqual(parsedFromArray[0].name, 'web-nginx');
+
+  // Fallback table format parsing
+  const mockTable = `CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS         PORTS                  NAMES
+f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 hours     0.0.0.0:3000->3000/tcp  app-backend`;
+  const parsedTable = parseDockerContainersOutput(mockTable);
+  assert.strictEqual(parsedTable.length, 1);
+  assert.strictEqual(parsedTable[0].name, 'app-backend');
+  assert.strictEqual(parsedTable[0].state, 'running');
+
+  // Empty input handling
+  assert.strictEqual(parseDockerContainersOutput('').length, 0);
+
+  // Security: Identifier validation
+  assert.strictEqual(isSafeContainerIdentifier('postgres-db'), true);
+  assert.strictEqual(isSafeContainerIdentifier('a1b2c3d4e5f6'), true);
+  assert.strictEqual(isSafeContainerIdentifier('web_app.service-1'), true);
+  assert.strictEqual(isSafeContainerIdentifier('web; rm -rf /'), false);
+  assert.strictEqual(isSafeContainerIdentifier('web && ls'), false);
+  assert.strictEqual(isSafeContainerIdentifier('`whoami`'), false);
+
+  // 11. MINI API TESTER (cURL LITE) TESTS
+  console.log('[Test 11] Mini API Tester (cURL Lite)');
+  // URL normalization
+  assert.strictEqual(normalizeUrl('localhost:4000/api'), 'http://localhost:4000/api');
+  assert.strictEqual(normalizeUrl('127.0.0.1:8080/test'), 'http://127.0.0.1:8080/test');
+  assert.strictEqual(normalizeUrl('api.example.com/v1'), 'https://api.example.com/v1');
+  assert.strictEqual(normalizeUrl('https://myapi.com/users'), 'https://myapi.com/users');
+  assert.strictEqual(normalizeUrl('http://myapi.com/users'), 'http://myapi.com/users');
+  assert.strictEqual(normalizeUrl(''), '');
+
+  // Payload size formatting
+  assert.strictEqual(formatPayloadSize(0), '0 B');
+  assert.strictEqual(formatPayloadSize(512), '512 B');
+  assert.strictEqual(formatPayloadSize(2048), '2.0 KB');
+  assert.strictEqual(formatPayloadSize(1024 * 1024 * 2.5), '2.50 MB');
+
+  // executeApiRequest validation on empty URL
+  const emptyRes = await executeApiRequest({ method: 'GET', url: '', headers: [] });
+  assert.strictEqual(emptyRes.status, 0);
+  assert.strictEqual(emptyRes.error, 'Please enter a valid URL.');
+
+  // Verify i18n keys exist for docker and api
+  const dockerKeys = [
+    'dockerTitle', 'dockerSubtitle', 'dockerNotInstalled', 'dockerDaemonNotRunning',
+    'dockerNoContainers', 'dockerFilterPlaceholder', 'dockerStart', 'dockerStop',
+    'dockerRestart', 'dockerLogs', 'dockerLogsTitle', 'dockerCloseLogs', 'dockerRefreshing',
+    'dockerImage', 'dockerPorts', 'dockerStatus'
+  ];
+  for (const k of dockerKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
+  }
+
+  const apiKeys = [
+    'apiTitle', 'apiSubtitle', 'apiMethod', 'apiUrlPlaceholder', 'apiSend', 'apiSending',
+    'apiTabHeaders', 'apiTabBody', 'apiAddHeader', 'apiHeaderKey', 'apiHeaderValue',
+    'apiBodyPlaceholder', 'apiFormatJson', 'apiResponseStatus', 'apiResponseTime',
+    'apiResponseSize', 'apiTabRespBody', 'apiTabRespHeaders', 'apiNoResponseYet',
+    'apiCopyResponse'
+  ];
+  for (const k of apiKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
+  }
+
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');
 }
 
-runTests();
+runTests().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

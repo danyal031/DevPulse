@@ -2,7 +2,7 @@
   "name": "devshelf",
   "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "danial031",
   "license": "MIT",
   "repository": {
@@ -35,6 +35,9 @@
     "commit-generator",
     "git-wizard",
     "git-cheat-sheet",
+    "docker",
+    "api-tester",
+    "curl",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -51,7 +54,9 @@
     "onCommand:devshelf.copySystemIp",
     "onCommand:devshelf.generateCommitMessage",
     "onCommand:devshelf.openGitWizard",
-    "onCommand:devshelf.gitCheatSheet"
+    "onCommand:devshelf.gitCheatSheet",
+    "onCommand:devshelf.openDockerDeck",
+    "onCommand:devshelf.openApiTester"
   ],
   "contributes": {
     "viewsContainers": {
@@ -133,6 +138,16 @@
       {
         "command": "devshelf.gitCheatSheet",
         "title": "Git Rescue Cheat Sheet",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openDockerDeck",
+        "title": "Open Docker Quick Deck",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openApiTester",
+        "title": "Open Mini API Tester",
         "category": "DevShelf"
       }
     ],

@@ -5,6 +5,8 @@ import { JwtView } from './components/JwtView';
 import { PersianJalaliView } from './components/PersianJalaliView';
 import { PortManagerView } from './components/PortManagerView';
 import { GitWizardView } from './components/GitWizardView';
+import { DockerView } from './components/DockerView';
+import { ApiTesterView } from './components/ApiTesterView';
 import { CryptoMockView } from './components/CryptoMockView';
 
 declare function acquireVsCodeApi(): {
@@ -24,6 +26,8 @@ class DevShelfApp {
   private persianView!: PersianJalaliView;
   private portView!: PortManagerView;
   private gitView!: GitWizardView;
+  private dockerView!: DockerView;
+  private apiView!: ApiTesterView;
   private cryptoView!: CryptoMockView;
 
   constructor() {
@@ -55,6 +59,8 @@ class DevShelfApp {
       jwtState: this.jwtView ? this.jwtView.getState() : undefined,
       persianState: this.persianView ? this.persianView.getState() : undefined,
       gitState: this.gitView ? this.gitView.getState() : undefined,
+      dockerState: this.dockerView ? this.dockerView.getState() : undefined,
+      apiState: this.apiView ? this.apiView.getState() : undefined,
       cryptoState: this.cryptoView ? this.cryptoView.getState() : undefined
     });
   }
@@ -78,6 +84,8 @@ class DevShelfApp {
         <button class="tab-btn" data-tab="persian" id="tab-nav-persian">${t('tabPersian', this.currentLang)}</button>
         <button class="tab-btn" data-tab="ports" id="tab-nav-ports">${t('tabPorts', this.currentLang)}</button>
         <button class="tab-btn" data-tab="git" id="tab-nav-git">${t('tabGit', this.currentLang)}</button>
+        <button class="tab-btn" data-tab="docker" id="tab-nav-docker">${t('tabDocker', this.currentLang)}</button>
+        <button class="tab-btn" data-tab="api" id="tab-nav-api">${t('tabApi', this.currentLang)}</button>
         <button class="tab-btn" data-tab="crypto" id="tab-nav-crypto">${t('tabCrypto', this.currentLang)}</button>
       </nav>
 
@@ -87,6 +95,8 @@ class DevShelfApp {
         <div id="view-persian" class="view-panel"></div>
         <div id="view-ports" class="view-panel"></div>
         <div id="view-git" class="view-panel"></div>
+        <div id="view-docker" class="view-panel"></div>
+        <div id="view-api" class="view-panel"></div>
         <div id="view-crypto" class="view-panel"></div>
       </main>
     `;
@@ -100,6 +110,8 @@ class DevShelfApp {
     const persianContainer = document.getElementById('view-persian')!;
     const portsContainer = document.getElementById('view-ports')!;
     const gitContainer = document.getElementById('view-git')!;
+    const dockerContainer = document.getElementById('view-docker')!;
+    const apiContainer = document.getElementById('view-api')!;
     const cryptoContainer = document.getElementById('view-crypto')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
@@ -107,6 +119,8 @@ class DevShelfApp {
     this.persianView = new PersianJalaliView(persianContainer, this.currentLang, postToHost);
     this.portView = new PortManagerView(portsContainer, this.currentLang, postToHost);
     this.gitView = new GitWizardView(gitContainer, this.currentLang, postToHost);
+    this.dockerView = new DockerView(dockerContainer, this.currentLang, postToHost);
+    this.apiView = new ApiTesterView(apiContainer, this.currentLang, postToHost);
     this.cryptoView = new CryptoMockView(cryptoContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
@@ -115,6 +129,8 @@ class DevShelfApp {
       if (state.jwtState) this.jwtView.restoreState(state.jwtState);
       if (state.persianState) this.persianView.restoreState(state.persianState);
       if (state.gitState) this.gitView.restoreState(state.gitState);
+      if (state.dockerState) this.dockerView.restoreState(state.dockerState);
+      if (state.apiState) this.apiView.restoreState(state.apiState);
       if (state.cryptoState) this.cryptoView.restoreState(state.cryptoState);
     }
   }
@@ -155,6 +171,18 @@ class DevShelfApp {
           break;
         case 'portKilled':
           this.portView.handlePortKilled(message);
+          break;
+        case 'dockerContainersList':
+          this.dockerView.setStatus(message.status);
+          break;
+        case 'dockerLogsResult':
+          this.dockerView.setLogs(message);
+          break;
+        case 'dockerActionResult':
+          this.dockerView.handleActionResult(message);
+          break;
+        case 'apiResponseResult':
+          this.apiView.setResponse(message.response);
           break;
         case 'setLanguage':
           if (message.lang && message.lang !== this.currentLang) {
@@ -203,6 +231,12 @@ class DevShelfApp {
     const tabGit = document.getElementById('tab-nav-git');
     if (tabGit) tabGit.textContent = t('tabGit', this.currentLang);
 
+    const tabDocker = document.getElementById('tab-nav-docker');
+    if (tabDocker) tabDocker.textContent = t('tabDocker', this.currentLang);
+
+    const tabApi = document.getElementById('tab-nav-api');
+    if (tabApi) tabApi.textContent = t('tabApi', this.currentLang);
+
     const tabCrypto = document.getElementById('tab-nav-crypto');
     if (tabCrypto) tabCrypto.textContent = t('tabCrypto', this.currentLang);
 
@@ -211,6 +245,8 @@ class DevShelfApp {
     this.persianView.setLanguage(this.currentLang);
     this.portView.setLanguage(this.currentLang);
     this.gitView.setLanguage(this.currentLang);
+    this.dockerView.setLanguage(this.currentLang);
+    this.apiView.setLanguage(this.currentLang);
     this.cryptoView.setLanguage(this.currentLang);
   }
 
@@ -237,6 +273,8 @@ class DevShelfApp {
 
     if (tabName === 'ports') {
       this.portView.requestScan();
+    } else if (tabName === 'docker') {
+      this.dockerView.refreshContainers();
     }
 
     this.saveCurrentState();

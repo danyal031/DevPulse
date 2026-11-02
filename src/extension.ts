@@ -433,6 +433,22 @@ export function activate(context: vscode.ExtensionContext) {
       }
     })
   );
+
+  // Command 13: Open Docker Quick Deck
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openDockerDeck', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('docker');
+    })
+  );
+
+  // Command 14: Open Mini API Tester
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openApiTester', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('api');
+    })
+  );
 }
 
 export function deactivate() {}

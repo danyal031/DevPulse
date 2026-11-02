@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as crypto from 'crypto';
 import { scanListeningPorts, killProcessByPid } from '../utils/portManager';
 import { getSystemNetworkInfo, fetchPublicIp } from '../utils/networkInfo';
+import { getDockerContainers, dockerContainerAction, getDockerLogs } from '../utils/dockerManager';
+import { executeApiRequest } from '../utils/apiTester';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'devshelf.sidebarView';
@@ -111,6 +113,87 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             vscode.window.showInformationMessage(`DevShelf: Executing in terminal: ${data.command}`);
           } catch (err: any) {
             vscode.window.showErrorMessage(`DevShelf Terminal Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerGetContainers': {
+          try {
+            const status = await getDockerContainers();
+            this.postMessage({ type: 'dockerContainersList', status });
+          } catch (err: any) {
+            this.postMessage({
+              type: 'dockerContainersList',
+              status: {
+                isInstalled: true,
+                isRunning: false,
+                errorMessage: err.message,
+                containers: []
+              }
+            });
+          }
+          break;
+        }
+
+        case 'dockerAction': {
+          try {
+            const { action, containerId } = data;
+            const res = await dockerContainerAction(action, containerId);
+            this.postMessage({ type: 'dockerActionResult', ...res, containerId, action });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Action Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerGetLogs': {
+          try {
+            const { containerId, name } = data;
+            const res = await getDockerLogs(containerId, 50);
+            this.postMessage({
+              type: 'dockerLogsResult',
+              containerId,
+              name,
+              logs: res.logs,
+              error: res.error,
+              success: res.success
+            });
+          } catch (err: any) {
+            this.postMessage({
+              type: 'dockerLogsResult',
+              containerId: data.containerId,
+              name: data.name,
+              logs: '',
+              error: err.message,
+              success: false
+            });
+          }
+          break;
+        }
+
+        case 'apiSendRequest': {
+          try {
+            const response = await executeApiRequest(data.request);
+            this.postMessage({ type: 'apiResponseResult', response });
+          } catch (err: any) {
+            this.postMessage({
+              type: 'apiResponseResult',
+              response: {
+                status: 0,
+                statusText: 'Error',
+                timeMs: 0,
+                sizeBytes: 0,
+                headers: {},
+                body: '',
+                isJson: false,
+                error: err.message
+              }
+            });
           }
           break;
         }
