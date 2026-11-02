@@ -123,7 +123,7 @@ export class CryptoMockView {
       </div>
 
       <!-- Hasher Section -->
-      <div style="border-top: 1px solid var(--devpulse-border); padding-top: 12px; margin-bottom: 14px;">
+      <div style="border-top: 1px solid var(--devshelf-border); padding-top: 12px; margin-bottom: 14px;">
         <span style="font-weight: 600; font-size: 11px; display: block; margin-bottom: 8px;">
           ${t('hasherTitle', this.currentLang)}
         </span>
@@ -144,7 +144,7 @@ export class CryptoMockView {
       </div>
 
       <!-- Base64 Section -->
-      <div style="border-top: 1px solid var(--devpulse-border); padding-top: 12px; margin-bottom: 14px;">
+      <div style="border-top: 1px solid var(--devshelf-border); padding-top: 12px; margin-bottom: 14px;">
         <span style="font-weight: 600; font-size: 11px; display: block; margin-bottom: 8px;">
           Base64 & URL Encode / Decode
         </span>
@@ -171,7 +171,7 @@ export class CryptoMockView {
       </div>
 
       <!-- Iranian Mock Data Section -->
-      <div style="border-top: 1px solid var(--devpulse-border); padding-top: 12px;">
+      <div style="border-top: 1px solid var(--devshelf-border); padding-top: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-weight: 600; font-size: 11px;">${t('iranMockTitle', this.currentLang)}</span>
           <button id="regen-mock-btn" class="btn btn-secondary" style="padding: 2px 7px; font-size: 10px;">

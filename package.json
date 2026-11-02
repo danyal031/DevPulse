@@ -1,18 +1,18 @@
 {
-  "name": "devpulse",
-  "displayName": "DevPulse (دِوپالس)",
+  "name": "devshelf",
+  "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
   "version": "1.0.0",
-  "publisher": "Danial031",
+  "publisher": "danyal031",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/danyal031/DevPulse"
+    "url": "https://github.com/danyal031/DevShelf"
   },
   "bugs": {
-    "url": "https://github.com/danyal031/DevPulse/issues"
+    "url": "https://github.com/danyal031/DevShelf/issues"
   },
-  "homepage": "https://github.com/danyal031/DevPulse#readme",
+  "homepage": "https://github.com/danyal031/DevShelf#readme",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
@@ -31,92 +31,92 @@
     "offline",
     "farsi",
     "json-to-typescript",
-    "devpulse"
+    "devshelf"
   ],
   "main": "./dist/extension.js",
   "activationEvents": [
-    "onView:devpulse.sidebarView",
-    "onCommand:devpulse.openSidebar",
-    "onCommand:devpulse.normalizePersianSelection",
-    "onCommand:devpulse.convertToJalali",
-    "onCommand:devpulse.generateUuid",
-    "onCommand:devpulse.generateSecret",
-    "onCommand:devpulse.jsonToTypescript",
-    "onCommand:devpulse.killPort"
+    "onView:devshelf.sidebarView",
+    "onCommand:devshelf.openSidebar",
+    "onCommand:devshelf.normalizePersianSelection",
+    "onCommand:devshelf.convertToJalali",
+    "onCommand:devshelf.generateUuid",
+    "onCommand:devshelf.generateSecret",
+    "onCommand:devshelf.jsonToTypescript",
+    "onCommand:devshelf.killPort"
   ],
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "devpulse-activitybar",
-          "title": "DevPulse (دِوپالس)",
-          "icon": "media/devpulse-icon.svg"
+          "id": "devshelf-activitybar",
+          "title": "DevShelf (دِوشلف)",
+          "icon": "media/devshelf-icon.svg"
         }
       ]
     },
     "views": {
-      "devpulse-activitybar": [
+      "devshelf-activitybar": [
         {
           "type": "webview",
-          "id": "devpulse.sidebarView",
-          "name": "DevPulse",
-          "icon": "media/devpulse-icon.svg"
+          "id": "devshelf.sidebarView",
+          "name": "DevShelf",
+          "icon": "media/devshelf-icon.svg"
         }
       ]
     },
     "commands": [
       {
-        "command": "devpulse.openSidebar",
+        "command": "devshelf.openSidebar",
         "title": "Open Developer Swiss Army Knife",
-        "category": "DevPulse"
+        "category": "DevShelf"
       },
       {
-        "command": "devpulse.normalizePersianSelection",
+        "command": "devshelf.normalizePersianSelection",
         "title": "Normalize Persian Text & Digits in Selection",
-        "category": "DevPulse"
+        "category": "DevShelf"
       },
       {
-        "command": "devpulse.convertToJalali",
+        "command": "devshelf.convertToJalali",
         "title": "Convert Date or Timestamp to Jalali",
-        "category": "DevPulse"
+        "category": "DevShelf"
       },
       {
-        "command": "devpulse.generateUuid",
+        "command": "devshelf.generateUuid",
         "title": "Generate UUID v4 at Cursor",
-        "category": "DevPulse"
+        "category": "DevShelf"
       },
       {
-        "command": "devpulse.generateSecret",
+        "command": "devshelf.generateSecret",
         "title": "Generate 64-Byte Secure Secret",
-        "category": "DevPulse"
+        "category": "DevShelf"
       },
       {
-        "command": "devpulse.jsonToTypescript",
+        "command": "devshelf.jsonToTypescript",
         "title": "Convert Selected JSON to TypeScript & Zod",
-        "category": "DevPulse"
+        "category": "DevShelf"
       },
       {
-        "command": "devpulse.killPort",
+        "command": "devshelf.killPort",
         "title": "Kill Process on Port...",
-        "category": "DevPulse"
+        "category": "DevShelf"
       }
     ],
     "menus": {
       "editor/context": [
         {
-          "command": "devpulse.normalizePersianSelection",
+          "command": "devshelf.normalizePersianSelection",
           "when": "editorHasSelection",
-          "group": "devpulse@1"
+          "group": "devshelf@1"
         },
         {
-          "command": "devpulse.jsonToTypescript",
+          "command": "devshelf.jsonToTypescript",
           "when": "editorHasSelection",
-          "group": "devpulse@2"
+          "group": "devshelf@2"
         },
         {
-          "command": "devpulse.convertToJalali",
+          "command": "devshelf.convertToJalali",
           "when": "editorHasSelection",
-          "group": "devpulse@3"
+          "group": "devshelf@3"
         }
       ]
     }

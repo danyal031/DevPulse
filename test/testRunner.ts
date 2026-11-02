@@ -27,7 +27,7 @@ import {
 } from '../src/utils/cryptoMock';
 
 function runTests() {
-  console.log('--- RUNNING DEVPULSE UNIT TESTS ---');
+  console.log('--- RUNNING DEVSHELF UNIT TESTS ---');
 
   // 1. JALALI TESTS
   console.log('[Test 1] Jalali Mathematical Conversion');
@@ -96,7 +96,7 @@ function runTests() {
   console.log('[Test 4] JSON to TypeScript & Zod');
   const jsonSample = JSON.stringify({
     id: 101,
-    name: 'DevPulse Extension',
+    name: 'DevShelf Extension',
     isActive: true,
     tags: ['developer', 'tools'],
     metadata: {

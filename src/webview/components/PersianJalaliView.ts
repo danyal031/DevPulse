@@ -131,7 +131,7 @@ export class PersianJalaliView {
         <div id="date-badges" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;"></div>
       </div>
 
-      <div style="border-top: 1px solid var(--devpulse-border); padding-top: 12px;">
+      <div style="border-top: 1px solid var(--devshelf-border); padding-top: 12px;">
         <span style="font-weight: 600; font-size: 11px; display: block; margin-bottom: 8px;">
           ${t("textSanitizerTitle", this.currentLang)}
         </span>

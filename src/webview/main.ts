@@ -14,7 +14,7 @@ declare function acquireVsCodeApi(): {
 
 const vscode = acquireVsCodeApi();
 
-class DevPulseApp {
+class DevShelfApp {
   private currentLang: Language = 'en';
   private activeTab: string = 'json';
 
@@ -227,5 +227,5 @@ class DevPulseApp {
 
 // Bootstrap
 window.addEventListener('DOMContentLoaded', () => {
-  new DevPulseApp();
+  new DevShelfApp();
 });

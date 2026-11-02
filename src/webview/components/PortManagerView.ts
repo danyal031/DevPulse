@@ -83,7 +83,7 @@ export class PortManagerView {
 
         <div id="port-status-notice" style="display: none; padding: 4px 6px; font-size: 11px; border-radius: 2px; margin-bottom: 6px;"></div>
 
-        <div style="max-height: 380px; overflow-y: auto; border: 1px solid var(--devpulse-border); border-radius: 3px;">
+        <div style="max-height: 380px; overflow-y: auto; border: 1px solid var(--devshelf-border); border-radius: 3px;">
           <table class="data-table" style="margin-top: 0;">
             <thead>
               <tr>

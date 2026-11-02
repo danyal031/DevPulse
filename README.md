@@ -1,6 +1,6 @@
-# DevPulse (دِوپالس) — Developer Swiss Army Knife
+# DevShelf (دِوشلف) — Developer Swiss Army Knife
 
-**DevPulse** is an offline-first, zero-bloat developer utility belt built natively for Visual Studio Code. It provides essential developer utilities right in your VS Code sidebar, with seamless bilingual support for **English (`LTR`)** and **Persian / فارسی (`RTL`)**.
+**DevShelf** is an offline-first, zero-bloat developer utility belt built natively for Visual Studio Code. It provides essential developer utilities right in your VS Code sidebar, with seamless bilingual support for **English (`LTR`)** and **Persian / فارسی (`RTL`)**.
 
 ---
 
@@ -32,12 +32,12 @@
   - Converts Persian/Arabic digits (`۱۲۳` / `١٢٣`) to English (`123`) and vice versa.
   - Normalizes Arabic `ي` / `ك` to Persian `ی` / `ک`.
   - Fixes Zero-Width Non-Joiner (ZWNJ / نیم‌فاصله) for prefixes (`می‌`, `نمی‌`) and suffixes (`‌ها`, `‌های`, `‌تر`, `‌ترین`, `‌ام`, etc.).
-  - Right-click editor context menu command: **`DevPulse: Normalize Persian Text & Digits in Selection`**.
+  - Right-click editor context menu command: **`DevShelf: Normalize Persian Text & Digits in Selection`**.
 
 ### 4. Local Port Manager (Port Killer)
 - **Cross-Platform TCP Detection:** Communicates with the extension host to inspect active listening TCP ports on Windows (`netstat`), macOS (`lsof`), and Linux (`ss`/`lsof`).
 - **Process Identification:** Displays port number, PID, and executable process name (e.g., `node.exe`, `python`, `dockerd`).
-- **One-Click Process Termination:** Terminate hanging dev servers directly from the sidebar or via Command Palette: **`DevPulse: Kill Process on Port...`**.
+- **One-Click Process Termination:** Terminate hanging dev servers directly from the sidebar or via Command Palette: **`DevShelf: Kill Process on Port...`**.
 
 ### 5. Crypto, ID & Mock Data Generator
 - **Identifier Generators:** Cryptographically secure UUID v4 (RFC 4122) and 26-character sortable ULID (Crockford Base32).
@@ -55,13 +55,13 @@
 
 | Command | Title | Context |
 | :--- | :--- | :--- |
-| `devpulse.openSidebar` | `DevPulse: Open Developer Swiss Army Knife` | Command Palette |
-| `devpulse.normalizePersianSelection` | `DevPulse: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
-| `devpulse.convertToJalali` | `DevPulse: Convert Date or Timestamp to Jalali` | Editor Context Menu & Command Palette |
-| `devpulse.jsonToTypescript` | `DevPulse: Convert Selected JSON to TypeScript & Zod` | Editor Context Menu & Command Palette |
-| `devpulse.killPort` | `DevPulse: Kill Process on Port...` | Command Palette |
-| `devpulse.generateUuid` | `DevPulse: Generate UUID v4 at Cursor` | Command Palette |
-| `devpulse.generateSecret` | `DevPulse: Generate 64-Byte Secure Secret` | Command Palette |
+| `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
+| `devshelf.normalizePersianSelection` | `DevShelf: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
+| `devshelf.convertToJalali` | `DevShelf: Convert Date or Timestamp to Jalali` | Editor Context Menu & Command Palette |
+| `devshelf.jsonToTypescript` | `DevShelf: Convert Selected JSON to TypeScript & Zod` | Editor Context Menu & Command Palette |
+| `devshelf.killPort` | `DevShelf: Kill Process on Port...` | Command Palette |
+| `devshelf.generateUuid` | `DevShelf: Generate UUID v4 at Cursor` | Command Palette |
+| `devshelf.generateSecret` | `DevShelf: Generate 64-Byte Secure Secret` | Command Palette |
 
 ---
 
@@ -73,7 +73,7 @@
 │   ├── tasks.json               # Build automation tasks
 │   └── settings.json            # Editor visual customizations
 ├── media/
-│   └── devpulse-icon.svg        # Monochromatic Activity Bar icon
+│   └── devshelf-icon.svg        # Monochromatic Activity Bar icon
 ├── src/
 │   ├── extension.ts             # Extension Host entry point & command registrations
 │   ├── providers/
@@ -117,6 +117,10 @@
    ```
 4. **Debug in VS Code:**
    Press `F5` in VS Code to launch the Extension Development Host window.
+5. **Package VSIX:**
+   ```bash
+   npx vsce package
+   ```
 
 ---
 

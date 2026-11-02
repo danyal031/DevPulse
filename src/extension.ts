@@ -28,17 +28,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Command 1: Open Sidebar
   context.subscriptions.push(
-    vscode.commands.registerCommand('devpulse.openSidebar', () => {
-      vscode.commands.executeCommand('devpulse.sidebarView.focus');
+    vscode.commands.registerCommand('devshelf.openSidebar', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
     })
   );
 
   // Command 2: Normalize Persian Selection
   context.subscriptions.push(
-    vscode.commands.registerCommand('devpulse.normalizePersianSelection', async () => {
+    vscode.commands.registerCommand('devshelf.normalizePersianSelection', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showInformationMessage('DevPulse: No active editor found.');
+        vscode.window.showInformationMessage('DevShelf: No active editor found.');
         return;
       }
 
@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
       const text = editor.document.getText(selection.isEmpty ? undefined : selection);
 
       if (!text) {
-        vscode.window.showInformationMessage('DevPulse: Please select Persian text to normalize.');
+        vscode.window.showInformationMessage('DevShelf: Please select Persian text to normalize.');
         return;
       }
 
@@ -69,13 +69,13 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
 
-      vscode.window.showInformationMessage('DevPulse: Normalized Persian text and digits successfully.');
+      vscode.window.showInformationMessage('DevShelf: Normalized Persian text and digits successfully.');
     })
   );
 
   // Command 3: Convert Date/Timestamp to Jalali
   context.subscriptions.push(
-    vscode.commands.registerCommand('devpulse.convertToJalali', async () => {
+    vscode.commands.registerCommand('devshelf.convertToJalali', async () => {
       const editor = vscode.window.activeTextEditor;
       let input = '';
 
@@ -119,7 +119,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       if (!result) {
-        vscode.window.showErrorMessage('DevPulse: Could not parse input as a valid date or timestamp.');
+        vscode.window.showErrorMessage('DevShelf: Could not parse input as a valid date or timestamp.');
         return;
       }
 
@@ -146,7 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Command 4: Generate UUID v4
   context.subscriptions.push(
-    vscode.commands.registerCommand('devpulse.generateUuid', async () => {
+    vscode.commands.registerCommand('devshelf.generateUuid', async () => {
       const uuid = generateUuidV4();
       const editor = vscode.window.activeTextEditor;
       if (editor) {
@@ -155,14 +155,14 @@ export function activate(context: vscode.ExtensionContext) {
         });
       } else {
         await vscode.env.clipboard.writeText(uuid);
-        vscode.window.showInformationMessage(`DevPulse: Copied UUID to clipboard: ${uuid}`);
+        vscode.window.showInformationMessage(`DevShelf: Copied UUID to clipboard: ${uuid}`);
       }
     })
   );
 
   // Command 5: Generate 64-byte Secret
   context.subscriptions.push(
-    vscode.commands.registerCommand('devpulse.generateSecret', async () => {
+    vscode.commands.registerCommand('devshelf.generateSecret', async () => {
       const secret = generateSecret(64, 'hex');
       const editor = vscode.window.activeTextEditor;
       if (editor) {
@@ -171,17 +171,17 @@ export function activate(context: vscode.ExtensionContext) {
         });
       } else {
         await vscode.env.clipboard.writeText(secret);
-        vscode.window.showInformationMessage('DevPulse: Copied 64-byte secret to clipboard.');
+        vscode.window.showInformationMessage('DevShelf: Copied 64-byte secret to clipboard.');
       }
     })
   );
 
   // Command 6: Convert Selected JSON to TypeScript & Zod
   context.subscriptions.push(
-    vscode.commands.registerCommand('devpulse.jsonToTypescript', async () => {
+    vscode.commands.registerCommand('devshelf.jsonToTypescript', async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showInformationMessage('DevPulse: No active editor found.');
+        vscode.window.showInformationMessage('DevShelf: No active editor found.');
         return;
       }
 
@@ -189,7 +189,7 @@ export function activate(context: vscode.ExtensionContext) {
       const text = editor.document.getText(selection).trim();
 
       if (!text) {
-        vscode.window.showInformationMessage('DevPulse: Please select valid JSON text in the editor.');
+        vscode.window.showInformationMessage('DevShelf: Please select valid JSON text in the editor.');
         return;
       }
 
@@ -215,18 +215,18 @@ export function activate(context: vscode.ExtensionContext) {
           editBuilder.replace(selection, toInsert);
         });
       } catch (err: any) {
-        vscode.window.showErrorMessage(`DevPulse JSON Parser Error: ${err.message}`);
+        vscode.window.showErrorMessage(`DevShelf JSON Parser Error: ${err.message}`);
       }
     })
   );
 
   // Command 7: Quick Kill Process on Port
   context.subscriptions.push(
-    vscode.commands.registerCommand('devpulse.killPort', async () => {
+    vscode.commands.registerCommand('devshelf.killPort', async () => {
       const ports = await scanListeningPorts();
 
       if (ports.length === 0) {
-        vscode.window.showInformationMessage('DevPulse: No listening TCP ports detected.');
+        vscode.window.showInformationMessage('DevShelf: No listening TCP ports detected.');
         return;
       }
 
@@ -252,9 +252,9 @@ export function activate(context: vscode.ExtensionContext) {
         if (confirm === 'Kill Process') {
           const result = await killProcessByPid(selected.pid);
           if (result.success) {
-            vscode.window.showInformationMessage(`DevPulse: Successfully killed :${selected.port} (${selected.name})`);
+            vscode.window.showInformationMessage(`DevShelf: Successfully killed :${selected.port} (${selected.name})`);
           } else {
-            vscode.window.showErrorMessage(`DevPulse: Failed to kill process: ${result.message}`);
+            vscode.window.showErrorMessage(`DevShelf: Failed to kill process: ${result.message}`);
           }
         }
       }
