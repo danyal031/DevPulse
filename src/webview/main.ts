@@ -76,28 +76,63 @@ class DevShelfApp {
     root.innerHTML = `
       <header class="header-bar">
         <div class="brand-wrapper">
+          <span class="brand-icon">${ICONS.wand}</span>
           <span class="brand-title" id="brand-title">${t('appName', this.currentLang)}</span>
           <span class="brand-badge">PRO</span>
         </div>
-        <button id="lang-toggle-btn" class="lang-toggle-btn">
-          ${ICONS.globe} <span id="lang-toggle-label">${t('langToggle', this.currentLang)}</span>
-        </button>
+        <div class="header-actions">
+          <button id="lang-toggle-btn" class="lang-toggle-btn" title="Toggle Language (English / فارسی)">
+            ${ICONS.globe} <span id="lang-toggle-label">${this.currentLang === 'en' ? 'FA' : 'EN'}</span>
+          </button>
+        </div>
       </header>
 
-      <nav class="tabs-nav">
-        <button class="tab-btn active" data-tab="json" id="tab-nav-json">${t('tabJson', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="jwt" id="tab-nav-jwt">${t('tabJwt', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="persian" id="tab-nav-persian">${t('tabPersian', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="ports" id="tab-nav-ports">${t('tabPorts', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="git" id="tab-nav-git">${t('tabGit', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="docker" id="tab-nav-docker">${t('tabDocker', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="api" id="tab-nav-api">${t('tabApi', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="sql" id="tab-nav-sql">${t('tabSql', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="logs" id="tab-nav-logs">${t('tabLogs', this.currentLang)}</button>
-        <button class="tab-btn" data-tab="crypto" id="tab-nav-crypto">${t('tabCrypto', this.currentLang)}</button>
-      </nav>
+      <div class="tabs-nav-container">
+        <nav class="tabs-nav" id="tabs-nav-bar">
+          <button class="tab-btn active" data-tab="json" id="tab-nav-json">
+            <span class="tab-icon">${ICONS.brackets}</span>
+            <span class="tab-label">${t('tabJson', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="jwt" id="tab-nav-jwt">
+            <span class="tab-icon">${ICONS.shield}</span>
+            <span class="tab-label">${t('tabJwt', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="persian" id="tab-nav-persian">
+            <span class="tab-icon">${ICONS.calendar}</span>
+            <span class="tab-label">${t('tabPersian', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="ports" id="tab-nav-ports">
+            <span class="tab-icon">${ICONS.server}</span>
+            <span class="tab-label">${t('tabPorts', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="git" id="tab-nav-git">
+            <span class="tab-icon">${ICONS.git}</span>
+            <span class="tab-label">${t('tabGit', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="docker" id="tab-nav-docker">
+            <span class="tab-icon">${ICONS.docker}</span>
+            <span class="tab-label">${t('tabDocker', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="api" id="tab-nav-api">
+            <span class="tab-icon">${ICONS.send}</span>
+            <span class="tab-label">${t('tabApi', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="sql" id="tab-nav-sql">
+            <span class="tab-icon">${ICONS.database}</span>
+            <span class="tab-label">${t('tabSql', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="logs" id="tab-nav-logs">
+            <span class="tab-icon">${ICONS.fileText}</span>
+            <span class="tab-label">${t('tabLogs', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="crypto" id="tab-nav-crypto">
+            <span class="tab-icon">${ICONS.key}</span>
+            <span class="tab-label">${t('tabCrypto', this.currentLang)}</span>
+          </button>
+        </nav>
+      </div>
 
-      <main>
+      <main class="main-content-area">
         <div id="view-json" class="view-panel active"></div>
         <div id="view-jwt" class="view-panel"></div>
         <div id="view-persian" class="view-panel"></div>
@@ -268,37 +303,28 @@ class DevShelfApp {
     if (brandTitle) brandTitle.textContent = t('appName', this.currentLang);
 
     const langLabel = document.getElementById('lang-toggle-label');
-    if (langLabel) langLabel.textContent = t('langToggle', this.currentLang);
+    if (langLabel) langLabel.textContent = this.currentLang === 'en' ? 'FA' : 'EN';
 
-    const tabJson = document.getElementById('tab-nav-json');
-    if (tabJson) tabJson.textContent = t('tabJson', this.currentLang);
+    const setTabLabel = (id: string, text: string) => {
+      const el = document.getElementById(id);
+      const label = el?.querySelector('.tab-label');
+      if (label) {
+        label.textContent = text;
+      } else if (el) {
+        el.textContent = text;
+      }
+    };
 
-    const tabJwt = document.getElementById('tab-nav-jwt');
-    if (tabJwt) tabJwt.textContent = t('tabJwt', this.currentLang);
-
-    const tabPersian = document.getElementById('tab-nav-persian');
-    if (tabPersian) tabPersian.textContent = t('tabPersian', this.currentLang);
-
-    const tabPorts = document.getElementById('tab-nav-ports');
-    if (tabPorts) tabPorts.textContent = t('tabPorts', this.currentLang);
-
-    const tabGit = document.getElementById('tab-nav-git');
-    if (tabGit) tabGit.textContent = t('tabGit', this.currentLang);
-
-    const tabDocker = document.getElementById('tab-nav-docker');
-    if (tabDocker) tabDocker.textContent = t('tabDocker', this.currentLang);
-
-    const tabApi = document.getElementById('tab-nav-api');
-    if (tabApi) tabApi.textContent = t('tabApi', this.currentLang);
-
-    const tabSql = document.getElementById('tab-nav-sql');
-    if (tabSql) tabSql.textContent = t('tabSql', this.currentLang);
-
-    const tabLogs = document.getElementById('tab-nav-logs');
-    if (tabLogs) tabLogs.textContent = t('tabLogs', this.currentLang);
-
-    const tabCrypto = document.getElementById('tab-nav-crypto');
-    if (tabCrypto) tabCrypto.textContent = t('tabCrypto', this.currentLang);
+    setTabLabel('tab-nav-json', t('tabJson', this.currentLang));
+    setTabLabel('tab-nav-jwt', t('tabJwt', this.currentLang));
+    setTabLabel('tab-nav-persian', t('tabPersian', this.currentLang));
+    setTabLabel('tab-nav-ports', t('tabPorts', this.currentLang));
+    setTabLabel('tab-nav-git', t('tabGit', this.currentLang));
+    setTabLabel('tab-nav-docker', t('tabDocker', this.currentLang));
+    setTabLabel('tab-nav-api', t('tabApi', this.currentLang));
+    setTabLabel('tab-nav-sql', t('tabSql', this.currentLang));
+    setTabLabel('tab-nav-logs', t('tabLogs', this.currentLang));
+    setTabLabel('tab-nav-crypto', t('tabCrypto', this.currentLang));
 
     this.jsonView.setLanguage(this.currentLang);
     this.jwtView.setLanguage(this.currentLang);
@@ -319,6 +345,7 @@ class DevShelfApp {
     document.querySelectorAll('.tab-btn').forEach((btn) => {
       if ((btn as HTMLElement).getAttribute('data-tab') === tabName) {
         btn.classList.add('active');
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       } else {
         btn.classList.remove('active');
       }

@@ -6,10 +6,11 @@
 
 ## Key Highlights
 
+- **Modern Hyper-Compact UI/UX (v1.2.5):** Sleek, horizontal icon-and-text pill navigation bar with smooth auto-scrolling, high-density 4px/8px grid spacing, slim 5px native scrollbars, and tactile micro-interactions (`transform: scale(0.97)`).
 - **100% Offline-First:** Runs entirely inside your local VS Code environment without transmitting tokens, data, or source code over the network.
-- **Native VS Code Theming:** Built exclusively with native VS Code CSS variables (`var(--vscode-sideBar-background)`, `var(--vscode-input-background)`, `var(--vscode-editor-background)`, etc.). Adapts seamlessly to Light, Dark, High Contrast, and custom community themes.
-- **Minimalist Codicon Aesthetic:** Zero emoji clutter. Clean, precise SVG icons matching VS Code's native desktop design system.
-- **Instant Bilingual Toggle:** One-click instant switch between English (`LTR`, System UI / Inter font) and Persian (`RTL`, Vazirmatn font) with full dictionary localization.
+- **Native VS Code Theming:** Built exclusively with native VS Code CSS variables (`var(--vscode-sideBar-background)`, `var(--vscode-input-background)`, `var(--vscode-editor-background)`, `var(--vscode-focusBorder)`, etc.). Adapts seamlessly to Light, Dark, High Contrast, and custom community themes.
+- **Minimalist Codicon Aesthetic:** Zero emoji clutter. Crisp, modern SVG Codicons matching VS Code's desktop design system.
+- **Masterclass Bilingual RTL/LTR Architecture:** One-click instant switch between English (`LTR`, System UI / Inter font) and Persian (`RTL`, Vazirmatn font) powered by modern CSS logical properties (`*-inline-start/end`).
 - **Persistent State:** Automatically saves your active tabs, inputs, and selected language across workspace reloads via `vscode.getState()` and `context.globalState`.
 
 ---
