@@ -17,7 +17,7 @@ import { parseJwt, formatTimeSpan } from '../src/utils/jwt';
 import { generateTsAndZod } from '../src/utils/jsonToTsZod';
 import { formatJson, minifyJson, repairCommonJson, validateJson } from '../src/utils/jsonFormatter';
 import { getSystemNetworkInfo } from '../src/utils/networkInfo';
-import { generateConventionalCommit } from '../src/utils/gitCommit';
+import { generateConventionalCommit, analyzeDiffHunks } from '../src/utils/gitCommit';
 import { GIT_SCENARIOS, GIT_CHEAT_SHEET } from '../src/utils/gitScenarios';
 import { parseDockerContainersOutput, isSafeContainerIdentifier } from '../src/utils/dockerManager';
 import { normalizeUrl, formatPayloadSize, executeApiRequest } from '../src/utils/apiTester';
@@ -186,6 +186,23 @@ async function runTests() {
   assert.ok(commit.fullMessage.includes('- update src/utils/portManager.ts'));
   assert.ok(commit.fullMessage.includes('- add src/utils/networkInfo.ts'));
 
+  // Test detailed semantic diff analysis
+  const mockDiff = `diff --git a/src/utils/portManager.ts b/src/utils/portManager.ts
+index 1234567..89abcdef 100644
+--- a/src/utils/portManager.ts
++++ b/src/utils/portManager.ts
+@@ -10,6 +10,12 @@
++export function killProcessTree(pid: number) {
++  return pid;
++}
+`;
+  const diffSummaries = analyzeDiffHunks(mockDiff);
+  assert.ok(diffSummaries.has('src/utils/portManager.ts'));
+  assert.ok(diffSummaries.get('src/utils/portManager.ts')![0].includes('killProcessTree'));
+
+  const detailedCommit = generateConventionalCommit(sampleChanges, mockDiff);
+  assert.ok(detailedCommit.fullMessage.includes('src/utils/portManager.ts: implement killProcessTree'));
+
   // 9. GIT COMMAND WIZARD & CHEAT SHEET TESTS
   console.log('[Test 9] Git Command Wizard & Rescue Cheat Sheet');
   assert.ok(GIT_SCENARIOS.length >= 10, 'Expected at least 10 git scenarios');
@@ -339,7 +356,9 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
     'dockerTitle', 'dockerSubtitle', 'dockerNotInstalled', 'dockerDaemonNotRunning',
     'dockerNoContainers', 'dockerFilterPlaceholder', 'dockerStart', 'dockerStop',
     'dockerRestart', 'dockerLogs', 'dockerLogsTitle', 'dockerCloseLogs', 'dockerRefreshing',
-    'dockerImage', 'dockerPorts', 'dockerStatus'
+    'dockerImage', 'dockerPorts', 'dockerStatus', 'dockerAll', 'dockerRunning', 'dockerStopped',
+    'dockerActivePorts', 'dockerQuickSamples', 'dockerRunInTerminal', 'dockerDaemonOfflineTips',
+    'dockerRetry', 'dockerCopiedId', 'dockerTotal'
   ];
   for (const k of dockerKeys) {
     assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
@@ -351,7 +370,10 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
     'apiTabHeaders', 'apiTabBody', 'apiAddHeader', 'apiHeaderKey', 'apiHeaderValue',
     'apiBodyPlaceholder', 'apiFormatJson', 'apiResponseStatus', 'apiResponseTime',
     'apiResponseSize', 'apiTabRespBody', 'apiTabRespHeaders', 'apiNoResponseYet',
-    'apiCopyResponse'
+    'apiCopyResponse', 'apiQuickPresets', 'apiPresetGetSample', 'apiPresetPostSample',
+    'apiPresetLocalhost', 'apiAuthTab', 'apiBearerToken', 'apiTokenPlaceholder',
+    'apiQuickHeaders', 'apiFastLatency', 'apiNormalLatency', 'apiSlowLatency',
+    'apiWelcomeTitle', 'apiWelcomeTip1', 'apiWelcomeTip2', 'apiWelcomeTip3'
   ];
   for (const k of apiKeys) {
     assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);

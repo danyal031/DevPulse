@@ -24,10 +24,13 @@ export class DockerView {
   private postMessage: (msg: any) => void;
 
   private filterQuery: string = '';
+  private filterState: 'all' | 'running' | 'stopped' = 'all';
   private isLoading: boolean = false;
   private statusPayload: DockerStatusPayload | null = null;
   private activeLogs: { containerId: string; name: string; logs: string; loading: boolean } | null = null;
-  private actionInProgress: Record<string, string> = {}; // containerId -> action
+  private actionInProgress: Record<string, string> = {};
+  private copiedIdTimeout: any = null;
+  private copiedContainerId: string | null = null;
 
   constructor(container: HTMLElement, lang: Language, postMessage: (msg: any) => void) {
     this.container = container;
@@ -71,24 +74,33 @@ export class DockerView {
 
   public getState() {
     return {
-      filterQuery: this.filterQuery
+      filterQuery: this.filterQuery,
+      filterState: this.filterState
     };
   }
 
   public restoreState(state: any) {
-    if (state && typeof state.filterQuery === 'string') {
-      this.filterQuery = state.filterQuery;
+    if (state) {
+      if (typeof state.filterQuery === 'string') this.filterQuery = state.filterQuery;
+      if (state.filterState) this.filterState = state.filterState;
     }
     this.refreshContainers();
   }
 
   private render() {
-    const isFa = this.currentLang === 'fa';
     const isInstalled = this.statusPayload?.isInstalled ?? true;
     const isRunning = this.statusPayload?.isRunning ?? true;
     const containers = this.statusPayload?.containers || [];
 
+    const runningCount = containers.filter((c) => c.state === 'running').length;
+    const stoppedCount = containers.length - runningCount;
+
     const filtered = containers.filter((c) => {
+      // Filter by state tab
+      if (this.filterState === 'running' && c.state !== 'running') return false;
+      if (this.filterState === 'stopped' && c.state === 'running') return false;
+
+      // Filter by query
       if (!this.filterQuery) return true;
       const q = this.filterQuery.toLowerCase();
       return (
@@ -101,9 +113,10 @@ export class DockerView {
 
     this.container.innerHTML = `
       <div class="docker-view-wrapper">
+        <!-- Header -->
         <div class="section-header">
           <div class="section-title-wrap">
-            <span class="section-icon">${ICONS.docker}</span>
+            <span class="section-icon docker-glow-icon">${ICONS.docker}</span>
             <div class="section-text">
               <h3 class="section-title">${t('dockerTitle', this.currentLang)}</h3>
               <p class="section-subtitle">${t('dockerSubtitle', this.currentLang)}</p>
@@ -115,29 +128,67 @@ export class DockerView {
         </div>
 
         ${!isInstalled ? `
-          <div class="alert-box alert-error">
-            <div class="alert-title">${t('error', this.currentLang)}</div>
+          <div class="docker-alert-card alert-error">
+            <div class="alert-header">
+              <span class="alert-icon">${ICONS.docker}</span>
+              <span class="alert-title">${t('error', this.currentLang)}</span>
+            </div>
             <div class="alert-desc">${t('dockerNotInstalled', this.currentLang)}</div>
           </div>
         ` : !isRunning ? `
-          <div class="alert-box alert-warning">
-            <div class="alert-title">${t('error', this.currentLang)}</div>
-            <div class="alert-desc">${t('dockerDaemonNotRunning', this.currentLang)}</div>
-            <button id="docker-retry-btn" class="btn btn-secondary btn-sm" style="margin-top: 8px;">
-              ${ICONS.sync} ${t('refresh', this.currentLang)}
-            </button>
+          <div class="docker-alert-card alert-warning">
+            <div class="alert-header">
+              <span class="alert-icon">${ICONS.docker}</span>
+              <span class="alert-title">${t('error', this.currentLang)}</span>
+            </div>
+            <div class="alert-desc">${t('dockerDaemonOfflineTips', this.currentLang)}</div>
+            <div class="alert-actions">
+              <button id="docker-retry-btn" class="btn btn-primary btn-sm">
+                ${ICONS.sync} ${t('dockerRetry', this.currentLang)}
+              </button>
+            </div>
           </div>
         ` : `
-          <div class="filter-bar">
-            <div class="input-with-icon">
-              <span class="input-icon">${ICONS.search}</span>
+          <!-- Summary Dashboard Cards -->
+          <div class="docker-stats-bar">
+            <div class="docker-stat-card">
+              <span class="stat-number">${containers.length}</span>
+              <span class="stat-label">${t('dockerTotal', this.currentLang)}</span>
+            </div>
+            <div class="docker-stat-card stat-running">
+              <span class="stat-number"><span class="stat-indicator-dot dot-running"></span>${runningCount}</span>
+              <span class="stat-label">${t('dockerRunning', this.currentLang)}</span>
+            </div>
+            <div class="docker-stat-card stat-stopped">
+              <span class="stat-number"><span class="stat-indicator-dot dot-stopped"></span>${stoppedCount}</span>
+              <span class="stat-label">${t('dockerStopped', this.currentLang)}</span>
+            </div>
+          </div>
+
+          <!-- Search & State Segmented Filters -->
+          <div class="docker-toolbar">
+            <div class="filter-search-box">
+              <span class="search-icon-inside">${ICONS.search}</span>
               <input
                 type="text"
                 id="docker-filter-input"
-                class="filter-input"
+                class="docker-search-input"
                 placeholder="${t('dockerFilterPlaceholder', this.currentLang)}"
                 value="${this.escapeHtml(this.filterQuery)}"
               />
+              ${this.filterQuery ? `<button id="docker-clear-filter" class="icon-btn-clear">${ICONS.clear}</button>` : ''}
+            </div>
+
+            <div class="segmented-pills">
+              <button class="pill-btn ${this.filterState === 'all' ? 'active' : ''}" data-state="all">
+                ${t('dockerAll', this.currentLang)} (${containers.length})
+              </button>
+              <button class="pill-btn ${this.filterState === 'running' ? 'active' : ''}" data-state="running">
+                ${t('dockerRunning', this.currentLang)} (${runningCount})
+              </button>
+              <button class="pill-btn ${this.filterState === 'stopped' ? 'active' : ''}" data-state="stopped">
+                ${t('dockerStopped', this.currentLang)} (${stoppedCount})
+              </button>
             </div>
           </div>
 
@@ -146,11 +197,11 @@ export class DockerView {
               <span class="spin">${ICONS.sync}</span>
               <p>${t('dockerRefreshing', this.currentLang)}</p>
             </div>
-          ` : filtered.length === 0 ? `
+          ` : filtered.length === 0 ? (containers.length === 0 ? this.renderStarterSamples() : `
             <div class="empty-state">
               <p>${t('dockerNoContainers', this.currentLang)}</p>
             </div>
-          ` : `
+          `) : `
             <div class="docker-containers-list">
               ${filtered.map((c) => this.renderContainerCard(c)).join('')}
             </div>
@@ -164,81 +215,159 @@ export class DockerView {
     this.attachEvents();
   }
 
-  private renderContainerCard(c: DockerContainerData): string {
-    const isRunning = c.state === 'running';
-    const currentAction = this.actionInProgress[c.id];
-
+  private renderStarterSamples(): string {
     return `
-      <div class="docker-card ${isRunning ? 'is-running' : 'is-stopped'}" data-id="${c.id}">
-        <div class="docker-card-header">
-          <div class="docker-name-badge">
-            <span class="docker-status-dot ${isRunning ? 'dot-running' : 'dot-stopped'}"></span>
-            <span class="docker-container-name" title="${this.escapeHtml(c.name)}">${this.escapeHtml(c.name)}</span>
-            <span class="docker-container-id">${c.id}</span>
+      <div class="docker-starter-box">
+        <div class="starter-header">
+          <span class="starter-title">${t('dockerQuickSamples', this.currentLang)}</span>
+        </div>
+        <p class="starter-desc">No containers are currently present on this host. You can spin up a lightweight test container right from here:</p>
+        
+        <div class="starter-item">
+          <div class="starter-item-info">
+            <span class="starter-name">Nginx Web Server</span>
+            <span class="code-text starter-cmd">docker run -d -p 8080:80 --name test-nginx nginx:alpine</span>
           </div>
-          <div class="docker-status-text">${this.escapeHtml(c.status)}</div>
+          <button class="btn btn-secondary btn-xs starter-run-btn" data-cmd="docker run -d -p 8080:80 --name test-nginx nginx:alpine">
+            ${ICONS.terminal} <span>${t('dockerRunInTerminal', this.currentLang)}</span>
+          </button>
         </div>
 
-        <div class="docker-card-body">
-          <div class="docker-meta-row">
-            <span class="docker-meta-label">${t('dockerImage', this.currentLang)}</span>
-            <span class="docker-meta-val code-text" title="${this.escapeHtml(c.image)}">${this.escapeHtml(c.image)}</span>
+        <div class="starter-item">
+          <div class="starter-item-info">
+            <span class="starter-name">Redis In-Memory Store</span>
+            <span class="code-text starter-cmd">docker run -d -p 6379:6379 --name test-redis redis:alpine</span>
           </div>
-          ${c.ports ? `
-            <div class="docker-meta-row">
-              <span class="docker-meta-label">${t('dockerPorts', this.currentLang)}</span>
-              <span class="docker-meta-val code-text" title="${this.escapeHtml(c.ports)}">${this.escapeHtml(c.ports)}</span>
-            </div>
-          ` : ''}
-        </div>
-
-        <div class="docker-card-actions">
-          ${isRunning ? `
-            <button
-              class="btn btn-secondary btn-xs docker-action-btn"
-              data-id="${c.id}"
-              data-action="stop"
-              ${currentAction ? 'disabled' : ''}
-              title="${t('dockerStop', this.currentLang)}"
-            >
-              ${currentAction === 'stop' ? `<span class="spin">${ICONS.sync}</span>` : ICONS.stop}
-              <span>${t('dockerStop', this.currentLang)}</span>
-            </button>
-            <button
-              class="btn btn-secondary btn-xs docker-action-btn"
-              data-id="${c.id}"
-              data-action="restart"
-              ${currentAction ? 'disabled' : ''}
-              title="${t('dockerRestart', this.currentLang)}"
-            >
-              ${currentAction === 'restart' ? `<span class="spin">${ICONS.sync}</span>` : ICONS.restart}
-              <span>${t('dockerRestart', this.currentLang)}</span>
-            </button>
-          ` : `
-            <button
-              class="btn btn-primary btn-xs docker-action-btn"
-              data-id="${c.id}"
-              data-action="start"
-              ${currentAction ? 'disabled' : ''}
-              title="${t('dockerStart', this.currentLang)}"
-            >
-              ${currentAction === 'start' ? `<span class="spin">${ICONS.sync}</span>` : ICONS.play}
-              <span>${t('dockerStart', this.currentLang)}</span>
-            </button>
-          `}
-
-          <button
-            class="btn btn-secondary btn-xs docker-logs-btn"
-            data-id="${c.id}"
-            data-name="${this.escapeHtml(c.name)}"
-            title="${t('dockerLogs', this.currentLang)}"
-          >
-            ${ICONS.log}
-            <span>${t('dockerLogs', this.currentLang)}</span>
+          <button class="btn btn-secondary btn-xs starter-run-btn" data-cmd="docker run -d -p 6379:6379 --name test-redis redis:alpine">
+            ${ICONS.terminal} <span>${t('dockerRunInTerminal', this.currentLang)}</span>
           </button>
         </div>
       </div>
     `;
+  }
+
+  private renderContainerCard(c: DockerContainerData): string {
+    const isRunning = c.state === 'running';
+    const currentAction = this.actionInProgress[c.id];
+    const isCopied = this.copiedContainerId === c.id;
+
+    // Parse port mappings for neat display
+    const portPills = this.extractPortPills(c.ports);
+
+    return `
+      <div class="docker-card ${isRunning ? 'is-running' : 'is-stopped'}" data-id="${c.id}">
+        <!-- Top Row: Icon + Name + Status Badge -->
+        <div class="docker-card-header">
+          <div class="docker-title-col">
+            <div class="docker-name-row">
+              <span class="docker-status-dot ${isRunning ? 'dot-running' : 'dot-stopped'}"></span>
+              <span class="docker-container-name" title="${this.escapeHtml(c.name)}">${this.escapeHtml(c.name)}</span>
+              <button
+                class="docker-id-pill"
+                data-copy-id="${c.id}"
+                title="Click to copy full ID"
+              >
+                ${isCopied ? ICONS.check : ICONS.copy}
+                <span>${isCopied ? t('dockerCopiedId', this.currentLang) : c.id}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="docker-status-badge ${isRunning ? 'badge-running' : 'badge-stopped'}">
+            <span>${this.escapeHtml(c.status || (isRunning ? 'Running' : 'Exited'))}</span>
+          </div>
+        </div>
+
+        <!-- Body: Details Table -->
+        <div class="docker-card-body">
+          <div class="docker-detail-row">
+            <span class="docker-detail-label">${t('dockerImage', this.currentLang)}</span>
+            <span class="docker-detail-val code-text" title="${this.escapeHtml(c.image)}">${this.escapeHtml(c.image)}</span>
+          </div>
+
+          ${portPills.length > 0 ? `
+            <div class="docker-detail-row">
+              <span class="docker-detail-label">${t('dockerPorts', this.currentLang)}</span>
+              <div class="docker-ports-wrap">
+                ${portPills.map((p) => `
+                  <span class="port-chip" title="${this.escapeHtml(p.raw)}">
+                    ${ICONS.link} ${this.escapeHtml(p.display)}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Actions Toolbar -->
+        <div class="docker-card-actions">
+          <div class="action-btn-group">
+            ${isRunning ? `
+              <button
+                class="btn btn-secondary btn-xs docker-action-btn action-stop"
+                data-id="${c.id}"
+                data-action="stop"
+                ${currentAction ? 'disabled' : ''}
+                title="${t('dockerStop', this.currentLang)}"
+              >
+                ${currentAction === 'stop' ? `<span class="spin">${ICONS.sync}</span>` : ICONS.stop}
+                <span>${t('dockerStop', this.currentLang)}</span>
+              </button>
+              <button
+                class="btn btn-secondary btn-xs docker-action-btn"
+                data-id="${c.id}"
+                data-action="restart"
+                ${currentAction ? 'disabled' : ''}
+                title="${t('dockerRestart', this.currentLang)}"
+              >
+                ${currentAction === 'restart' ? `<span class="spin">${ICONS.sync}</span>` : ICONS.restart}
+                <span>${t('dockerRestart', this.currentLang)}</span>
+              </button>
+            ` : `
+              <button
+                class="btn btn-primary btn-xs docker-action-btn action-start"
+                data-id="${c.id}"
+                data-action="start"
+                ${currentAction ? 'disabled' : ''}
+                title="${t('dockerStart', this.currentLang)}"
+              >
+                ${currentAction === 'start' ? `<span class="spin">${ICONS.sync}</span>` : ICONS.play}
+                <span>${t('dockerStart', this.currentLang)}</span>
+              </button>
+            `}
+
+            <button
+              class="btn btn-secondary btn-xs docker-logs-btn"
+              data-id="${c.id}"
+              data-name="${this.escapeHtml(c.name)}"
+              title="${t('dockerLogs', this.currentLang)}"
+            >
+              ${ICONS.terminal}
+              <span>${t('dockerLogs', this.currentLang)}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private extractPortPills(portsStr: string): { display: string; raw: string }[] {
+    if (!portsStr || !portsStr.trim()) return [];
+    const parts = portsStr.split(/,\s*/);
+    const pills: { display: string; raw: string }[] = [];
+
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      // Example: 0.0.0.0:8080->80/tcp or 5432/tcp
+      const arrowMatch = trimmed.match(/:(\d+)->(\d+)/);
+      if (arrowMatch) {
+        pills.push({ display: `:${arrowMatch[1]} → ${arrowMatch[2]}`, raw: trimmed });
+      } else {
+        pills.push({ display: trimmed, raw: trimmed });
+      }
+    }
+    return pills;
   }
 
   private renderLogsModal(): string {
@@ -248,10 +377,13 @@ export class DockerView {
       <div class="docker-logs-panel">
         <div class="logs-header">
           <div class="logs-title">
-            <span class="logs-icon">${ICONS.log}</span>
+            <span class="logs-icon">${ICONS.terminal}</span>
             <span class="logs-name">${t('dockerLogsTitle', this.currentLang)}: ${this.escapeHtml(this.activeLogs.name)}</span>
           </div>
           <div class="logs-actions">
+            <button id="docker-logs-copy" class="btn btn-secondary btn-xs" title="Copy all logs">
+              ${ICONS.copy} <span>Copy</span>
+            </button>
             <button id="docker-logs-refresh" class="icon-btn-secondary" title="${t('refresh', this.currentLang)}">
               ${ICONS.sync}
             </button>
@@ -267,7 +399,7 @@ export class DockerView {
               <span>Loading logs...</span>
             </div>
           ` : `
-            <pre class="logs-content"><code>${this.escapeHtml(this.activeLogs.logs)}</code></pre>
+            <pre class="logs-content" id="docker-logs-pre"><code>${this.escapeHtml(this.activeLogs.logs)}</code></pre>
           `}
         </div>
       </div>
@@ -294,6 +426,59 @@ export class DockerView {
         this.render();
       });
     }
+
+    // Clear filter
+    const clearBtn = this.container.querySelector('#docker-clear-filter');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.filterQuery = '';
+        this.render();
+      });
+    }
+
+    // Segmented state pills
+    const pills = this.container.querySelectorAll('.pill-btn');
+    pills.forEach((p) => {
+      p.addEventListener('click', () => {
+        const state = (p as HTMLElement).getAttribute('data-state') as 'all' | 'running' | 'stopped';
+        if (state) {
+          this.filterState = state;
+          this.render();
+        }
+      });
+    });
+
+    // Copy container ID
+    const copyIdBtns = this.container.querySelectorAll('[data-copy-id]');
+    copyIdBtns.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const id = (btn as HTMLElement).getAttribute('data-copy-id');
+        if (id) {
+          await navigator.clipboard.writeText(id);
+          this.copiedContainerId = id;
+          this.render();
+          if (this.copiedIdTimeout) clearTimeout(this.copiedIdTimeout);
+          this.copiedIdTimeout = setTimeout(() => {
+            this.copiedContainerId = null;
+            this.render();
+          }, 2000);
+        }
+      });
+    });
+
+    // Starter sample run in terminal
+    const starterBtns = this.container.querySelectorAll('.starter-run-btn');
+    starterBtns.forEach((b) => {
+      b.addEventListener('click', () => {
+        const cmd = (b as HTMLElement).getAttribute('data-cmd');
+        if (cmd) {
+          this.postMessage({
+            type: 'runTerminalCommand',
+            command: cmd
+          });
+        }
+      });
+    });
 
     // Action buttons (start / stop / restart)
     const actionBtns = this.container.querySelectorAll('.docker-action-btn');
@@ -342,6 +527,15 @@ export class DockerView {
       closeLogsBtn.addEventListener('click', () => {
         this.activeLogs = null;
         this.render();
+      });
+    }
+
+    // Copy logs
+    const copyLogsBtn = this.container.querySelector('#docker-logs-copy');
+    if (copyLogsBtn && this.activeLogs) {
+      copyLogsBtn.addEventListener('click', async () => {
+        if (!this.activeLogs) return;
+        await navigator.clipboard.writeText(this.activeLogs.logs);
       });
     }
 

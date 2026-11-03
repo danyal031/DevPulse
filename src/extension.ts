@@ -12,7 +12,7 @@ import { generateTsAndZod } from './utils/jsonToTsZod';
 import { formatJson } from './utils/jsonFormatter';
 import { scanListeningPorts, killProcessByPid } from './utils/portManager';
 import { getSystemNetworkInfo } from './utils/networkInfo';
-import { getGitChanges, generateConventionalCommit } from './utils/gitCommit';
+import { getGitChanges, getGitDiff, generateConventionalCommit } from './utils/gitCommit';
 import { GIT_CHEAT_SHEET } from './utils/gitScenarios';
 import { translations } from './webview/i18n';
 
@@ -327,7 +327,8 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const commit = generateConventionalCommit(changes);
+      const diffText = await getGitDiff(rootPath);
+      const commit = generateConventionalCommit(changes, diffText);
 
       // 1. Try to set commit message in VS Code Git Source Control input box directly
       let insertedIntoScm = false;

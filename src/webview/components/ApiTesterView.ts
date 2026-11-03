@@ -13,7 +13,8 @@ export interface ApiTesterState {
   url: string;
   headers: HeaderRow[];
   body: string;
-  activeReqTab: 'headers' | 'body';
+  bearerToken: string;
+  activeReqTab: 'headers' | 'body' | 'auth';
   activeRespTab: 'body' | 'headers';
   lastResponse?: {
     status: number;
@@ -38,7 +39,8 @@ export class ApiTesterView {
     { id: '1', key: 'Accept', value: 'application/json', enabled: true }
   ];
   private body: string = '{\n  "title": "foo",\n  "body": "bar",\n  "userId": 1\n}';
-  private activeReqTab: 'headers' | 'body' = 'headers';
+  private bearerToken: string = '';
+  private activeReqTab: 'headers' | 'body' | 'auth' = 'headers';
   private activeRespTab: 'body' | 'headers' = 'body';
 
   private isSending: boolean = false;
@@ -70,6 +72,7 @@ export class ApiTesterView {
       url: this.url,
       headers: this.headers,
       body: this.body,
+      bearerToken: this.bearerToken,
       activeReqTab: this.activeReqTab,
       activeRespTab: this.activeRespTab,
       lastResponse: this.lastResponse
@@ -82,6 +85,7 @@ export class ApiTesterView {
     if (typeof state.url === 'string') this.url = state.url;
     if (Array.isArray(state.headers)) this.headers = state.headers;
     if (typeof state.body === 'string') this.body = state.body;
+    if (typeof state.bearerToken === 'string') this.bearerToken = state.bearerToken;
     if (state.activeReqTab) this.activeReqTab = state.activeReqTab;
     if (state.activeRespTab) this.activeRespTab = state.activeRespTab;
     if (state.lastResponse) this.lastResponse = state.lastResponse;
@@ -90,14 +94,14 @@ export class ApiTesterView {
   }
 
   private render() {
-    const isFa = this.currentLang === 'fa';
     const allowsBody = !['GET', 'HEAD'].includes(this.method);
 
     this.container.innerHTML = `
       <div class="api-tester-wrapper">
+        <!-- Header -->
         <div class="section-header">
           <div class="section-title-wrap">
-            <span class="section-icon">${ICONS.send}</span>
+            <span class="section-icon api-glow-icon">${ICONS.send}</span>
             <div class="section-text">
               <h3 class="section-title">${t('apiTitle', this.currentLang)}</h3>
               <p class="section-subtitle">${t('apiSubtitle', this.currentLang)}</p>
@@ -105,28 +109,49 @@ export class ApiTesterView {
           </div>
         </div>
 
-        <!-- Request Line -->
-        <div class="api-request-bar">
-          <select id="api-method-select" class="api-method-select method-${this.method.toLowerCase()}">
-            <option value="GET" ${this.method === 'GET' ? 'selected' : ''}>GET</option>
-            <option value="POST" ${this.method === 'POST' ? 'selected' : ''}>POST</option>
-            <option value="PUT" ${this.method === 'PUT' ? 'selected' : ''}>PUT</option>
-            <option value="PATCH" ${this.method === 'PATCH' ? 'selected' : ''}>PATCH</option>
-            <option value="DELETE" ${this.method === 'DELETE' ? 'selected' : ''}>DELETE</option>
-            <option value="HEAD" ${this.method === 'HEAD' ? 'selected' : ''}>HEAD</option>
-          </select>
+        <!-- Quick Presets Row -->
+        <div class="api-presets-row">
+          <span class="presets-label">${t('apiQuickPresets', this.currentLang)}</span>
+          <div class="presets-chips">
+            <button class="preset-chip" id="preset-get-sample">
+              ${t('apiPresetGetSample', this.currentLang)}
+            </button>
+            <button class="preset-chip" id="preset-post-sample">
+              ${t('apiPresetPostSample', this.currentLang)}
+            </button>
+            <button class="preset-chip" id="preset-localhost">
+              ${t('apiPresetLocalhost', this.currentLang)}
+            </button>
+          </div>
+        </div>
 
-          <input
-            type="text"
-            id="api-url-input"
-            class="api-url-input"
-            placeholder="${t('apiUrlPlaceholder', this.currentLang)}"
-            value="${this.escapeHtml(this.url)}"
-          />
+        <!-- Main Request Bar -->
+        <div class="api-request-bar">
+          <div class="method-select-wrap">
+            <select id="api-method-select" class="api-method-select method-${this.method.toLowerCase()}">
+              <option value="GET" ${this.method === 'GET' ? 'selected' : ''}>GET</option>
+              <option value="POST" ${this.method === 'POST' ? 'selected' : ''}>POST</option>
+              <option value="PUT" ${this.method === 'PUT' ? 'selected' : ''}>PUT</option>
+              <option value="PATCH" ${this.method === 'PATCH' ? 'selected' : ''}>PATCH</option>
+              <option value="DELETE" ${this.method === 'DELETE' ? 'selected' : ''}>DELETE</option>
+              <option value="HEAD" ${this.method === 'HEAD' ? 'selected' : ''}>HEAD</option>
+            </select>
+          </div>
+
+          <div class="api-url-wrap">
+            <input
+              type="text"
+              id="api-url-input"
+              class="api-url-input"
+              placeholder="${t('apiUrlPlaceholder', this.currentLang)}"
+              value="${this.escapeHtml(this.url)}"
+            />
+            ${this.url ? `<button id="api-clear-url" class="icon-btn-clear">${ICONS.clear}</button>` : ''}
+          </div>
 
           <button id="api-send-btn" class="btn btn-primary api-send-btn" ${this.isSending ? 'disabled' : ''}>
             ${this.isSending ? `<span class="spin">${ICONS.sync}</span>` : ICONS.send}
-            <span>${this.isSending ? t('apiSending', this.currentLang) : t('apiSend', this.currentLang)}</span>
+            <span>${this.isSending ? t('apiSending', this.currentLang) : `${t('apiSend', this.currentLang)}`}</span>
           </button>
         </div>
 
@@ -136,7 +161,7 @@ export class ApiTesterView {
             class="subtab-btn ${this.activeReqTab === 'headers' ? 'active' : ''}"
             id="subtab-req-headers"
           >
-            ${t('apiTabHeaders', this.currentLang)} (${this.headers.filter((h) => h.enabled && h.key).length})
+            ${t('apiTabHeaders', this.currentLang)} <span class="badge-count">${this.headers.filter((h) => h.enabled && h.key).length}</span>
           </button>
           ${allowsBody ? `
             <button
@@ -146,14 +171,22 @@ export class ApiTesterView {
               ${t('apiTabBody', this.currentLang)}
             </button>
           ` : ''}
+          <button
+            class="subtab-btn ${this.activeReqTab === 'auth' ? 'active' : ''}"
+            id="subtab-req-auth"
+          >
+            ${t('apiAuthTab', this.currentLang)} ${this.bearerToken ? '<span class="dot-active"></span>' : ''}
+          </button>
         </div>
 
-        <!-- Request Panel -->
+        <!-- Request Panel Content -->
         <div class="api-req-panel">
-          ${this.activeReqTab === 'headers' ? this.renderHeadersEditor() : this.renderBodyEditor()}
+          ${this.activeReqTab === 'headers' ? this.renderHeadersEditor() :
+            this.activeReqTab === 'body' ? this.renderBodyEditor() :
+            this.renderAuthEditor()}
         </div>
 
-        <!-- Response Section -->
+        <!-- Response Dashboard Section -->
         <div class="api-response-container">
           ${this.renderResponseSection()}
         </div>
@@ -166,6 +199,13 @@ export class ApiTesterView {
   private renderHeadersEditor(): string {
     return `
       <div class="headers-editor-wrap">
+        <!-- Quick Header Injectors -->
+        <div class="quick-headers-bar">
+          <span class="quick-headers-label">${t('apiQuickHeaders', this.currentLang)}</span>
+          <button class="header-inject-btn" id="inject-header-json">+ JSON Content-Type</button>
+          <button class="header-inject-btn" id="inject-header-accept">+ Accept */*</button>
+        </div>
+
         <div class="headers-table">
           ${this.headers.map((h, idx) => `
             <div class="header-row" data-id="${h.id}">
@@ -174,7 +214,7 @@ export class ApiTesterView {
                 class="header-enable-check"
                 data-idx="${idx}"
                 ${h.enabled ? 'checked' : ''}
-                title="Enable/Disable header"
+                title="Toggle header"
               />
               <input
                 type="text"
@@ -200,28 +240,64 @@ export class ApiTesterView {
             </div>
           `).join('')}
         </div>
-        <button id="api-add-header-btn" class="btn btn-secondary btn-sm" style="margin-top: 6px;">
-          ${ICONS.plus} ${t('apiAddHeader', this.currentLang)}
+
+        <button id="api-add-header-btn" class="btn btn-secondary btn-xs add-header-action">
+          ${ICONS.plus} <span>${t('apiAddHeader', this.currentLang)}</span>
         </button>
       </div>
     `;
   }
 
   private renderBodyEditor(): string {
+    let isValidJson = false;
+    try {
+      if (this.body.trim()) {
+        JSON.parse(this.body);
+        isValidJson = true;
+      }
+    } catch {}
+
     return `
       <div class="body-editor-wrap">
         <div class="body-actions-bar">
-          <span class="text-muted">JSON / Raw Body</span>
-          <button id="api-format-body-btn" class="btn btn-secondary btn-xs">
-            ${ICONS.wand} ${t('apiFormatJson', this.currentLang)}
-          </button>
+          <span class="json-valid-badge ${isValidJson ? 'badge-valid' : 'badge-invalid'}">
+            ${isValidJson ? 'JSON Valid' : 'Syntax Check'}
+          </span>
+          <div class="body-tool-btns">
+            <button id="api-format-body-btn" class="btn btn-secondary btn-xs">
+              ${ICONS.wand} <span>${t('apiFormatJson', this.currentLang)}</span>
+            </button>
+            <button id="api-clear-body-btn" class="icon-btn-secondary" title="Clear body">
+              ${ICONS.clear}
+            </button>
+          </div>
         </div>
         <textarea
           id="api-body-textarea"
-          class="code-textarea"
-          rows="5"
+          class="code-textarea body-editor-textarea"
+          rows="6"
           placeholder="${t('apiBodyPlaceholder', this.currentLang)}"
         >${this.escapeHtml(this.body)}</textarea>
+      </div>
+    `;
+  }
+
+  private renderAuthEditor(): string {
+    return `
+      <div class="auth-editor-wrap">
+        <div class="auth-field-group">
+          <label class="auth-field-label">${t('apiBearerToken', this.currentLang)}</label>
+          <div class="auth-input-wrapper">
+            <input
+              type="text"
+              id="api-bearer-input"
+              class="auth-input"
+              placeholder="${t('apiTokenPlaceholder', this.currentLang)}"
+              value="${this.escapeHtml(this.bearerToken)}"
+            />
+          </div>
+          <p class="auth-hint">Setting a Bearer token automatically updates the <code>Authorization: Bearer &lt;token&gt;</code> header.</p>
+        </div>
       </div>
     `;
   }
@@ -230,16 +306,25 @@ export class ApiTesterView {
     if (this.isSending) {
       return `
         <div class="response-loading-state">
-          <span class="spin">${ICONS.sync}</span>
-          <p>${t('apiSending', this.currentLang)}</p>
+          <span class="spin pulse-loader">${ICONS.sync}</span>
+          <p class="loading-title">${t('apiSending', this.currentLang)}</p>
+          <span class="loading-subtitle">Dispatching request through Extension Host...</span>
         </div>
       `;
     }
 
     if (!this.lastResponse) {
       return `
-        <div class="response-empty-state">
-          <p class="text-muted">${t('apiNoResponseYet', this.currentLang)}</p>
+        <div class="api-welcome-card">
+          <div class="welcome-header">
+            <span class="welcome-icon">${ICONS.send}</span>
+            <span class="welcome-title">${t('apiWelcomeTitle', this.currentLang)}</span>
+          </div>
+          <ul class="welcome-tips-list">
+            <li>${t('apiWelcomeTip1', this.currentLang)}</li>
+            <li>${t('apiWelcomeTip2', this.currentLang)}</li>
+            <li>${t('apiWelcomeTip3', this.currentLang)}</li>
+          </ul>
         </div>
       `;
     }
@@ -254,27 +339,40 @@ export class ApiTesterView {
 
     const headerKeys = Object.keys(res.headers || {});
 
+    // Latency evaluation
+    let latencyBadge = t('apiNormalLatency', this.currentLang);
+    let latencyClass = 'latency-normal';
+    if (res.timeMs < 200) {
+      latencyBadge = t('apiFastLatency', this.currentLang);
+      latencyClass = 'latency-fast';
+    } else if (res.timeMs > 600) {
+      latencyBadge = t('apiSlowLatency', this.currentLang);
+      latencyClass = 'latency-slow';
+    }
+
     return `
       <div class="response-card">
+        <!-- Status & Meta Bar -->
         <div class="response-meta-bar">
           <div class="status-badge ${statusClass}">
             <span class="status-code">${res.status || 'ERR'}</span>
             <span class="status-text">${this.escapeHtml(res.statusText || (res.error ? 'Failed' : 'OK'))}</span>
           </div>
 
-          <div class="meta-item">
-            <span class="meta-label">${t('apiResponseTime', this.currentLang)}:</span>
-            <span class="meta-val">${res.timeMs} ms</span>
-          </div>
+          <div class="response-badges-group">
+            <div class="meta-pill ${latencyClass}" title="Response Latency">
+              ${ICONS.gauge}
+              <span>${res.timeMs} ms (${latencyBadge})</span>
+            </div>
 
-          <div class="meta-item">
-            <span class="meta-label">${t('apiResponseSize', this.currentLang)}:</span>
-            <span class="meta-val">${this.formatBytes(res.sizeBytes)}</span>
+            <div class="meta-pill" title="Payload Size">
+              <span>${this.formatBytes(res.sizeBytes)}</span>
+            </div>
           </div>
         </div>
 
         ${res.error ? `
-          <div class="alert-box alert-error" style="margin-top: 8px;">
+          <div class="docker-alert-card alert-error" style="margin-top: 8px;">
             <div class="alert-title">${t('error', this.currentLang)}</div>
             <div class="alert-desc">${this.escapeHtml(res.error)}</div>
           </div>
@@ -292,7 +390,7 @@ export class ApiTesterView {
             class="subtab-btn ${this.activeRespTab === 'headers' ? 'active' : ''}"
             id="subtab-resp-headers"
           >
-            ${t('apiTabRespHeaders', this.currentLang)} (${headerKeys.length})
+            ${t('apiTabRespHeaders', this.currentLang)} <span class="badge-count">${headerKeys.length}</span>
           </button>
         </div>
 
@@ -300,7 +398,7 @@ export class ApiTesterView {
           ${this.activeRespTab === 'body' ? `
             <div class="resp-body-wrap">
               <div class="resp-body-actions">
-                <span class="text-muted">${res.isJson ? 'JSON' : 'Text'}</span>
+                <span class="body-format-pill">${res.isJson ? 'JSON' : 'Raw Text'}</span>
                 <div class="action-btn-group">
                   <button id="resp-copy-btn" class="btn btn-secondary btn-xs">
                     ${ICONS.copy} <span id="resp-copy-text">${t('apiCopyResponse', this.currentLang)}</span>
@@ -332,6 +430,40 @@ export class ApiTesterView {
   }
 
   private attachEvents() {
+    // Presets
+    const presetGet = this.container.querySelector('#preset-get-sample');
+    if (presetGet) {
+      presetGet.addEventListener('click', () => {
+        this.method = 'GET';
+        this.url = 'https://jsonplaceholder.typicode.com/posts/1';
+        this.render();
+      });
+    }
+
+    const presetPost = this.container.querySelector('#preset-post-sample');
+    if (presetPost) {
+      presetPost.addEventListener('click', () => {
+        this.method = 'POST';
+        this.url = 'https://jsonplaceholder.typicode.com/posts';
+        this.body = JSON.stringify({ title: 'New DevShelf Feature', body: 'Mini API Tester', userId: 1 }, null, 2);
+        this.activeReqTab = 'body';
+        // Add JSON header if missing
+        if (!this.headers.some((h) => h.key.toLowerCase() === 'content-type')) {
+          this.headers.push({ id: String(Date.now()), key: 'Content-Type', value: 'application/json', enabled: true });
+        }
+        this.render();
+      });
+    }
+
+    const presetLocal = this.container.querySelector('#preset-localhost');
+    if (presetLocal) {
+      presetLocal.addEventListener('click', () => {
+        this.method = 'GET';
+        this.url = 'http://localhost:3000/api/health';
+        this.render();
+      });
+    }
+
     // Method change
     const methodSelect = this.container.querySelector('#api-method-select') as HTMLSelectElement;
     if (methodSelect) {
@@ -357,6 +489,14 @@ export class ApiTesterView {
       });
     }
 
+    const clearUrlBtn = this.container.querySelector('#api-clear-url');
+    if (clearUrlBtn) {
+      clearUrlBtn.addEventListener('click', () => {
+        this.url = '';
+        this.render();
+      });
+    }
+
     // Send button
     const sendBtn = this.container.querySelector('#api-send-btn');
     if (sendBtn) {
@@ -376,6 +516,43 @@ export class ApiTesterView {
     if (reqBodyTab) {
       reqBodyTab.addEventListener('click', () => {
         this.activeReqTab = 'body';
+        this.render();
+      });
+    }
+
+    const reqAuthTab = this.container.querySelector('#subtab-req-auth');
+    if (reqAuthTab) {
+      reqAuthTab.addEventListener('click', () => {
+        this.activeReqTab = 'auth';
+        this.render();
+      });
+    }
+
+    // Quick headers injectors
+    const injectJson = this.container.querySelector('#inject-header-json');
+    if (injectJson) {
+      injectJson.addEventListener('click', () => {
+        const existing = this.headers.find((h) => h.key.toLowerCase() === 'content-type');
+        if (existing) {
+          existing.value = 'application/json';
+          existing.enabled = true;
+        } else {
+          this.headers.push({ id: String(Date.now()), key: 'Content-Type', value: 'application/json', enabled: true });
+        }
+        this.render();
+      });
+    }
+
+    const injectAccept = this.container.querySelector('#inject-header-accept');
+    if (injectAccept) {
+      injectAccept.addEventListener('click', () => {
+        const existing = this.headers.find((h) => h.key.toLowerCase() === 'accept');
+        if (existing) {
+          existing.value = '*/*';
+          existing.enabled = true;
+        } else {
+          this.headers.push({ id: String(Date.now()), key: 'Accept', value: '*/*', enabled: true });
+        }
         this.render();
       });
     }
@@ -446,6 +623,39 @@ export class ApiTesterView {
           this.body = JSON.stringify(parsed, null, 2);
           this.render();
         } catch {}
+      });
+    }
+
+    const clearBodyBtn = this.container.querySelector('#api-clear-body-btn');
+    if (clearBodyBtn) {
+      clearBodyBtn.addEventListener('click', () => {
+        this.body = '';
+        this.render();
+      });
+    }
+
+    // Auth input
+    const bearerInput = this.container.querySelector('#api-bearer-input') as HTMLInputElement;
+    if (bearerInput) {
+      bearerInput.addEventListener('input', (e) => {
+        this.bearerToken = (e.target as HTMLInputElement).value.trim();
+        // Sync with headers
+        const existingAuth = this.headers.find((h) => h.key.toLowerCase() === 'authorization');
+        if (this.bearerToken) {
+          if (existingAuth) {
+            existingAuth.value = `Bearer ${this.bearerToken}`;
+            existingAuth.enabled = true;
+          } else {
+            this.headers.push({
+              id: String(Date.now()),
+              key: 'Authorization',
+              value: `Bearer ${this.bearerToken}`,
+              enabled: true
+            });
+          }
+        } else if (existingAuth) {
+          existingAuth.enabled = false;
+        }
       });
     }
 

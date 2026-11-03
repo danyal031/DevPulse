@@ -258,6 +258,16 @@ export const translations = {
     dockerStatus: 'Status:',
     dockerRunningBadge: 'Running',
     dockerExitedBadge: 'Exited',
+    dockerAll: 'All',
+    dockerRunning: 'Running',
+    dockerStopped: 'Stopped',
+    dockerActivePorts: 'Ports',
+    dockerQuickSamples: 'Quick Starter Containers',
+    dockerRunInTerminal: 'Run in Terminal',
+    dockerDaemonOfflineTips: 'Docker daemon is not running. Please start Docker Desktop or the system docker service.',
+    dockerRetry: 'Retry Connection',
+    dockerCopiedId: 'Copied ID!',
+    dockerTotal: 'Total',
 
     // API Tester
     apiTitle: 'Mini API Tester (cURL Lite)',
@@ -279,7 +289,22 @@ export const translations = {
     apiTabRespBody: 'Response Body',
     apiTabRespHeaders: 'Response Headers',
     apiNoResponseYet: 'Hit "Send Request" to test an endpoint.',
-    apiCopyResponse: 'Copy Response'
+    apiCopyResponse: 'Copy Response',
+    apiQuickPresets: 'Quick Presets:',
+    apiPresetGetSample: 'GET Posts (Sample)',
+    apiPresetPostSample: 'POST JSON (Sample)',
+    apiPresetLocalhost: 'Ping Localhost:3000',
+    apiAuthTab: 'Auth',
+    apiBearerToken: 'Bearer Token',
+    apiTokenPlaceholder: 'Paste bearer token or auth secret...',
+    apiQuickHeaders: 'Quick Headers:',
+    apiFastLatency: 'Fast',
+    apiNormalLatency: 'Normal',
+    apiSlowLatency: 'Slow',
+    apiWelcomeTitle: 'Ready to dispatch HTTP requests',
+    apiWelcomeTip1: 'Zero CORS: Requests execute directly via Extension Host Node.js runtime',
+    apiWelcomeTip2: 'Supports localhost:3000, 127.0.0.1, internal IP addresses, and remote web APIs',
+    apiWelcomeTip3: 'Shortcut: Press Ctrl+Enter or hit Enter in the URL field to send'
   },
   fa: {
     appName: 'دِوشلف (DevShelf)',
@@ -538,6 +563,16 @@ export const translations = {
     dockerStatus: 'وضعیت:',
     dockerRunningBadge: 'فعال',
     dockerExitedBadge: 'متوقف',
+    dockerAll: 'همه',
+    dockerRunning: 'در حال اجرا',
+    dockerStopped: 'متوقف',
+    dockerActivePorts: 'پورت‌ها',
+    dockerQuickSamples: 'کانتینرهای تستی سریع',
+    dockerRunInTerminal: 'اجرا در ترمینال',
+    dockerDaemonOfflineTips: 'دیمن داکر در حال اجرا نیست. لطفاً نرم‌افزار Docker Desktop یا سرویس داکر را اجرا کنید.',
+    dockerRetry: 'تلاش مجدد اتصال',
+    dockerCopiedId: 'شناسه کپی شد!',
+    dockerTotal: 'کل کانتینرها',
 
     // API Tester
     apiTitle: 'تستر سریع API (cURL Lite)',
@@ -559,7 +594,22 @@ export const translations = {
     apiTabRespBody: 'بدنه پاسخ',
     apiTabRespHeaders: 'هدرهای دریافتی',
     apiNoResponseYet: 'برای تست اندپوینت، روی «ارسال درخواست» کلیک کنید.',
-    apiCopyResponse: 'کپی پاسخ'
+    apiCopyResponse: 'کپی پاسخ',
+    apiQuickPresets: 'الگوهای سریع:',
+    apiPresetGetSample: 'درخواست نمونه GET',
+    apiPresetPostSample: 'ارسال نمونه POST',
+    apiPresetLocalhost: 'پینگ Localhost:3000',
+    apiAuthTab: 'احراز هویت',
+    apiBearerToken: 'توکن Bearer',
+    apiTokenPlaceholder: 'توکن دسترسی (Bearer) را وارد کنید...',
+    apiQuickHeaders: 'هدرهای سریع:',
+    apiFastLatency: 'سریع',
+    apiNormalLatency: 'عادی',
+    apiSlowLatency: 'کند',
+    apiWelcomeTitle: 'آماده ارسال و تست درخواست‌های HTTP',
+    apiWelcomeTip1: 'بدون محدودیت CORS: اجرای مستقیم از طریق ران‌تایم نود در هاست اکستنشن',
+    apiWelcomeTip2: 'پشتیبانی کامل از localhost:3000، آی‌پی‌های لوکال شبکه و سرورهای وب ریموت',
+    apiWelcomeTip3: 'کلید میانبر: فشردن Ctrl+Enter یا Enter در کادر آدرس برای ارسال'
   }
 } as const;
 

@@ -128,7 +128,10 @@
         "command": "devshelf.generateCommitMessage",
         "title": "Generate Conventional Commit Message",
         "category": "DevShelf",
-        "icon": "media/commit-icon.svg"
+        "icon": {
+          "light": "media/commit-icon-light.svg",
+          "dark": "media/commit-icon-dark.svg"
+        }
       },
       {
         "command": "devshelf.openGitWizard",

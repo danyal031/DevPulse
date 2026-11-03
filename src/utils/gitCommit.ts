@@ -15,7 +15,7 @@ export interface GeneratedCommit {
 
 function runGitCommand(cmd: string, cwd: string): Promise<string> {
   return new Promise((resolve) => {
-    exec(`git ${cmd}`, { cwd, maxBuffer: 10 * 1024 * 1024 }, (error, stdout) => {
+    exec(`git ${cmd}`, { cwd, maxBuffer: 15 * 1024 * 1024 }, (error, stdout) => {
       if (error) {
         resolve('');
       } else {
@@ -67,7 +67,159 @@ export async function getGitChanges(cwd: string): Promise<FileChange[]> {
   return changes;
 }
 
-export function generateConventionalCommit(changes: FileChange[]): GeneratedCommit {
+/**
+ * Retrieves git diff patch text. Checks staged diff first; falls back to unstaged diff.
+ */
+export async function getGitDiff(cwd: string): Promise<string> {
+  const stagedDiff = await runGitCommand('diff --cached', cwd);
+  if (stagedDiff) return stagedDiff;
+  return await runGitCommand('diff', cwd);
+}
+
+/**
+ * Parses raw git diff output to extract semantic descriptions of changes within each file.
+ */
+export function analyzeDiffHunks(diffText: string): Map<string, string[]> {
+  const fileSummaries = new Map<string, string[]>();
+  if (!diffText || !diffText.trim()) {
+    return fileSummaries;
+  }
+
+  // Split diff into per-file chunks
+  const fileChunks = diffText.split(/^diff --git /m);
+
+  for (const chunk of fileChunks) {
+    if (!chunk.trim()) continue;
+
+    const firstLine = chunk.split(/\r?\n/)[0];
+    const match = firstLine.match(/a\/(\S+)\s+b\/(\S+)/);
+    if (!match) continue;
+
+    const filePath = match[2];
+    const descriptions: string[] = [];
+
+    const lines = chunk.split(/\r?\n/);
+    const addedLines: string[] = [];
+    const removedLines: string[] = [];
+
+    for (const l of lines) {
+      if (l.startsWith('+++') || l.startsWith('---')) continue;
+      if (l.startsWith('+')) addedLines.push(l.substring(1).trim());
+      else if (l.startsWith('-')) removedLines.push(l.substring(1).trim());
+    }
+
+    // 1. Detect version bump in package.json
+    if (filePath.endsWith('package.json')) {
+      for (const line of addedLines) {
+        const verMatch = line.match(/"version":\s*"([^"]+)"/);
+        if (verMatch) {
+          descriptions.push(`bump version to ${verMatch[1]}`);
+          break;
+        }
+      }
+      for (const line of addedLines) {
+        const cmdMatch = line.match(/"command":\s*"devshelf\.([^"]+)"/);
+        if (cmdMatch) {
+          descriptions.push(`register ${cmdMatch[1]} command`);
+        }
+      }
+    }
+
+    // 2. Detect functions, classes, interfaces, or types
+    const addedFuncs = new Set<string>();
+    const modifiedFuncs = new Set<string>();
+    const addedTypes = new Set<string>();
+
+    for (const line of addedLines) {
+      // Functions
+      const fnMatch = line.match(/(?:export\s+)?(?:async\s+)?function\s+([a-zA-Z0-9_$]+)/);
+      if (fnMatch) addedFuncs.add(fnMatch[1]);
+
+      // Classes
+      const clsMatch = line.match(/(?:export\s+)?class\s+([a-zA-Z0-9_$]+)/);
+      if (clsMatch) addedFuncs.add(clsMatch[1]);
+
+      // Interfaces & Types
+      const typeMatch = line.match(/(?:export\s+)?(?:interface|type)\s+([a-zA-Z0-9_$]+)/);
+      if (typeMatch) addedTypes.add(typeMatch[1]);
+
+      // Command registrations
+      const regMatch = line.match(/registerCommand\(['"]devshelf\.([^'"]+)['"]/);
+      if (regMatch) descriptions.push(`register devshelf.${regMatch[1]} command`);
+
+      // Event/Message handlers
+      const caseMatch = line.match(/case\s+['"]([a-zA-Z0-9_$]+)['"]:/);
+      if (caseMatch && !['get', 'post', 'put', 'delete'].includes(caseMatch[1].toLowerCase())) {
+        descriptions.push(`handle ${caseMatch[1]} message`);
+      }
+    }
+
+    if (addedFuncs.size > 0) {
+      const names = Array.from(addedFuncs).slice(0, 3).join(', ');
+      descriptions.push(`implement ${names}${addedFuncs.size > 3 ? ` (+${addedFuncs.size - 3} more)` : ''}`);
+    }
+
+    if (addedTypes.size > 0) {
+      const types = Array.from(addedTypes).slice(0, 3).join(', ');
+      descriptions.push(`define ${types}`);
+    }
+
+    // 3. UI/CSS styles
+    if (filePath.endsWith('.css')) {
+      const addedClasses = new Set<string>();
+      for (const line of addedLines) {
+        const classMatch = line.match(/\.([a-zA-Z0-9\-_]+)\s*\{/);
+        if (classMatch) addedClasses.add(classMatch[1]);
+      }
+      if (addedClasses.size > 0) {
+        const sel = Array.from(addedClasses).slice(0, 3).map((c) => `.${c}`).join(', ');
+        descriptions.push(`add UI styles for ${sel}`);
+      }
+    }
+
+    // 4. Docs / Markdown sections
+    if (filePath.endsWith('.md')) {
+      const sections: string[] = [];
+      for (const line of addedLines) {
+        const hMatch = line.match(/^#{1,3}\s+(.+)$/);
+        if (hMatch) sections.push(hMatch[1].replace(/[\*\_`]/g, '').trim());
+      }
+      if (sections.length > 0) {
+        descriptions.push(`document ${sections.slice(0, 2).join(' and ')}`);
+      }
+    }
+
+    // 5. Bug fix / error handling detection
+    const hasErrorFix = addedLines.some((l) =>
+      l.includes('catch') ||
+      l.includes('try {') ||
+      l.includes('validate') ||
+      l.includes('sanitize') ||
+      l.includes('timeout') ||
+      l.includes('error')
+    );
+    if (hasErrorFix && descriptions.length === 0) {
+      descriptions.push('enhance error handling and input validation');
+    }
+
+    // Fallback if no specific patterns matched
+    if (descriptions.length === 0) {
+      if (addedLines.length > 0 && removedLines.length === 0) {
+        descriptions.push('add component logic and utilities');
+      } else if (removedLines.length > 0 && addedLines.length === 0) {
+        descriptions.push('remove obsolete code and cleanup');
+      } else {
+        descriptions.push('update implementation details');
+      }
+    }
+
+    fileSummaries.set(filePath, descriptions);
+  }
+
+  return fileSummaries;
+}
+
+export function generateConventionalCommit(changes: FileChange[], diffText?: string): GeneratedCommit {
   if (changes.length === 0) {
     return {
       type: 'chore',
@@ -77,7 +229,9 @@ export function generateConventionalCommit(changes: FileChange[]): GeneratedComm
     };
   }
 
-  // Detect types by inspecting file paths and statuses
+  const detailedSummaries = diffText ? analyzeDiffHunks(diffText) : new Map<string, string[]>();
+
+  // Detect types by inspecting file paths, statuses, and diff contents
   let type = 'feat';
   const filePaths = changes.map((c) => c.filePath.toLowerCase());
 
@@ -102,7 +256,6 @@ export function generateConventionalCommit(changes: FileChange[]): GeneratedComm
   } else if (hasOnlyConfigs) {
     type = 'chore';
   } else {
-    // Check if changes indicate a fix vs a feature
     const isFix = filePaths.some((f) => f.includes('fix') || f.includes('error') || f.includes('kill') || f.includes('port'));
     const isNew = changes.some((c) => c.status === 'A' || c.status === '?');
 
@@ -115,9 +268,13 @@ export function generateConventionalCommit(changes: FileChange[]): GeneratedComm
     }
   }
 
-  // Detect scope from common folder or component name
+  // Detect scope from folder or component name
   let scope = 'app';
-  if (filePaths.some((f) => f.includes('port') || f.includes('network'))) {
+  if (filePaths.some((f) => f.includes('docker'))) {
+    scope = 'docker';
+  } else if (filePaths.some((f) => f.includes('api') || f.includes('curl') || f.includes('tester'))) {
+    scope = 'api';
+  } else if (filePaths.some((f) => f.includes('port') || f.includes('network'))) {
     scope = 'network';
   } else if (filePaths.some((f) => f.includes('json') || f.includes('zod'))) {
     scope = 'json';
@@ -126,33 +283,60 @@ export function generateConventionalCommit(changes: FileChange[]): GeneratedComm
   } else if (filePaths.some((f) => f.includes('jalali') || f.includes('persian'))) {
     scope = 'persian';
   } else if (filePaths.some((f) => f.includes('scm') || f.includes('commit') || f.includes('git'))) {
-    scope = 'scm';
+    scope = 'git';
   } else if (filePaths.some((f) => f.includes('webview') || f.includes('components'))) {
     scope = 'ui';
   } else if (filePaths.some((f) => f.includes('package') || f.includes('deps'))) {
     scope = 'deps';
   }
 
-  // Generate concise subject
+  // Generate concise, informative subject
   let subject = '';
   if (changes.length === 1) {
     const single = changes[0];
     const baseName = path.basename(single.filePath, path.extname(single.filePath));
     const verb = single.status === 'A' || single.status === '?' ? 'add' : single.status === 'D' ? 'remove' : 'update';
-    subject = `${verb} ${baseName}`;
+    const detailList = detailedSummaries.get(single.filePath);
+    if (detailList && detailList.length > 0) {
+      subject = `${detailList[0]} in ${baseName}`;
+    } else {
+      subject = `${verb} ${baseName}`;
+    }
   } else {
-    const verbs: string[] = [];
-    if (changes.some((c) => c.status === 'A' || c.status === '?')) verbs.push('add');
-    if (changes.some((c) => c.status === 'M')) verbs.push('update');
-    if (changes.some((c) => c.status === 'D')) verbs.push('remove');
+    // Check if we have specific actions analyzed from the diff
+    const allActions: string[] = [];
+    for (const [_, actions] of detailedSummaries) {
+      allActions.push(...actions);
+    }
 
-    const primaryVerb = verbs.join(' and ') || 'update';
-    subject = `${primaryVerb} ${scope} components and utilities`;
+    if (allActions.length > 0) {
+      // Pick the most descriptive action for the subject
+      const primaryAction = allActions.find((a) => a.startsWith('implement') || a.startsWith('add') || a.startsWith('bump')) || allActions[0];
+      subject = `${primaryAction} and update ${scope} components`;
+    } else {
+      const verbs: string[] = [];
+      if (changes.some((c) => c.status === 'A' || c.status === '?')) verbs.push('add');
+      if (changes.some((c) => c.status === 'M')) verbs.push('update');
+      if (changes.some((c) => c.status === 'D')) verbs.push('remove');
+
+      const primaryVerb = verbs.join(' and ') || 'update';
+      subject = `${primaryVerb} ${scope} components and utilities`;
+    }
   }
 
-  // Generate bullet points for body
-  const bullets = changes.slice(0, 8).map((c) => {
+  // Ensure subject is within reasonable length
+  if (subject.length > 70) {
+    subject = subject.substring(0, 67) + '...';
+  }
+
+  // Generate rich bullet points detailing actual changes inside each file
+  const bullets = changes.slice(0, 10).map((c) => {
     const action = c.status === 'A' || c.status === '?' ? 'add' : c.status === 'D' ? 'remove' : 'update';
+    const details = detailedSummaries.get(c.filePath);
+
+    if (details && details.length > 0) {
+      return `- ${c.filePath}: ${details.join('; ')}`;
+    }
     return `- ${action} ${c.filePath}`;
   });
 
