@@ -2,7 +2,7 @@
   "name": "devshelf",
   "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "publisher": "danial031",
   "license": "MIT",
   "repository": {
@@ -38,6 +38,8 @@
     "docker",
     "api-tester",
     "curl",
+    "sql-generator",
+    "log-analyzer",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -56,7 +58,9 @@
     "onCommand:devshelf.openGitWizard",
     "onCommand:devshelf.gitCheatSheet",
     "onCommand:devshelf.openDockerDeck",
-    "onCommand:devshelf.openApiTester"
+    "onCommand:devshelf.openApiTester",
+    "onCommand:devshelf.openSqlPlayground",
+    "onCommand:devshelf.openLogAnalyzer"
   ],
   "contributes": {
     "viewsContainers": {
@@ -151,6 +155,16 @@
       {
         "command": "devshelf.openApiTester",
         "title": "Open Mini API Tester",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openSqlPlayground",
+        "title": "Open SQL Query & Schema Playground",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openLogAnalyzer",
+        "title": "Open Log File Analyzer & Highlighter",
         "category": "DevShelf"
       }
     ],

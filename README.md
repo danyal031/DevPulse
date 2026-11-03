@@ -83,6 +83,32 @@
 - **Headers & JSON Body Editor:** Dynamic key-value headers table with row toggle, plus formatted JSON payload editor with syntax helper.
 - **Rich Response Inspector:** Color-coded status badges (2xx/3xx/4xx/5xx), millisecond response time, byte payload size, formatted JSON viewer, response headers table, and 1-click clipboard copy.
 
+### 10. SQL Query & Schema Playground (تولیدکننده و اعتبارسنج اسکیماهای SQL)
+- **Visual Table & Column Builder:**
+  - Multi-dialect support: **PostgreSQL**, **MySQL**, and **SQLite**.
+  - Dynamic column designer: Name, Data Type (`INT`, `BIGINT`, `VARCHAR`, `TEXT`, `BOOLEAN`, `TIMESTAMP`, `DATE`, `DECIMAL`, `UUID`, `JSON`), Length/Precision.
+  - Constraints & Flags: Primary Key (PK), Auto Increment (Auto), Not Null (NN), Unique (UQ), Default Values, and Foreign Key References (`TargetTable.TargetColumn` with `CASCADE` / `SET NULL`).
+- **Live DDL Generation:** Generates clean, production-ready, syntax-compliant `CREATE TABLE` DDL statements in real time.
+- **Instant Query Templates:** Generates ready-to-use parameterized SQL query templates:
+  - `Select All` (ordered by primary key)
+  - `Pagination` (limit and offset customized per dialect)
+  - `Insert Row` (with dialect-specific syntax like PostgreSQL `RETURNING`)
+  - `Update Row` (parameterized update statement by PK)
+  - `Search Filter` (case-insensitive `ILIKE` / `LIKE` across text columns)
+  - `Inner Join` (auto-detected foreign key relationship query)
+- **Editor & Clipboard Actions:** 1-click **Copy SQL** to clipboard or **Insert at Cursor** directly into active SQL migration or schema files.
+
+### 11. Log File Analyzer & Highlighter (دیکودر و تحلیل‌گر فایل‌های لاگ)
+- **Multi-Source Log Ingestion:** Parses raw logs from Docker containers, Node.js, Nginx, Python tracebacks, Go, Java, and microservice JSON logs.
+- **Active Editor File Grabber:** One-click **Analyze Active Editor File** button pulls the complete contents of currently open `.log` or output files directly into the analyzer.
+- **Smart Level & Stack Trace Detection:**
+  - Auto-classifies log severities (`ERROR`, `WARN`, `INFO`, `DEBUG`) with distinct native theme color borders and badges.
+  - Groups multi-line stack traces (Node.js `at ...`, Python `Traceback`, Java `Caused by:`) under the parent error entry in collapsible details.
+- **Interactive Filtering & Search:**
+  - Filter by log level chips (`Errors`, `Warnings`, `Info`, `Debug`) with real-time occurrence counts.
+  - Real-time keyword filter across log messages and timestamps.
+- **Clean Error Summary Exporter:** Aggregates unique issues, occurrence counts, and sample stack traces into a clean Markdown error report ready to share with teams or paste into issue trackers.
+
 ---
 
 ## Command Palette & Context Menu Contributions
@@ -95,6 +121,8 @@
 | `devshelf.gitCheatSheet` | `DevShelf: Git Rescue Cheat Sheet` | Command Palette |
 | `devshelf.openDockerDeck` | `DevShelf: Open Docker Quick Deck` | Command Palette |
 | `devshelf.openApiTester` | `DevShelf: Open Mini API Tester` | Command Palette |
+| `devshelf.openSqlPlayground` | `DevShelf: Open SQL Query & Schema Playground` | Command Palette |
+| `devshelf.openLogAnalyzer` | `DevShelf: Open Log File Analyzer & Highlighter` | Command Palette |
 | `devshelf.copySystemIp` | `DevShelf: Copy Local System IP` | Command Palette |
 | `devshelf.formatJson` | `DevShelf: Format JSON in Selection` | Editor Context Menu & Command Palette |
 | `devshelf.normalizePersianSelection` | `DevShelf: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
@@ -114,7 +142,8 @@
 │   ├── tasks.json               # Build automation tasks
 │   └── settings.json            # Editor visual customizations
 ├── media/
-│   ├── commit-icon.svg          # SCM commit toolbar icon
+│   ├── commit-icon-dark.svg     # SCM commit toolbar icon (dark themes)
+│   ├── commit-icon-light.svg    # SCM commit toolbar icon (light themes)
 │   └── devshelf-icon.svg        # Activity Bar icon
 ├── src/
 │   ├── extension.ts             # Host entry point, commands & SCM commit hook
@@ -132,6 +161,8 @@
 │   │   ├── gitScenarios.ts      # Git Wizard interactive scenarios & rescue cheat sheet
 │   │   ├── dockerManager.ts     # Docker container lifecycle & log inspector
 │   │   ├── apiTester.ts         # Zero-CORS Node.js HTTP request client
+│   │   ├── sqlBuilder.ts        # SQL DDL dialect generator & sample query builder
+│   │   ├── logAnalyzer.ts       # Log parser, level classifier & error report exporter
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
@@ -140,7 +171,7 @@
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   └── testRunner.ts            # 11 unit test suites
+│   └── testRunner.ts            # 13 unit test suites
 ├── esbuild.js                   # Fast bundler config
 ├── package.json                 # Extension manifest & contributions
 ├── tsconfig.json                # Strict TypeScript configuration

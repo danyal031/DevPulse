@@ -1338,4 +1338,653 @@ body {
   text-align: left;
 }
 
+/* ==========================================================================
+   SQL Playground & Schema Builder
+   ========================================================================== */
+.sql-view-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sql-header-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.sql-dialect-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dialect-pill {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--devshelf-border);
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dialect-pill:hover {
+  border-color: var(--vscode-focusBorder);
+}
+
+.dialect-pill.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--vscode-button-background);
+}
+
+.sql-table-config {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sql-columns-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sql-columns-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--vscode-descriptionForeground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sql-columns-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.column-card {
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.column-row-primary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.col-name-input {
+  flex: 2;
+  min-width: 80px;
+  direction: ltr;
+  text-align: left;
+}
+
+.col-type-select {
+  flex: 1.5;
+  min-width: 90px;
+  direction: ltr;
+}
+
+.col-len-input {
+  width: 55px;
+  direction: ltr;
+  text-align: center;
+}
+
+.col-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.col-delete-btn:hover {
+  color: var(--vscode-errorForeground, #f85149);
+  background-color: rgba(248, 81, 73, 0.12);
+}
+
+.column-row-constraints {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.col-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  user-select: none;
+}
+
+.col-checkbox-label input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.col-def-input {
+  flex: 1;
+  min-width: 90px;
+  font-size: 10px;
+  direction: ltr;
+}
+
+.sql-add-col-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px;
+  font-size: 11px;
+}
+
+.sql-templates-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.template-chip {
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  border-radius: 3px;
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.template-chip:hover {
+  border-color: var(--vscode-focusBorder);
+}
+
+.template-chip.active {
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  border-color: var(--vscode-badge-background);
+}
+
+.sql-output-card {
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sql-output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sql-output-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sql-code-view {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+  user-select: text;
+}
+
+/* ==========================================================================
+   Log File Analyzer & Highlighter
+   ========================================================================== */
+.logs-view-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.logs-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logs-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.logs-editor-textarea {
+  width: 100%;
+  min-height: 110px;
+  max-height: 220px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 11px;
+  line-height: 1.45;
+  resize: vertical;
+  direction: ltr;
+  text-align: left;
+  padding: 8px;
+}
+
+.logs-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10px;
+}
+
+.logs-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-weight: 500;
+  border-radius: 4px;
+  border: 1px solid var(--devshelf-border);
+  background-color: var(--devshelf-panel-bg);
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.filter-chip.active {
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  border-color: var(--vscode-badge-background);
+}
+
+.filter-chip.chip-error.active {
+  background-color: rgba(248, 81, 73, 0.2);
+  color: #f85149;
+  border-color: #f85149;
+}
+
+.filter-chip.chip-warn.active {
+  background-color: rgba(210, 153, 34, 0.2);
+  color: #d29922;
+  border-color: #d29922;
+}
+
+.filter-chip.chip-info.active {
+  background-color: rgba(88, 166, 255, 0.2);
+  color: #58a6ff;
+  border-color: #58a6ff;
+}
+
+.filter-chip.chip-debug.active {
+  background-color: rgba(139, 148, 158, 0.2);
+  color: #8b949e;
+  border-color: #8b949e;
+}
+
+.logs-search-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.logs-search-wrapper .search-icon {
+  position: absolute;
+  left: 8px;
+  color: var(--vscode-descriptionForeground);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+[dir="rtl"] .logs-search-wrapper .search-icon {
+  left: auto;
+  right: 8px;
+}
+
+.logs-search-input {
+  width: 100%;
+  padding-left: 28px;
+  padding-right: 26px;
+  font-size: 11px;
+}
+
+[dir="rtl"] .logs-search-input {
+  padding-left: 26px;
+  padding-right: 28px;
+}
+
+.logs-clear-search-btn {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+[dir="rtl"] .logs-clear-search-btn {
+  right: auto;
+  left: 6px;
+}
+
+.logs-entries-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 460px;
+  overflow-y: auto;
+  border: 1px solid var(--devshelf-border);
+  border-radius: 5px;
+  padding: 4px;
+  background-color: var(--vscode-editor-background);
+}
+
+.log-entry-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border-left: 3px solid transparent;
+  background-color: var(--devshelf-panel-bg);
+  font-size: 11px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  line-height: 1.4;
+  direction: ltr;
+  text-align: left;
+}
+
+[dir="rtl"] .log-entry-row {
+  border-left: none;
+  border-right: 3px solid transparent;
+}
+
+.log-entry-row.level-error {
+  border-left-color: #f85149;
+  background-color: rgba(248, 81, 73, 0.08);
+}
+
+[dir="rtl"] .log-entry-row.level-error {
+  border-right-color: #f85149;
+}
+
+.log-entry-row.level-warn {
+  border-left-color: #d29922;
+  background-color: rgba(210, 153, 34, 0.08);
+}
+
+[dir="rtl"] .log-entry-row.level-warn {
+  border-right-color: #d29922;
+}
+
+.log-entry-row.level-info {
+  border-left-color: #58a6ff;
+  background-color: rgba(88, 166, 255, 0.04);
+}
+
+[dir="rtl"] .log-entry-row.level-info {
+  border-right-color: #58a6ff;
+}
+
+.log-entry-row.level-debug {
+  border-left-color: #8b949e;
+  background-color: rgba(139, 148, 158, 0.04);
+}
+
+[dir="rtl"] .log-entry-row.level-debug {
+  border-right-color: #8b949e;
+}
+
+.log-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.log-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+}
+
+.badge-error {
+  background-color: #f85149;
+  color: #ffffff;
+}
+
+.badge-warn {
+  background-color: #d29922;
+  color: #1a1a1a;
+}
+
+.badge-info {
+  background-color: #58a6ff;
+  color: #0d1117;
+}
+
+.badge-debug {
+  background-color: #8b949e;
+  color: #0d1117;
+}
+
+.log-timestamp {
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.log-source {
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  background-color: rgba(255, 255, 255, 0.06);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.log-message {
+  word-break: break-all;
+  white-space: pre-wrap;
+  color: var(--vscode-foreground);
+}
+
+.log-stack-trace {
+  margin-top: 4px;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stack-trace-details {
+  border: 1px solid var(--devshelf-border);
+  border-radius: 3px;
+}
+
+.stack-trace-summary {
+  padding: 3px 6px;
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  user-select: none;
+}
+
+.stack-trace-pre {
+  margin: 0;
+  padding: 6px 8px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10px;
+  line-height: 1.4;
+  color: #f85149;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.logs-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--vscode-descriptionForeground);
+  gap: 8px;
+}
+
+/* Modal Dialog for Clean Error Report */
+.logs-summary-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 12px;
+}
+
+.modal-dialog {
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--vscode-focusBorder);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--devshelf-border);
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.modal-close-btn:hover {
+  color: var(--vscode-foreground);
+}
+
+.modal-body {
+  padding: 10px 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.summary-report-code {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 4px;
+  padding: 8px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10.5px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+  user-select: text;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--devshelf-border);
+}
+
 

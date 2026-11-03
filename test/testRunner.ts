@@ -21,6 +21,16 @@ import { generateConventionalCommit, analyzeDiffHunks } from '../src/utils/gitCo
 import { GIT_SCENARIOS, GIT_CHEAT_SHEET } from '../src/utils/gitScenarios';
 import { parseDockerContainersOutput, isSafeContainerIdentifier } from '../src/utils/dockerManager';
 import { normalizeUrl, formatPayloadSize, executeApiRequest } from '../src/utils/apiTester';
+import {
+  generateCreateTableDdl,
+  generateSampleQuery,
+  SqlTableSchema
+} from '../src/utils/sqlBuilder';
+import {
+  parseLogText,
+  filterLogEntries,
+  exportCleanErrorSummary
+} from '../src/utils/logAnalyzer';
 import { translations } from '../src/webview/i18n';
 import {
   generateUuidV4,
@@ -378,6 +388,183 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
   for (const k of apiKeys) {
     assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
     assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
+  }
+
+  // 12. SQL QUERY & SCHEMA BUILDER TESTS
+  console.log('[Test 12] SQL Query & Schema Builder');
+  const sampleSchema: SqlTableSchema = {
+    tableName: 'users',
+    dialect: 'postgres',
+    columns: [
+      {
+        id: '1',
+        name: 'id',
+        type: 'BIGINT',
+        isPrimaryKey: true,
+        isAutoIncrement: true,
+        isNotNull: true,
+        isUnique: true
+      },
+      {
+        id: '2',
+        name: 'email',
+        type: 'VARCHAR',
+        lengthOrPrecision: '255',
+        isPrimaryKey: false,
+        isAutoIncrement: false,
+        isNotNull: true,
+        isUnique: true
+      },
+      {
+        id: '3',
+        name: 'role_id',
+        type: 'INT',
+        isPrimaryKey: false,
+        isAutoIncrement: false,
+        isNotNull: false,
+        isUnique: false,
+        foreignKey: {
+          targetTable: 'roles',
+          targetColumn: 'id'
+        }
+      },
+      {
+        id: '4',
+        name: 'created_at',
+        type: 'TIMESTAMP',
+        isPrimaryKey: false,
+        isAutoIncrement: false,
+        isNotNull: true,
+        isUnique: false,
+        defaultValue: 'CURRENT_TIMESTAMP'
+      }
+    ]
+  };
+
+  // Postgres DDL
+  const pgDdl = generateCreateTableDdl(sampleSchema);
+  assert.ok(pgDdl.includes('CREATE TABLE "users"'));
+  assert.ok(pgDdl.includes('"id" BIGSERIAL'));
+  assert.ok(pgDdl.includes('PRIMARY KEY ("id")'));
+  assert.ok(pgDdl.includes('"email" VARCHAR(255) NOT NULL UNIQUE'));
+  assert.ok(pgDdl.includes('REFERENCES "roles" ("id")'));
+  assert.ok(pgDdl.includes('DEFAULT CURRENT_TIMESTAMP'));
+
+  // MySQL DDL
+  const mysqlSchema: SqlTableSchema = { ...sampleSchema, dialect: 'mysql' };
+  const mysqlDdl = generateCreateTableDdl(mysqlSchema);
+  assert.ok(mysqlDdl.includes('CREATE TABLE `users`'));
+  assert.ok(mysqlDdl.includes('`id` BIGINT AUTO_INCREMENT PRIMARY KEY'));
+  assert.ok(mysqlDdl.includes('`email` VARCHAR(255) NOT NULL UNIQUE'));
+  assert.ok(mysqlDdl.includes('REFERENCES `roles` (`id`)'));
+
+  // SQLite DDL
+  const sqliteSchema: SqlTableSchema = { ...sampleSchema, dialect: 'sqlite' };
+  const sqliteDdl = generateCreateTableDdl(sqliteSchema);
+  assert.ok(sqliteDdl.includes('CREATE TABLE users'));
+  assert.ok(sqliteDdl.includes('id INTEGER PRIMARY KEY AUTOINCREMENT'));
+  assert.ok(sqliteDdl.includes('REFERENCES roles (id)'));
+
+  // Sample Queries
+  const selectQuery = generateSampleQuery(sampleSchema, 'select_all');
+  assert.ok(selectQuery.includes('SELECT *'));
+  assert.ok(selectQuery.includes('FROM "users"'));
+  assert.ok(selectQuery.includes('ORDER BY "id" DESC;'));
+
+  const pageQuery = generateSampleQuery(sampleSchema, 'pagination');
+  assert.ok(pageQuery.includes('LIMIT 20 OFFSET 0;'));
+
+  const insertQuery = generateSampleQuery(sampleSchema, 'insert');
+  assert.ok(insertQuery.includes('INSERT INTO "users"'));
+  assert.ok(insertQuery.includes('"email"'));
+
+  const updateQuery = generateSampleQuery(sampleSchema, 'update');
+  assert.ok(updateQuery.includes('UPDATE "users"'));
+  assert.ok(updateQuery.includes('WHERE "id" = 1;'));
+
+  const searchQuery = generateSampleQuery(sampleSchema, 'search');
+  assert.ok(searchQuery.includes('WHERE "email" ILIKE \'%keyword%\''));
+
+  const joinQuery = generateSampleQuery(sampleSchema, 'join');
+  assert.ok(joinQuery.includes('INNER JOIN "roles" f ON t."role_id" = f."id"'));
+
+  // 13. LOG FILE ANALYZER & HIGHLIGHTER TESTS
+  console.log('[Test 13] Log File Analyzer & Highlighter');
+  const rawLogSample = `[2026-11-03T10:00:01.000Z] [INFO] Server started on port 3000
+2026-11-03 10:00:02 [WARN] High memory usage detected: 85%
+{"timestamp":"2026-11-03T10:00:05.123Z","level":"error","message":"Database connection timeout after 5000ms","service":"auth-service"}
+2026-11-03T10:00:06.000Z [ERROR] Failed to query users table
+    at Query.run (/app/node_modules/pg/lib/query.js:12:5)
+    at Database.execute (/app/src/db.ts:45:18)
+    at async AuthController.login (/app/src/controllers/auth.ts:22:9)
+[DEBUG] Connection pool metrics: active=4, idle=1`;
+
+  const { entries: parsedLogs, stats: logStats } = parseLogText(rawLogSample);
+  assert.strictEqual(parsedLogs.length, 5); // 5 logical entries, stack trace grouped into entry #4
+  assert.strictEqual(logStats.counts.error, 2);
+  assert.strictEqual(logStats.counts.warn, 1);
+  assert.strictEqual(logStats.counts.info, 1);
+  assert.strictEqual(logStats.counts.debug, 1);
+
+  // Check Entry 1: INFO
+  assert.strictEqual(parsedLogs[0].level, 'info');
+  assert.strictEqual(parsedLogs[0].timestamp, '2026-11-03T10:00:01.000Z');
+  assert.ok(parsedLogs[0].message.includes('Server started on port 3000'));
+
+  // Check Entry 2: WARN
+  assert.strictEqual(parsedLogs[1].level, 'warn');
+  assert.ok(parsedLogs[1].message.includes('High memory usage detected'));
+
+  // Check Entry 3: JSON ERROR
+  assert.strictEqual(parsedLogs[2].level, 'error');
+  assert.strictEqual(parsedLogs[2].isJson, true);
+  assert.strictEqual(parsedLogs[2].message, 'Database connection timeout after 5000ms');
+
+  // Check Entry 4: Multiline ERROR with Stack Trace
+  assert.strictEqual(parsedLogs[3].level, 'error');
+  assert.ok(parsedLogs[3].stackTrace);
+  assert.strictEqual(parsedLogs[3].stackTrace!.length, 3);
+  assert.ok(parsedLogs[3].stackTrace![0].includes('at Query.run'));
+
+  // Check Entry 5: DEBUG
+  assert.strictEqual(parsedLogs[4].level, 'debug');
+
+  // Filtering by Level
+  const errorsOnly = filterLogEntries(parsedLogs, { levels: ['error'] });
+  assert.strictEqual(errorsOnly.length, 2);
+
+  // Filtering by Query
+  const dbRelated = filterLogEntries(parsedLogs, { query: 'Database' });
+  assert.strictEqual(dbRelated.length, 2);
+
+  // Export Clean Error Summary
+  const summaryReport = exportCleanErrorSummary(parsedLogs);
+  assert.ok(summaryReport.includes('### Log Error Report (2 total errors'));
+  assert.ok(summaryReport.includes('**Occurrences:** 1'));
+  assert.ok(summaryReport.includes('at Query.run'));
+
+  // Check i18n keys for SQL and Logs
+  const sqlKeys = [
+    'sqlTitle', 'sqlSubtitle', 'sqlDialect', 'sqlTableName', 'sqlAddColumn',
+    'sqlColName', 'sqlColType', 'sqlColLength', 'sqlPk', 'sqlAutoInc',
+    'sqlNotNull', 'sqlUnique', 'sqlDefault', 'sqlFk', 'sqlGeneratedDdl',
+    'sqlCopy', 'sqlInsert', 'sqlSampleQueries', 'sqlQuerySelect', 'sqlQueryPagination',
+    'sqlQueryInsert', 'sqlQueryUpdate', 'sqlQuerySearch', 'sqlQueryJoin'
+  ];
+  for (const k of sqlKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN SQL key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA SQL key: ${k}`);
+  }
+
+  const logKeys = [
+    'logsTitle', 'logsSubtitle', 'logsInputPlaceholder', 'logsAnalyzeActiveFile',
+    'logsFilterAll', 'logsFilterError', 'logsFilterWarn', 'logsFilterInfo',
+    'logsFilterDebug', 'logsSearchPlaceholder', 'logsExportSummary', 'logsSummaryTitle',
+    'logsNoLogs', 'logsTotal', 'logsParsed', 'logsCopy', 'logsCloseSummary'
+  ];
+  for (const k of logKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN Log key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA Log key: ${k}`);
   }
 
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');

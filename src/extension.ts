@@ -450,6 +450,22 @@ export function activate(context: vscode.ExtensionContext) {
       sidebarProvider.switchTab('api');
     })
   );
+
+  // Command 15: Open SQL Playground & Schema Builder
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openSqlPlayground', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('sql');
+    })
+  );
+
+  // Command 16: Open Log File Analyzer
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openLogAnalyzer', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('logs');
+    })
+  );
 }
 
 export function deactivate() {}

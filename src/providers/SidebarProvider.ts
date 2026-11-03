@@ -43,6 +43,17 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           break;
         }
 
+        case 'getActiveEditorText': {
+          const editor = vscode.window.activeTextEditor;
+          if (editor) {
+            const text = editor.document.getText();
+            this.postMessage({ type: 'activeEditorText', text });
+          } else {
+            vscode.window.showInformationMessage('DevShelf: No active editor file found to analyze.');
+          }
+          break;
+        }
+
         case 'scanPorts': {
           try {
             const ports = await scanListeningPorts();
