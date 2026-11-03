@@ -484,263 +484,773 @@ body {
   color: var(--vscode-foreground);
 }
 
-.segmented-pills {
+/* ==========================================================================
+   Docker Super-Deck Dashboard
+   ========================================================================== */
+.docker-superdeck-wrapper {
   display: flex;
-  gap: 4px;
-  background-color: var(--devshelf-editor-bg);
-  border: 1px solid var(--devshelf-border);
-  border-radius: 4px;
-  padding: 2px;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
 }
 
-.pill-btn {
-  flex: 1;
+/* Sub-Nav Bar (Containers, Images, Volumes/Networks, Stats/Prune) */
+.docker-subnav-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 6px;
+  padding: 3px;
+}
+
+.docker-subtab-btn {
   background: transparent;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
+  padding: 6px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.docker-subtab-btn:hover {
+  color: var(--vscode-foreground);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.docker-subtab-btn.active {
+  background-color: var(--vscode-button-secondaryBackground, var(--vscode-editor-background));
+  color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.subtab-counter-badge {
+  font-size: 9.5px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  background-color: var(--devshelf-border);
+  color: var(--vscode-foreground);
+  padding: 1px 5px;
+  border-radius: 8px;
+  line-height: 1.2;
+}
+
+.docker-subtab-btn.active .subtab-counter-badge {
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+}
+
+/* Docker Subview Content Container */
+.docker-subview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Toolbar & Filter Chips */
+.docker-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.docker-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 12px;
+  padding: 2px 8px;
   font-size: 10px;
   font-weight: 500;
   color: var(--vscode-descriptionForeground);
-  padding: 3px 6px;
   cursor: pointer;
-  text-align: center;
   transition: all 0.15s ease;
 }
 
-.pill-btn:hover {
+.filter-pill:hover {
+  color: var(--vscode-foreground);
+  border-color: var(--vscode-focusBorder);
+}
+
+.filter-pill.active {
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  border-color: var(--vscode-badge-background);
+}
+
+/* Status Indicator Dots */
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.dot-running {
+  background-color: #3fb950;
+  box-shadow: 0 0 6px rgba(63, 185, 80, 0.6);
+}
+
+.dot-stopped {
+  background-color: #f85149;
+}
+
+.dot-paused {
+  background-color: #d29922;
+  box-shadow: 0 0 5px rgba(210, 153, 34, 0.5);
+}
+
+/* Docker Search Bar */
+.docker-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  width: 100%;
+}
+
+.docker-search-bar .search-icon {
+  position: absolute;
+  inset-inline-start: 8px;
+  color: var(--vscode-descriptionForeground);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.docker-search-input {
+  width: 100%;
+  padding-inline-start: 28px;
+  padding-inline-end: 8px;
+  height: 26px;
+  font-size: 11px;
+}
+
+/* Docker Cards List */
+.docker-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-inline-end: 2px;
+}
+
+/* Docker Item Card */
+.docker-item-card {
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.docker-item-card:hover {
+  border-color: var(--vscode-focusBorder);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-running {
+  border-inline-start: 3px solid #3fb950;
+}
+
+.card-stopped {
+  border-inline-start: 3px solid #8b949e;
+}
+
+.image-card {
+  border-inline-start: 3px solid #58a6ff;
+}
+
+.vn-card {
+  border-inline-start: 3px solid #a371f7;
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.container-name, .image-repo-title, .vn-title {
+  font-weight: 600;
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--vscode-foreground);
 }
 
-.pill-btn.active {
-  background-color: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
+.container-id-badge {
+  font-size: 9.5px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  direction: ltr;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
-/* Docker Containers List & Cards */
-.docker-containers-list {
+.container-id-badge:hover {
+  color: var(--vscode-foreground);
+  border-color: var(--vscode-focusBorder);
+}
+
+.image-tag-badge {
+  font-size: 9.5px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  background-color: rgba(88, 166, 255, 0.15);
+  color: #58a6ff;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.copied-indicator {
+  color: #3fb950;
+}
+
+/* Card Actions Toolbar */
+.card-actions-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.card-actions-toolbar .icon-btn-secondary {
+  padding: 3px;
+  color: var(--vscode-descriptionForeground);
+  border-radius: 3px;
+}
+
+.card-actions-toolbar .icon-btn-secondary:hover {
+  color: var(--vscode-foreground);
+  background-color: var(--vscode-toolbar-hoverBackground, rgba(255, 255, 255, 0.1));
+}
+
+.btn-delete-container:hover, .btn-delete-image:hover, .btn-delete-volume:hover, .btn-delete-network:hover {
+  color: #f85149 !important;
+  background-color: rgba(248, 81, 73, 0.12) !important;
+}
+
+/* Card Details Grid */
+.card-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.detail-label {
+  color: var(--vscode-descriptionForeground);
+  font-size: 10px;
+  min-width: 42px;
+}
+
+.detail-value {
+  color: var(--vscode-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-value.monospace {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10px;
+  direction: ltr;
+  text-align: left;
+}
+
+.detail-value.port-val {
+  color: #58a6ff;
+}
+
+.status-subtext {
+  color: var(--vscode-descriptionForeground);
+  font-size: 10px;
+}
+
+/* Pull Image Box */
+.docker-pull-box {
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 6px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.docker-card {
-  background-color: var(--devshelf-editor-bg);
+.pull-input-wrap {
+  display: flex;
+  gap: 6px;
+}
+
+.pull-input {
+  flex: 1;
+  direction: ltr;
+  font-size: 11px;
+}
+
+.btn-pull {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.pull-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Segmented Control (Volumes / Networks) */
+.segmented-control {
+  display: flex;
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 5px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.seg-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  padding: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.seg-btn:hover {
+  color: var(--vscode-foreground);
+}
+
+.seg-btn.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+/* Stats Section Card */
+.stats-section-card {
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.stats-empty-wrap {
+  padding: 16px;
+  text-align: center;
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+}
+
+.stats-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-container-card {
+  background-color: var(--vscode-editor-background);
   border: 1px solid var(--devshelf-border);
   border-radius: 5px;
   padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.docker-card.is-running {
-  border-inline-start: 3px solid var(--vscode-testing-iconPassed, #3fb950);
-}
-
-.docker-card.is-stopped {
-  border-inline-start: 3px solid var(--vscode-disabledForeground, #8b949e);
-}
-
-.docker-card:hover {
-  border-color: var(--vscode-focusBorder, var(--devshelf-border));
-}
-
-.docker-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: 6px;
 }
 
-.docker-title-col {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
-}
-
-.docker-name-row {
+.stat-card-top {
   display: flex;
   align-items: center;
-  gap: 6px;
-  overflow: hidden;
+  justify-content: space-between;
 }
 
-.docker-container-name {
+.stat-container-name {
   font-weight: 600;
-  font-size: 12px;
-  white-space: nowrap;
+  font-size: 11px;
+  color: var(--vscode-foreground);
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--vscode-foreground);
-}
-
-.docker-id-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background-color: var(--devshelf-panel-bg);
-  border: 1px solid var(--devshelf-border);
-  border-radius: 3px;
-  padding: 1px 5px;
-  font-family: var(--vscode-editor-font-family, monospace);
-  font-size: 9px;
-  color: var(--vscode-descriptionForeground);
-  cursor: pointer;
-  direction: ltr;
-}
-
-.docker-id-pill:hover {
-  color: var(--vscode-foreground);
-  border-color: var(--vscode-focusBorder);
-}
-
-.docker-status-badge {
-  font-size: 10px;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 10px;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
-.badge-running {
-  background-color: rgba(63, 185, 80, 0.15);
-  color: var(--vscode-testing-iconPassed, #3fb950);
-  border: 1px solid rgba(63, 185, 80, 0.3);
-}
-
-.badge-stopped {
-  background-color: rgba(139, 148, 158, 0.15);
+.stat-pid-badge {
+  font-size: 9.5px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  background-color: var(--devshelf-panel-bg);
+  padding: 1px 5px;
+  border-radius: 3px;
   color: var(--vscode-descriptionForeground);
-  border: 1px solid var(--devshelf-border);
 }
 
-.docker-card-body {
+.stat-metric-row {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.docker-detail-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-}
-
-.docker-detail-label {
-  color: var(--vscode-descriptionForeground);
-  font-size: 10px;
-  min-width: 44px;
-}
-
-.docker-detail-val {
-  font-size: 11px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  direction: ltr;
-}
-
-.docker-ports-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.port-chip {
-  display: inline-flex;
-  align-items: center;
   gap: 3px;
-  font-family: var(--vscode-editor-font-family, monospace);
-  font-size: 10px;
-  background-color: var(--devshelf-panel-bg);
-  border: 1px solid var(--devshelf-border);
-  border-radius: 3px;
-  padding: 1px 5px;
-  direction: ltr;
-  color: #58a6ff;
 }
 
-.docker-card-actions {
+.metric-labels {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 5px;
+  font-size: 10px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.metric-val {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.metric-val.val-high {
+  color: #f85149;
+}
+
+.metric-bar-bg {
+  width: 100%;
+  height: 4px;
+  background-color: var(--devshelf-panel-bg);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.metric-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.fill-cpu {
+  background-color: #58a6ff;
+}
+
+.fill-mem {
+  background-color: #3fb950;
+}
+
+.stat-io-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 9.5px;
+  padding-top: 4px;
   border-top: 1px solid var(--devshelf-border);
 }
 
-.action-stop:hover {
-  background-color: rgba(248, 81, 73, 0.15) !important;
-  color: var(--vscode-testing-iconFailed, #f85149) !important;
-  border-color: rgba(248, 81, 73, 0.3) !important;
-}
-
-.action-start {
-  background-color: var(--vscode-button-background) !important;
-  color: var(--vscode-button-foreground) !important;
-}
-
-/* Docker Starter Box (Empty State Helper) */
-.docker-starter-box {
-  background-color: var(--devshelf-editor-bg);
-  border: 1px dashed var(--devshelf-border);
-  border-radius: 5px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.starter-title {
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--vscode-foreground);
-}
-
-.starter-desc {
-  font-size: 11px;
-  color: var(--vscode-descriptionForeground);
-  line-height: 1.4;
-}
-
-.starter-item {
-  background-color: var(--devshelf-panel-bg);
-  border: 1px solid var(--devshelf-border);
-  border-radius: 4px;
-  padding: 7px 9px;
+.io-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 4px;
 }
 
-.starter-item-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
-}
-
-.starter-name {
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.starter-cmd {
-  font-size: 10px;
+.io-label {
   color: var(--vscode-descriptionForeground);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.io-val {
+  color: var(--vscode-foreground);
   direction: ltr;
 }
 
-/* Docker Alert Cards */
+/* Master Prune Hub Card */
+.prune-hub-card {
+  background-color: rgba(248, 81, 73, 0.04);
+  border: 1px solid rgba(248, 81, 73, 0.25);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prune-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prune-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f85149;
+}
+
+.prune-desc {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--vscode-foreground);
+  margin: 0;
+}
+
+.prune-action-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-master-prune {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f85149;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-master-prune:hover {
+  background-color: #da3633;
+}
+
+/* Modals & Backdrop */
+.docker-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 10px;
+}
+
+.docker-modal-dialog {
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--vscode-focusBorder);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.docker-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--devshelf-border);
+}
+
+.modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 11.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docker-modal-body {
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docker-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--devshelf-border);
+}
+
+/* Logs Modal Specifics */
+.logs-modal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background-color: var(--vscode-editor-background);
+  border-bottom: 1px solid var(--devshelf-border);
+}
+
+.logs-search-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.logs-search-wrap .search-icon {
+  position: absolute;
+  inset-inline-start: 6px;
+  color: var(--vscode-descriptionForeground);
+  pointer-events: none;
+}
+
+.logs-search-input {
+  width: 100%;
+  padding-inline-start: 24px;
+  height: 24px;
+  font-size: 10.5px;
+}
+
+.logs-tail-control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+}
+
+.tail-select {
+  height: 24px;
+  font-size: 10.5px;
+  padding: 0 4px;
+}
+
+.logs-viewer-pre, .inspect-viewer-pre {
+  margin: 0;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10.5px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+  user-select: text;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--devshelf-border);
+  border-radius: 4px;
+  padding: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+/* Form Groups inside Modals */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-label {
+  font-size: 10.5px;
+  color: var(--vscode-descriptionForeground);
+  font-weight: 500;
+}
+
+.checkbox-group {
+  margin-top: 4px;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.confirm-message {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--vscode-foreground);
+  margin: 0;
+}
+
+/* Offline Alert Cards */
 .docker-alert-card {
-  border-radius: 5px;
+  border-radius: 6px;
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -777,67 +1287,13 @@ body {
   font-size: 11px;
   line-height: 1.4;
   color: var(--vscode-foreground);
+  margin: 0;
 }
 
 .alert-actions {
   margin-top: 4px;
 }
 
-/* Docker Logs Modal / Panel */
-.docker-logs-panel {
-  border: 1px solid var(--vscode-focusBorder, var(--devshelf-border));
-  background-color: var(--devshelf-editor-bg);
-  border-radius: 5px;
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.logs-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--devshelf-border);
-  background-color: var(--devshelf-panel-bg);
-}
-
-.logs-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 500;
-  font-size: 11px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.logs-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.logs-viewer-body {
-  max-height: 240px;
-  overflow-y: auto;
-  padding: 8px;
-  background-color: var(--devshelf-editor-bg);
-}
-
-.logs-content {
-  font-family: var(--vscode-editor-font-family, monospace);
-  font-size: 11px;
-  line-height: 1.45;
-  white-space: pre-wrap;
-  word-break: break-all;
-  direction: ltr;
-  text-align: left;
-  user-select: text;
-}
 
 /* API Tester Modern Styles */
 .api-tester-wrapper {

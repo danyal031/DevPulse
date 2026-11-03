@@ -72,11 +72,25 @@
   - Valid 10-digit Iranian Postal Code.
   - Valid Iranian IBAN / Sheba (`IR...`) with ISO 7064 Modulo 97-10 check digits.
 
-### 8. Docker Quick Deck (مدیریت کانتینرها و سرویس‌های داکر)
-- **Container Lifecycle Management:** Real-time inspection of active and stopped local containers (Name, Image, Ports, Status) with graceful status handling when daemon is offline.
-- **One-Click Actions:** Start, Stop, and Restart containers directly from the sidebar without terminal switching.
-- **Live Log Streamer:** Monospace viewer fetching recent 50 container log lines with instant reload and auto-scroll.
-- **Instant Search Filter:** Real-time container filtering by name, image, or port.
+### 8. Docker Super-Deck (مدیریت کانتینرها، ایمیج‌ها، ولووم‌ها و منابع داکر)
+A full-featured Docker Desktop client alternative integrated directly into the VS Code sidebar with native theming:
+- **Containers Dashboard (مدیریت کانتینرها):**
+  - **Live State & Identification:** Real-time container list with visual status dots (Green for running, Yellow for paused/restarting, Red for stopped/dead), image tags, uptime, and mapped ports.
+  - **Comprehensive Lifecycle Controls:** One-click actions for `Start`, `Stop`, `Restart`, `Pause`, `Unpause`, and `Delete/Remove` (with confirmation safety prompt).
+  - **Integrated Terminal Access:** Open an interactive shell terminal (`docker exec -it <id> sh`) directly in the VS Code terminal panel.
+  - **Live Log Streamer:** Real-time monospace log viewer with inside-search, line tail selector (50, 100, 200, 500 lines), and 1-click clipboard copy.
+  - **Inspect JSON Viewer:** Detailed inspect modal to review full container metadata, mounts, environment variables, and network configurations.
+- **Images Management (مدیریت ایمیج‌ها):**
+  - **Repository & Tag Browser:** View all local Docker images with ID (1-click copy), disk size, and creation date.
+  - **Pull Image:** Direct image pull bar with progress indicators (`docker pull <image>`).
+  - **Run Container Dialog:** Launch new containers directly from any image with customizable container name, host:container port mappings (`-p`), and environment variables (`-e`).
+  - **Prune & Delete:** Remove individual images or prune all dangling/unused images (`docker image prune -a`).
+- **Volumes & Networks Explorer (مدیریت ولووم‌ها و شبکه‌ها):**
+  - **Volumes Explorer:** Inspect local volumes, view driver/scope, inspect raw metadata, and prune unused volumes.
+  - **Networks Explorer:** View bridge, host, and custom user networks; inspect network subnets and remove unused custom networks.
+- **System Resource Stats & Prune Hub (مخزن آمار حیاتی و پاکسازی):**
+  - **Real-Time Resource Monitor:** Snapshot of active container CPU %, memory usage/limits with visual progress bars, Net I/O, Block I/O, and PIDs count.
+  - **Global System Prune:** Master disk cleanup tool to reclaim storage space by safely removing stopped containers, unused networks, dangling images, and build caches (`docker system prune -af --volumes`) protected by a two-step confirmation dialog.
 
 ### 9. Mini API Tester / cURL Lite (تست و پینگ سریع اندپوینت‌ها)
 - **Zero-CORS Request Runner:** Dispatches HTTP requests (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`) directly via Node.js native `fetch` from the Extension Host, completely bypassing browser CORS restrictions.

@@ -2,7 +2,24 @@ import * as vscode from 'vscode';
 import * as crypto from 'crypto';
 import { scanListeningPorts, killProcessByPid } from '../utils/portManager';
 import { getSystemNetworkInfo, fetchPublicIp } from '../utils/networkInfo';
-import { getDockerContainers, dockerContainerAction, getDockerLogs } from '../utils/dockerManager';
+import {
+  getDockerContainers,
+  dockerContainerAction,
+  getDockerLogs,
+  inspectDockerObject,
+  getDockerImages,
+  pullDockerImage,
+  removeDockerImage,
+  pruneDockerImages,
+  runDockerContainer,
+  getDockerVolumes,
+  removeDockerVolume,
+  pruneDockerVolumes,
+  getDockerNetworks,
+  removeDockerNetwork,
+  getDockerStats,
+  dockerSystemPrune
+} from '../utils/dockerManager';
 import { executeApiRequest } from '../utils/apiTester';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
@@ -164,8 +181,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         case 'dockerGetLogs': {
           try {
-            const { containerId, name } = data;
-            const res = await getDockerLogs(containerId, 50);
+            const { containerId, name, tail } = data;
+            const res = await getDockerLogs(containerId, tail || 100);
             this.postMessage({
               type: 'dockerLogsResult',
               containerId,
@@ -183,6 +200,214 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
               error: err.message,
               success: false
             });
+          }
+          break;
+        }
+
+        case 'dockerInspect': {
+          try {
+            const { target, targetType } = data;
+            const res = await inspectDockerObject(target);
+            this.postMessage({
+              type: 'dockerInspectResult',
+              target,
+              targetType,
+              ...res
+            });
+          } catch (err: any) {
+            this.postMessage({
+              type: 'dockerInspectResult',
+              target: data.target,
+              targetType: data.targetType,
+              success: false,
+              error: err.message
+            });
+          }
+          break;
+        }
+
+        case 'dockerExecTerminal': {
+          try {
+            const { containerId, name, shell } = data;
+            const targetShell = shell || 'sh';
+            const termName = `Docker: ${name || containerId}`;
+            let terminal = vscode.window.terminals.find((t) => t.name === termName);
+            if (!terminal) {
+              terminal = vscode.window.createTerminal({
+                name: termName
+              });
+            }
+            terminal.show(true);
+            terminal.sendText(`docker exec -it ${containerId} ${targetShell}`);
+            vscode.window.showInformationMessage(`DevShelf: Opened terminal session in container ${name || containerId}`);
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf: Failed to open container terminal: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerGetImages': {
+          try {
+            const res = await getDockerImages();
+            this.postMessage({ type: 'dockerImagesList', ...res });
+          } catch (err: any) {
+            this.postMessage({ type: 'dockerImagesList', success: false, images: [], error: err.message });
+          }
+          break;
+        }
+
+        case 'dockerPullImage': {
+          try {
+            const { imageName } = data;
+            vscode.window.showInformationMessage(`DevShelf: Pulling Docker image "${imageName}"...`);
+            const res = await pullDockerImage(imageName);
+            this.postMessage({ type: 'dockerPullResult', ...res, imageName });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: Pulled "${imageName}" successfully.`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            this.postMessage({ type: 'dockerPullResult', success: false, message: err.message, imageName: data.imageName });
+            vscode.window.showErrorMessage(`DevShelf Docker Pull Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerRemoveImage': {
+          try {
+            const { imageId, force } = data;
+            const res = await removeDockerImage(imageId, force);
+            this.postMessage({ type: 'dockerRemoveImageResult', ...res, imageId });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Image Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerPruneImages': {
+          try {
+            const res = await pruneDockerImages(data.all ?? true);
+            this.postMessage({ type: 'dockerPruneImagesResult', ...res });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Prune Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerRunContainer': {
+          try {
+            const res = await runDockerContainer(data.config);
+            this.postMessage({ type: 'dockerRunContainerResult', ...res });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Run Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerGetVolumes': {
+          try {
+            const res = await getDockerVolumes();
+            this.postMessage({ type: 'dockerVolumesList', ...res });
+          } catch (err: any) {
+            this.postMessage({ type: 'dockerVolumesList', success: false, volumes: [], error: err.message });
+          }
+          break;
+        }
+
+        case 'dockerRemoveVolume': {
+          try {
+            const { name } = data;
+            const res = await removeDockerVolume(name);
+            this.postMessage({ type: 'dockerRemoveVolumeResult', ...res, name });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Volume Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerPruneVolumes': {
+          try {
+            const res = await pruneDockerVolumes();
+            this.postMessage({ type: 'dockerPruneVolumesResult', ...res });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Prune Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerGetNetworks': {
+          try {
+            const res = await getDockerNetworks();
+            this.postMessage({ type: 'dockerNetworksList', ...res });
+          } catch (err: any) {
+            this.postMessage({ type: 'dockerNetworksList', success: false, networks: [], error: err.message });
+          }
+          break;
+        }
+
+        case 'dockerRemoveNetwork': {
+          try {
+            const { id } = data;
+            const res = await removeDockerNetwork(id);
+            this.postMessage({ type: 'dockerRemoveNetworkResult', ...res, id });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Network Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'dockerGetStats': {
+          try {
+            const res = await getDockerStats();
+            this.postMessage({ type: 'dockerStatsList', ...res });
+          } catch (err: any) {
+            this.postMessage({ type: 'dockerStatsList', success: false, stats: [], error: err.message });
+          }
+          break;
+        }
+
+        case 'dockerSystemPrune': {
+          try {
+            const res = await dockerSystemPrune(data.includeVolumes ?? true);
+            this.postMessage({ type: 'dockerSystemPruneResult', ...res });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf Docker: ${res.message}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf Docker: ${res.message}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Docker Prune Error: ${err.message}`);
           }
           break;
         }

@@ -197,6 +197,41 @@ class DevShelfApp {
         case 'dockerActionResult':
           this.dockerView.handleActionResult(message);
           break;
+        case 'dockerInspectResult':
+          this.dockerView.setInspectResult(message);
+          break;
+        case 'dockerImagesList':
+          this.dockerView.setImages(message.images, message.error);
+          break;
+        case 'dockerPullResult':
+          this.dockerView.handlePullResult(message);
+          break;
+        case 'dockerRemoveImageResult':
+        case 'dockerPruneImagesResult':
+          this.dockerView.handleImageActionResult(message);
+          break;
+        case 'dockerRunContainerResult':
+          this.dockerView.handleRunContainerResult(message);
+          break;
+        case 'dockerVolumesList':
+          this.dockerView.setVolumes(message.volumes, message.error);
+          break;
+        case 'dockerRemoveVolumeResult':
+        case 'dockerPruneVolumesResult':
+          this.dockerView.handleVolumeActionResult(message);
+          break;
+        case 'dockerNetworksList':
+          this.dockerView.setNetworks(message.networks, message.error);
+          break;
+        case 'dockerRemoveNetworkResult':
+          this.dockerView.handleNetworkActionResult(message);
+          break;
+        case 'dockerStatsList':
+          this.dockerView.setStats(message.stats, message.error);
+          break;
+        case 'dockerSystemPruneResult':
+          this.dockerView.handleSystemPruneResult(message);
+          break;
         case 'apiResponseResult':
           this.apiView.setResponse(message.response);
           break;

@@ -19,7 +19,15 @@ import { formatJson, minifyJson, repairCommonJson, validateJson } from '../src/u
 import { getSystemNetworkInfo } from '../src/utils/networkInfo';
 import { generateConventionalCommit, analyzeDiffHunks } from '../src/utils/gitCommit';
 import { GIT_SCENARIOS, GIT_CHEAT_SHEET } from '../src/utils/gitScenarios';
-import { parseDockerContainersOutput, isSafeContainerIdentifier } from '../src/utils/dockerManager';
+import {
+  parseDockerContainersOutput,
+  parseDockerImagesOutput,
+  parseDockerVolumesOutput,
+  parseDockerNetworksOutput,
+  parseDockerStatsOutput,
+  isSafeContainerIdentifier,
+  isSafeDockerIdentifier
+} from '../src/utils/dockerManager';
 import { normalizeUrl, formatPayloadSize, executeApiRequest } from '../src/utils/apiTester';
 import {
   generateCreateTableDdl,
@@ -340,6 +348,46 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
   assert.strictEqual(isSafeContainerIdentifier('web && ls'), false);
   assert.strictEqual(isSafeContainerIdentifier('`whoami`'), false);
 
+  assert.strictEqual(isSafeDockerIdentifier('redis:alpine'), true);
+  assert.strictEqual(isSafeDockerIdentifier('myregistry.azurecr.io/team/app:v2.1'), true);
+  assert.strictEqual(isSafeDockerIdentifier('nginx:latest; rm -rf /'), false);
+  assert.strictEqual(isSafeDockerIdentifier('app | bash'), false);
+
+  // Images parsing
+  const mockImagesJson = `{"ID":"sha256:7b5d1e2f3a4b","Repository":"redis","Tag":"alpine","Size":"32.4MB","CreatedSince":"2 days ago"}
+{"ID":"c9d8e7f6a5b4","Repository":"node","Tag":"20-alpine","Size":"178MB","CreatedSince":"3 weeks ago"}`;
+  const parsedImages = parseDockerImagesOutput(mockImagesJson);
+  assert.strictEqual(parsedImages.length, 2);
+  assert.strictEqual(parsedImages[0].repository, 'redis');
+  assert.strictEqual(parsedImages[0].tag, 'alpine');
+  assert.strictEqual(parsedImages[0].size, '32.4MB');
+  assert.strictEqual(parsedImages[1].id, 'c9d8e7f6a5b4');
+
+  // Volumes parsing
+  const mockVolumesJson = `{"Name":"db_data","Driver":"local","Scope":"local"}
+{"Name":"redis_cache","Driver":"local","Scope":"local"}`;
+  const parsedVolumes = parseDockerVolumesOutput(mockVolumesJson);
+  assert.strictEqual(parsedVolumes.length, 2);
+  assert.strictEqual(parsedVolumes[0].name, 'db_data');
+  assert.strictEqual(parsedVolumes[0].driver, 'local');
+
+  // Networks parsing
+  const mockNetworksJson = `{"ID":"e1f2a3b4c5d6","Name":"bridge","Driver":"bridge","Scope":"local"}
+{"ID":"9a8b7c6d5e4f","Name":"my-custom-net","Driver":"bridge","Scope":"local"}`;
+  const parsedNetworks = parseDockerNetworksOutput(mockNetworksJson);
+  assert.strictEqual(parsedNetworks.length, 2);
+  assert.strictEqual(parsedNetworks[0].name, 'bridge');
+  assert.strictEqual(parsedNetworks[1].name, 'my-custom-net');
+
+  // Stats parsing
+  const mockStatsJson = `{"ID":"a1b2c3d4e5f6","Name":"postgres-db","CPUPerc":"1.45%","MemUsage":"42.5MiB / 7.68GiB","MemPerc":"0.54%","NetIO":"1.2MB / 850KB","BlockIO":"0B / 12KB","PIDs":"6"}`;
+  const parsedStats = parseDockerStatsOutput(mockStatsJson);
+  assert.strictEqual(parsedStats.length, 1);
+  assert.strictEqual(parsedStats[0].name, 'postgres-db');
+  assert.strictEqual(parsedStats[0].cpuPerc, '1.45%');
+  assert.strictEqual(parsedStats[0].memPerc, '0.54%');
+  assert.strictEqual(parsedStats[0].pids, '6');
+
   // 11. MINI API TESTER (cURL LITE) TESTS
   console.log('[Test 11] Mini API Tester (cURL Lite)');
   // URL normalization
@@ -365,10 +413,26 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
   const dockerKeys = [
     'dockerTitle', 'dockerSubtitle', 'dockerNotInstalled', 'dockerDaemonNotRunning',
     'dockerNoContainers', 'dockerFilterPlaceholder', 'dockerStart', 'dockerStop',
-    'dockerRestart', 'dockerLogs', 'dockerLogsTitle', 'dockerCloseLogs', 'dockerRefreshing',
-    'dockerImage', 'dockerPorts', 'dockerStatus', 'dockerAll', 'dockerRunning', 'dockerStopped',
-    'dockerActivePorts', 'dockerQuickSamples', 'dockerRunInTerminal', 'dockerDaemonOfflineTips',
-    'dockerRetry', 'dockerCopiedId', 'dockerTotal'
+    'dockerRestart', 'dockerPause', 'dockerUnpause', 'dockerRemove', 'dockerTerminal',
+    'dockerInspect', 'dockerInspectTitle', 'dockerLogs', 'dockerLogsTitle', 'dockerCloseLogs',
+    'dockerRefreshing', 'dockerImage', 'dockerPorts', 'dockerStatus', 'dockerAll',
+    'dockerRunning', 'dockerStopped', 'dockerActivePorts', 'dockerQuickSamples',
+    'dockerRunInTerminal', 'dockerDaemonOfflineTips', 'dockerRetry', 'dockerCopiedId',
+    'dockerTotal', 'dockerTabContainers', 'dockerTabImages', 'dockerTabVolumesNetworks',
+    'dockerTabStatsPrune', 'dockerTabVolumes', 'dockerTabNetworks', 'dockerPull',
+    'dockerPulling', 'dockerPullPlaceholder', 'dockerPruneImages', 'dockerConfirmPruneImages',
+    'dockerRunImage', 'dockerDeleteImage', 'dockerConfirmDeleteImage', 'dockerRunModalTitle',
+    'dockerRunContainerName', 'dockerRunPorts', 'dockerRunEnv', 'dockerRunLaunch',
+    'dockerRunDetached', 'dockerNoImages', 'dockerNoVolumes', 'dockerNoNetworks',
+    'dockerDeleteVolume', 'dockerPruneVolumes', 'dockerConfirmDeleteVolume',
+    'dockerDeleteNetwork', 'dockerConfirmDeleteNetwork', 'dockerStatsTitle',
+    'dockerRefreshStats', 'dockerCpuUsage', 'dockerMemUsage', 'dockerNetIo',
+    'dockerBlockIo', 'dockerPids', 'dockerNoRunningStats', 'dockerPruneHubTitle',
+    'dockerPruneHubDesc', 'dockerRunSystemPrune', 'dockerConfirmSystemPrune',
+    'dockerPruning', 'dockerSearchImages', 'dockerSearchVolumes', 'dockerSearchNetworks',
+    'dockerImageSize', 'dockerImageCreated', 'dockerVolumeDriver', 'dockerNetworkDriver',
+    'dockerNetworkScope', 'dockerSearchLogs', 'dockerTailLines', 'dockerClearLogs',
+    'dockerCopyLogs', 'dockerCancel'
   ];
   for (const k of dockerKeys) {
     assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
