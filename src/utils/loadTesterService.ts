@@ -67,6 +67,7 @@ export class LoadTesterService {
   private errorCount: number = 0;
 
   private streamTimer: any = null;
+  private durationTimer: any = null;
   private onSnapshotCallback?: (snapshot: LoadTestSnapshot) => void;
   private onCompleteCallback?: (snapshot: LoadTestSnapshot) => void;
 
@@ -130,6 +131,12 @@ export class LoadTesterService {
     this.startTime = Date.now();
     const durationSeconds = config.durationSeconds || 10;
     this.endTime = config.mode === 'duration' ? this.startTime + durationSeconds * 1000 : 0;
+
+    if (config.mode === 'duration') {
+      this.durationTimer = setTimeout(() => {
+        this.finishTest();
+      }, durationSeconds * 1000);
+    }
 
     // Start 250ms telemetry streaming
     this.streamTimer = setInterval(() => {
@@ -226,6 +233,20 @@ export class LoadTesterService {
           this.recordResult(code, `${code} ${res.statusMessage || ''}`.trim(), durationMs, isSuccess);
           resolve();
         });
+        res.on('error', (err: any) => {
+          if (finished) return;
+          finished = true;
+          const durationMs = Math.round((performance.now() - start) * 10) / 10;
+          this.recordResult(0, err.code || 'RESP_ERROR', durationMs, false, err.message);
+          resolve();
+        });
+        res.on('close', () => {
+          if (finished) return;
+          finished = true;
+          const durationMs = Math.round((performance.now() - start) * 10) / 10;
+          this.recordResult(0, 'CONN_CLOSED', durationMs, false, 'Connection closed');
+          resolve();
+        });
       });
 
       req.on('timeout', () => {
@@ -299,6 +320,17 @@ export class LoadTesterService {
   private finishTest(): void {
     if (!this.isRunning && !this.streamTimer) return;
     this.isRunning = false;
+    const isCompleted = !this.isAborted;
+    this.isAborted = true;
+
+    if (this.durationTimer) {
+      clearTimeout(this.durationTimer);
+      this.durationTimer = null;
+    }
+
+    if (this.abortController) {
+      this.abortController.abort();
+    }
 
     if (this.streamTimer) {
       clearInterval(this.streamTimer);
@@ -314,7 +346,7 @@ export class LoadTesterService {
       this.httpsAgent = null;
     }
 
-    const finalSnapshot = this.computeSnapshot(true);
+    const finalSnapshot = this.computeSnapshot(isCompleted);
     if (this.onCompleteCallback) {
       this.onCompleteCallback(finalSnapshot);
     }

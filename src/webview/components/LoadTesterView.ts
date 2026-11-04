@@ -94,8 +94,13 @@ export class LoadTesterView {
   }
 
   public updateTelemetry(snapshot: LoadTesterTelemetrySnapshot) {
-    this.isRunning = snapshot.isRunning;
+    const wasRunning = this.isRunning;
+    this.isRunning = Boolean(snapshot.isRunning);
     this.lastSnapshot = snapshot;
+
+    if (wasRunning !== this.isRunning) {
+      this.updateRunningStateUI();
+    }
     this.updateDashboardMetrics();
   }
 
@@ -212,6 +217,43 @@ export class LoadTesterView {
     this.updateDashboardMetrics();
   }
 
+  private updateRunningStateUI() {
+    // 1. Toggle Button UI
+    const toggleBtn = this.container.querySelector('#btn-toggle-benchmark') as HTMLButtonElement | null;
+    if (toggleBtn) {
+      if (this.isRunning) {
+        toggleBtn.className = 'btn btn-danger pulse-action';
+        toggleBtn.innerHTML = `${ICONS.stop} ${t('loadAbort', this.currentLang)}`;
+        toggleBtn.setAttribute('title', t('loadAbort', this.currentLang));
+      } else {
+        toggleBtn.className = 'btn';
+        toggleBtn.innerHTML = `${ICONS.speed} ${t('loadStart', this.currentLang)}`;
+        toggleBtn.setAttribute('title', t('loadStart', this.currentLang));
+      }
+    }
+
+    // 2. Enable/disable all config inputs
+    const inputsToToggle: (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement | null)[] = [
+      this.container.querySelector('#load-method-select'),
+      this.container.querySelector('#load-url-input'),
+      this.container.querySelector('#load-concurrency-slider'),
+      this.container.querySelector('#btn-mode-duration'),
+      this.container.querySelector('#btn-mode-requests'),
+      this.container.querySelector('#load-duration-select'),
+      this.container.querySelector('#load-total-select'),
+      this.container.querySelector('#load-timeout-input'),
+      this.container.querySelector('#load-headers-input'),
+      this.container.querySelector('#load-body-input'),
+      this.container.querySelector('#btn-reset-benchmark')
+    ];
+
+    for (const el of inputsToToggle) {
+      if (el) {
+        el.disabled = this.isRunning;
+      }
+    }
+  }
+
   private attachListeners() {
     const methodSelect = this.container.querySelector('#load-method-select') as HTMLSelectElement;
     methodSelect?.addEventListener('change', () => {
@@ -221,7 +263,7 @@ export class LoadTesterView {
 
     const urlInput = this.container.querySelector('#load-url-input') as HTMLInputElement;
     urlInput?.addEventListener('input', () => {
-      this.config.url = urlInput.value.trim();
+      this.config.url = urlInput.value;
     });
 
     const slider = this.container.querySelector('#load-concurrency-slider') as HTMLInputElement;
@@ -274,8 +316,22 @@ export class LoadTesterView {
     // Start / Abort
     this.container.querySelector('#btn-toggle-benchmark')?.addEventListener('click', () => {
       if (this.isRunning) {
+        this.isRunning = false;
+        this.updateRunningStateUI();
         this.onMessage({ type: 'loadTesterAbort' });
       } else {
+        let targetUrl = this.config.url.trim();
+        if (!targetUrl) {
+          return;
+        }
+
+        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+          targetUrl = 'http://' + targetUrl;
+          this.config.url = targetUrl;
+          const urlInput = this.container.querySelector('#load-url-input') as HTMLInputElement;
+          if (urlInput) urlInput.value = targetUrl;
+        }
+
         let parsedHeaders: Record<string, string> = {};
         if (this.config.headers.trim()) {
           try {
@@ -284,12 +340,12 @@ export class LoadTesterView {
         }
 
         this.isRunning = true;
-        this.render();
+        this.updateRunningStateUI();
 
         this.onMessage({
           type: 'loadTesterStart',
           config: {
-            url: this.config.url,
+            url: targetUrl,
             method: this.config.method,
             concurrency: this.config.concurrency,
             mode: this.config.mode,
@@ -306,6 +362,7 @@ export class LoadTesterView {
 
     // Reset Metrics
     this.container.querySelector('#btn-reset-benchmark')?.addEventListener('click', () => {
+      if (this.isRunning) return;
       this.lastSnapshot = null;
       this.updateDashboardMetrics();
     });

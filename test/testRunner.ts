@@ -832,6 +832,31 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
     assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
   }
 
+  // Verify start and abort lifecycle
+  let receivedSnapshot: LoadTestSnapshot | null = null;
+  loadTester.setCallbacks(
+    (snap) => { receivedSnapshot = snap; },
+    (snap) => { receivedSnapshot = snap; }
+  );
+
+  // Start with invalid dummy url and abort immediately
+  const abortPromise = loadTester.start({
+    url: 'http://127.0.0.1:59999/test',
+    method: 'GET',
+    concurrency: 2,
+    mode: 'duration',
+    durationSeconds: 10
+  });
+
+  assert.strictEqual(loadTester.isTestRunning(), true, 'Load tester must be running after start()');
+  loadTester.abort();
+  assert.strictEqual(loadTester.isTestRunning(), false, 'Load tester must be stopped immediately after abort()');
+  await abortPromise;
+  assert.strictEqual(loadTester.isTestRunning(), false, 'Load tester must remain stopped after promise settles');
+  assert.ok(receivedSnapshot, 'Snapshot callback must have been received');
+  assert.strictEqual((receivedSnapshot as any).isRunning, false, 'Final snapshot isRunning must be false');
+  assert.strictEqual((receivedSnapshot as any).isCompleted, false, 'Snapshot isCompleted must be false when aborted');
+
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');
 }
 
