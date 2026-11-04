@@ -25,6 +25,10 @@ import { MockServerService } from '../utils/mockServerService';
 import { TunnelService } from '../utils/tunnelService';
 import { SystemMonitorService } from '../utils/systemMonitorService';
 import { LoadTesterService } from '../utils/loadTesterService';
+import { getSelectedCodeSnippet, saveSnapshotImage } from '../services/codeSnapshotService';
+import { CommandCenterService } from '../services/commandCenterService';
+import { CacheCleanerService } from '../services/cacheCleanerService';
+import { MobilePreviewPanel } from '../services/mobilePreviewPanel';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'devshelf.sidebarView';
@@ -50,7 +54,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
-      switch (data.type) {
+      const actionType = data.type || data.command;
+      switch (actionType) {
         case 'insertText': {
           const editor = vscode.window.activeTextEditor;
           if (editor) {
@@ -611,10 +616,107 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           }
           break;
         }
+
+        // Snapshot Studio Messages
+        case 'getEditorCode': {
+          const snippet = getSelectedCodeSnippet();
+          this.postMessage({
+            type: 'activeCodeUpdate',
+            code: snippet.code,
+            languageId: snippet.languageId,
+            filename: snippet.filename
+          });
+          break;
+        }
+
+        case 'saveSnapshotImage': {
+          if (data.dataUrl) {
+            await saveSnapshotImage(data.dataUrl, data.filename);
+          }
+          break;
+        }
+
+        case 'copySnapshotDataUrl': {
+          if (data.dataUrl) {
+            await vscode.env.clipboard.writeText(data.dataUrl);
+          }
+          break;
+        }
+
+        // Command Center Messages
+        case 'scanTasks': {
+          try {
+            const tasks = await CommandCenterService.getInstance().scanTasks();
+            this.postMessage({ type: 'tasksList', tasks });
+          } catch {}
+          break;
+        }
+
+        case 'runTask': {
+          if (data.taskId) {
+            await CommandCenterService.getInstance().runTask(data.taskId);
+          }
+          break;
+        }
+
+        case 'stopTask': {
+          if (data.taskId) {
+            CommandCenterService.getInstance().stopTask(data.taskId);
+          }
+          break;
+        }
+
+        case 'restartTask': {
+          if (data.taskId) {
+            await CommandCenterService.getInstance().restartTask(data.taskId);
+          }
+          break;
+        }
+
+        case 'openTaskTerminal': {
+          if (data.taskId) {
+            CommandCenterService.getInstance().openTerminal(data.taskId);
+          }
+          break;
+        }
+
+        // CSS Designer & Mobile Viewport Messages
+        case 'openMobilePreview': {
+          MobilePreviewPanel.createOrShow(this._extensionUri);
+          break;
+        }
+
+        case 'copyToClipboard': {
+          if (data.text) {
+            await vscode.env.clipboard.writeText(data.text);
+          }
+          break;
+        }
+
+        // Dev Junk & Cache Cleaner Messages
+        case 'scanJunk': {
+          try {
+            const items = await CacheCleanerService.getInstance().scanJunk();
+            this.postMessage({ type: 'junkItemsList', items });
+          } catch {}
+          break;
+        }
+
+        case 'purgeJunkItems': {
+          try {
+            const freedBytes = await CacheCleanerService.getInstance().purgeItems(data.itemIds || []);
+            this.postMessage({ type: 'junkPurgeResult', freedBytes });
+            const formatted = CacheCleanerService.getInstance().formatBytes(freedBytes);
+            vscode.window.showInformationMessage(`DevShelf: Reclaimed ${formatted} of disk space!`);
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf: Failed to purge items: ${err.message}`);
+          }
+          break;
+        }
       }
     });
 
-    // Wire callbacks for MockServer, Tunnel, and LoadTester live events
+    // Wire callbacks for MockServer, Tunnel, LoadTester, and CommandCenter live events
     MockServerService.getInstance().setCallbacks(
       (captured) => this.postMessage({ type: 'mockCapturedRequest', request: captured }),
       (status) => this.postMessage({ type: 'mockStatus', status })
@@ -628,6 +730,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       (snapshot) => this.postMessage({ type: 'loadTesterSnapshot', snapshot }),
       (snapshot) => this.postMessage({ type: 'loadTesterSnapshot', snapshot })
     );
+
+    CommandCenterService.getInstance().setTaskStatusCallback((taskId, isRunning, startTime) => {
+      this.postMessage({ type: 'taskStatusUpdate', taskId, isRunning, startTime });
+    });
 
     webviewView.onDidDispose(() => {
       LoadTesterService.getInstance().abort();

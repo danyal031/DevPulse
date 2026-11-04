@@ -14,6 +14,10 @@ import { MockServerView } from './components/MockServerView';
 import { TunnelView } from './components/TunnelView';
 import { SystemMonitorView } from './components/SystemMonitorView';
 import { LoadTesterView } from './components/LoadTesterView';
+import { CodeSnapshotView } from './components/CodeSnapshotView';
+import { CommandCenterView } from './components/CommandCenterView';
+import { CssDesignerView } from './components/CssDesignerView';
+import { CacheCleanerView } from './components/CacheCleanerView';
 
 declare function acquireVsCodeApi(): {
   postMessage(message: unknown): void;
@@ -25,19 +29,21 @@ const vscode = acquireVsCodeApi();
 
 interface FeatureTool {
   id: string;
-  category: 'dev' | 'network' | 'system';
+  category: 'dev' | 'network' | 'ops' | 'system';
   icon: string;
   titleKey: keyof typeof translations['en'];
   subKey: keyof typeof translations['en'];
 }
 
 const FEATURE_TOOLS: FeatureTool[] = [
-  // Dev & Data (5)
+  // Dev & Design (7)
   { id: 'json', category: 'dev', icon: ICONS.brackets, titleKey: 'tabJson', subKey: 'subJson' },
   { id: 'jwt', category: 'dev', icon: ICONS.shield, titleKey: 'tabJwt', subKey: 'subJwt' },
   { id: 'persian', category: 'dev', icon: ICONS.calendar, titleKey: 'tabPersian', subKey: 'subPersian' },
   { id: 'crypto', category: 'dev', icon: ICONS.key, titleKey: 'tabCrypto', subKey: 'subCrypto' },
   { id: 'sql', category: 'dev', icon: ICONS.database, titleKey: 'tabSql', subKey: 'subSql' },
+  { id: 'snapshot', category: 'dev', icon: ICONS.camera, titleKey: 'tabSnapshot', subKey: 'subSnapshot' },
+  { id: 'cssdesign', category: 'dev', icon: ICONS.palette, titleKey: 'tabCssDesigner', subKey: 'subCssDesigner' },
 
   // Network & API (4)
   { id: 'api', category: 'network', icon: ICONS.send, titleKey: 'tabApi', subKey: 'subApi' },
@@ -45,12 +51,16 @@ const FEATURE_TOOLS: FeatureTool[] = [
   { id: 'tunnel', category: 'network', icon: ICONS.tunnel, titleKey: 'tabTunnel', subKey: 'subTunnel' },
   { id: 'loadtest', category: 'network', icon: ICONS.speed, titleKey: 'tabLoadTest', subKey: 'subLoadtest' },
 
-  // System & Git (5)
+  // Project & Ops (3)
+  { id: 'commandcenter', category: 'ops', icon: ICONS.playCircle, titleKey: 'tabCommandCenter', subKey: 'subCommandCenter' },
+  { id: 'docker', category: 'ops', icon: ICONS.docker, titleKey: 'tabDocker', subKey: 'subDocker' },
+  { id: 'git', category: 'ops', icon: ICONS.git, titleKey: 'tabGit', subKey: 'subGit' },
+
+  // System & Cleanup (4)
   { id: 'ports', category: 'system', icon: ICONS.server, titleKey: 'tabPorts', subKey: 'subPorts' },
-  { id: 'docker', category: 'system', icon: ICONS.docker, titleKey: 'tabDocker', subKey: 'subDocker' },
   { id: 'sysmon', category: 'system', icon: ICONS.cpu, titleKey: 'tabSysMon', subKey: 'subSysmon' },
   { id: 'logs', category: 'system', icon: ICONS.fileText, titleKey: 'tabLogs', subKey: 'subLogs' },
-  { id: 'git', category: 'system', icon: ICONS.git, titleKey: 'tabGit', subKey: 'subGit' }
+  { id: 'cleaner', category: 'system', icon: ICONS.broom, titleKey: 'tabCleaner', subKey: 'subCleaner' }
 ];
 
 class DevShelfApp {
@@ -73,6 +83,10 @@ class DevShelfApp {
   private tunnelView!: TunnelView;
   private sysmonView!: SystemMonitorView;
   private loadTesterView!: LoadTesterView;
+  private snapshotView!: CodeSnapshotView;
+  private commandCenterView!: CommandCenterView;
+  private cssDesignerView!: CssDesignerView;
+  private cleanerView!: CacheCleanerView;
 
   constructor() {
     this.restoreState();
@@ -119,7 +133,11 @@ class DevShelfApp {
       mockState: this.mockView ? this.mockView.getState() : undefined,
       tunnelState: this.tunnelView ? this.tunnelView.getState() : undefined,
       sysmonState: this.sysmonView ? this.sysmonView.getState() : undefined,
-      loadTesterState: this.loadTesterView ? this.loadTesterView.getState() : undefined
+      loadTesterState: this.loadTesterView ? this.loadTesterView.getState() : undefined,
+      snapshotState: this.snapshotView ? this.snapshotView.getState() : undefined,
+      commandCenterState: this.commandCenterView ? this.commandCenterView.getState() : undefined,
+      cssDesignerState: this.cssDesignerView ? this.cssDesignerView.getState() : undefined,
+      cleanerState: this.cleanerView ? this.cleanerView.getState() : undefined
     });
   }
 
@@ -189,19 +207,23 @@ class DevShelfApp {
           <div class="deck-categories-bar" id="deck-categories-bar">
             <button class="deck-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
               <span>${t('deckCatAll', this.currentLang)}</span>
-              <span class="cat-count">14</span>
+              <span class="cat-count">18</span>
             </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
               <span>${t('deckCatDev', this.currentLang)}</span>
-              <span class="cat-count">5</span>
+              <span class="cat-count">7</span>
             </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
               <span>${t('deckCatNetwork', this.currentLang)}</span>
               <span class="cat-count">4</span>
             </button>
+            <button class="deck-cat-chip ${this.selectedCategory === 'ops' ? 'active' : ''}" data-cat="ops">
+              <span>${t('deckCatOps', this.currentLang)}</span>
+              <span class="cat-count">3</span>
+            </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'system' ? 'active' : ''}" data-cat="system">
               <span>${t('deckCatSystem', this.currentLang)}</span>
-              <span class="cat-count">5</span>
+              <span class="cat-count">4</span>
             </button>
           </div>
 
@@ -227,9 +249,10 @@ class DevShelfApp {
         <div id="view-tunnel" class="view-panel"></div>
         <div id="view-sysmon" class="view-panel"></div>
         <div id="view-loadtest" class="view-panel"></div>
-      </main>
-        <div id="view-sysmon" class="view-panel"></div>
-        <div id="view-loadtest" class="view-panel"></div>
+        <div id="view-snapshot" class="view-panel"></div>
+        <div id="view-commandcenter" class="view-panel"></div>
+        <div id="view-cssdesign" class="view-panel"></div>
+        <div id="view-cleaner" class="view-panel"></div>
       </main>
     `;
   }
@@ -251,6 +274,10 @@ class DevShelfApp {
     const tunnelContainer = document.getElementById('view-tunnel')!;
     const sysmonContainer = document.getElementById('view-sysmon')!;
     const loadtestContainer = document.getElementById('view-loadtest')!;
+    const snapshotContainer = document.getElementById('view-snapshot')!;
+    const cmdCenterContainer = document.getElementById('view-commandcenter')!;
+    const cssDesignContainer = document.getElementById('view-cssdesign')!;
+    const cleanerContainer = document.getElementById('view-cleaner')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
     this.jwtView = new JwtView(jwtContainer, this.currentLang, postToHost);
@@ -266,6 +293,10 @@ class DevShelfApp {
     this.tunnelView = new TunnelView(tunnelContainer, this.currentLang, postToHost);
     this.sysmonView = new SystemMonitorView(sysmonContainer, this.currentLang, postToHost);
     this.loadTesterView = new LoadTesterView(loadtestContainer, this.currentLang, postToHost);
+    this.snapshotView = new CodeSnapshotView(snapshotContainer, this.currentLang, postToHost);
+    this.commandCenterView = new CommandCenterView(cmdCenterContainer, this.currentLang, postToHost);
+    this.cssDesignerView = new CssDesignerView(cssDesignContainer, this.currentLang, postToHost);
+    this.cleanerView = new CacheCleanerView(cleanerContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
     if (state) {
@@ -282,6 +313,10 @@ class DevShelfApp {
       if (state.tunnelState) this.tunnelView.restoreState(state.tunnelState);
       if (state.sysmonState) this.sysmonView.restoreState(state.sysmonState);
       if (state.loadTesterState) this.loadTesterView.restoreState(state.loadTesterState);
+      if (state.snapshotState) this.snapshotView.restoreState(state.snapshotState);
+      if (state.commandCenterState) this.commandCenterView.restoreState(state.commandCenterState);
+      if (state.cssDesignerState) this.cssDesignerView.restoreState(state.cssDesignerState);
+      if (state.cleanerState) this.cleanerView.restoreState(state.cleanerState);
     }
   }
 
@@ -419,6 +454,21 @@ class DevShelfApp {
         case 'loadTesterSnapshot':
           this.loadTesterView.updateTelemetry(message.snapshot);
           break;
+        case 'tasksList':
+          this.commandCenterView.setTasks(message.tasks || []);
+          break;
+        case 'taskStatusUpdate':
+          this.commandCenterView.updateTaskStatus(message.taskId, message.isRunning, message.startTime);
+          break;
+        case 'activeCodeUpdate':
+          this.snapshotView.setCodeSnippet(message.code, message.languageId, message.filename);
+          break;
+        case 'junkItemsList':
+          this.cleanerView.setItems(message.items || []);
+          break;
+        case 'junkPurgeResult':
+          this.cleanerView.onPurgeSuccess(message.freedBytes || 0);
+          break;
         case 'replayInApiTester':
           this.switchTab('api');
           this.apiView.prefillRequest(message.request);
@@ -513,10 +563,11 @@ class DevShelfApp {
         el.innerHTML = `<span>${t(labelKey, this.currentLang)}</span><span class="cat-count">${count}</span>`;
       }
     };
-    setCatText('all', 'deckCatAll', 14);
-    setCatText('dev', 'deckCatDev', 5);
+    setCatText('all', 'deckCatAll', 18);
+    setCatText('dev', 'deckCatDev', 7);
     setCatText('network', 'deckCatNetwork', 4);
-    setCatText('system', 'deckCatSystem', 5);
+    setCatText('ops', 'deckCatOps', 3);
+    setCatText('system', 'deckCatSystem', 4);
 
     // Update all cards in the deck
     FEATURE_TOOLS.forEach((tool) => {
@@ -553,6 +604,10 @@ class DevShelfApp {
     this.tunnelView.setLanguage(this.currentLang);
     this.sysmonView.setLanguage(this.currentLang);
     this.loadTesterView.setLanguage(this.currentLang);
+    this.snapshotView.setLanguage(this.currentLang);
+    this.commandCenterView.setLanguage(this.currentLang);
+    this.cssDesignerView.setLanguage(this.currentLang);
+    this.cleanerView.setLanguage(this.currentLang);
   }
 
   private switchTab(tabName: string) {
@@ -598,6 +653,12 @@ class DevShelfApp {
       vscode.postMessage({ type: 'mockGetRequests' });
     } else if (tabName === 'tunnel') {
       vscode.postMessage({ type: 'tunnelGetStatus' });
+    } else if (tabName === 'commandcenter') {
+      vscode.postMessage({ command: 'scanTasks' });
+    } else if (tabName === 'cleaner') {
+      vscode.postMessage({ command: 'scanJunk' });
+    } else if (tabName === 'snapshot') {
+      vscode.postMessage({ command: 'getEditorCode' });
     }
 
     this.saveCurrentState();

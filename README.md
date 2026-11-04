@@ -6,7 +6,7 @@
 
 ## Key Highlights
 
-- **Feature Cards Deck & Quick Navigator (v1.4.0):** Hyper-modern card-based navigation featuring a responsive 2-column card deck with distinct icon badges, high-contrast typography, and sub-labels. Includes 1-click category filtering (`All Tools [14]`, `Dev & Data [5]`, `Network & API [4]`, `System & Git [5]`) and collapsible active tool summary banner.
+- **Feature Cards Deck & Quick Navigator (v1.5.0):** Hyper-modern card-based navigation featuring a responsive 2-column card deck with distinct icon badges, high-contrast typography, and sub-labels. Includes 1-click category filtering (`All Tools [18]`, `Dev & Design [7]`, `Network & API [4]`, `Project & Ops [3]`, `System & Cleanup [4]`) and collapsible active tool summary banner.
 - **100% Offline-First:** Runs entirely inside your local VS Code environment without transmitting tokens, data, or source code over the network.
 - **Native VS Code Theming:** Built exclusively with native VS Code CSS variables (`var(--vscode-sideBar-background)`, `var(--vscode-input-background)`, `var(--vscode-editor-background)`, `var(--vscode-focusBorder)`, etc.). Adapts seamlessly to Light, Dark, High Contrast, and custom community themes.
 - **Minimalist Codicon Aesthetic:** Zero emoji clutter. Crisp, modern SVG Codicons matching VS Code's desktop design system.
@@ -171,14 +171,59 @@ A full-featured Docker Desktop client alternative integrated directly into the V
   - **Status Codes Breakdown Table:** Detailed breakdown of response HTTP status codes (2xx, 3xx, 4xx, 5xx) and connection errors (e.g. `ECONNREFUSED`, `ETIMEDOUT`).
   - **1-Click Markdown Benchmark Report:** Instant export of complete benchmark telemetry to clipboard formatted for GitHub issues, PRs, and Slack.
 
+### 16. Code-to-Image & Snapshot Studio (استودیوی ساخت عکس‌های خیره‌کننده از کد)
+- **Studio-Quality Code Snapshots (Ray.so / Carbon Alternative):**
+  - Transform code selections or active editor files into high-resolution, shareable images.
+  - **6 Curated Mesh Gradient Presets:** Sunset Rose, Deep Ocean, Midnight Neon, Emerald Glass, Amber Ember, and Monochrome Slate.
+  - **macOS Window Chrome:** Realistic window frame with red/yellow/green traffic light dots, customizable window title/filename, and language badge.
+  - **Instant Syntax Token Highlighting:** Lexical colorization for keywords, strings, comments, numbers, and identifiers.
+  - **Customizable Controls:** Line numbers toggle, watermark/author tag toggle, and adjustable padding (16px, 24px, 32px, 48px).
+  - **2x Retina Canvas Exporter:** Zero-dependency, pure HTML5 Canvas rendering supporting direct **Copy Image to Clipboard** and **Save as PNG** via native VS Code save dialog.
+
+### 17. 1-Click Project Command Center (داشبورد هوشمند اسکریپت‌ها و تسک‌های پروژه)
+- **Universal Multi-Ecosystem Task Discovery:**
+  - Automatically discovers package scripts across `package.json` (`npm`, `pnpm`, `yarn`, `bun`), `Makefile` targets, `docker-compose.yml` services, `Cargo.toml` tasks, and Python scripts (`pyproject.toml` / `requirements.txt`).
+  - **Interactive Script Cards:** Distinct package manager badges, quick search and category filtering (`All`, `Node & Web`, `Makefile`, `Docker`, `Cargo`, `Python`).
+  - **Live State & Elapsed Timer:** Dynamic running status indicators (pulsing green dot for active tasks) and sub-second elapsed timers (`MM:SS`).
+  - **Integrated Terminal Execution:** 1-click **Run**, **Stop**, **Restart**, and **Open Integrated Terminal** actions maintaining full TTY interactivity and ANSI colors.
+
+### 18. Frontend & CSS Live Design Toolkit (جعبه‌ابزار فرانت‌اند، CSS و پیش‌نمایش موبایل)
+- **Smart Color & Nearest Tailwind Matcher:**
+  - Synchronized HEX, RGB, and HSL color picker.
+  - Real-time Euclidean RGB distance matching against standard Tailwind CSS palette (shades 50–950) with 1-click copy buttons for background (`bg-*`), text (`text-*`), and border (`border-*`) classes.
+- **Interactive Glassmorphism & Shadow Generator:**
+  - Real-time glass card preview over animated colorful mesh bubbles demonstrating refraction and blur.
+  - Sliders for backdrop blur (0–40px), opacity (5–90%), border opacity, and border radius.
+  - 1-click **Copy CSS** snippet and **Copy Tailwind** utility classes (`backdrop-blur-md bg-white/25 border-white/20 shadow-lg`).
+- **Bidirectional PX <-> REM Calculator:**
+  - Instant conversion with configurable root font size (default: 16px) and quick breakpoint/spacing preset buttons.
+- **Responsive Multi-Device Viewport Preview:**
+  - Side-by-side dedicated Webview panel hosting pixel-perfect simulated device frames: **iPhone 16 Pro** (393 × 852), **iPad Air** (820 × 1180), and **Desktop** (1024 × 768).
+  - Live orientation toggle (Portrait / Landscape), zoom scaling (50% to 125%), URL navigation bar, and reload controls.
+
+### 19. Dev Junk & Cache Obliterator (تمیزکننده هوشمند حافظه و کش‌های مرده)
+- **Storage Junk Scanner:**
+  - Identifies abandoned workspace build artifacts (`.next`, `.nuxt`, `dist`, `build`, `.turbo`), heavy dependencies (`node_modules`), Python caches (`__pycache__`, `.pytest_cache`, `.venv`), and Rust target artifacts (`target`).
+  - Scans global package manager cache directories (`~/.npm`, `~/.local/share/pnpm/store`, `~/.cache/yarn`, `~/.cache/pip`).
+- **Visual Storage Distribution Chart:**
+  - Pure-SVG segmented distribution bar showing relative space occupied by build artifacts, dependencies, and caches.
+- **Safety Ratings & Safe Master Purge:**
+  - Categorizes targets with safety badges (`Safe to Delete` vs `Reinstall Required`).
+  - Safe confirmation modal with item counts and total reclaimable space calculation before permanent deletion.
+
 ---
 
 ## Command Palette & Context Menu Contributions
 
 | Command | Title | Context |
 | :--- | :--- | :--- |
-| `devshelf.generateCommitMessage` | `DevShelf: Generate Conventional Commit Message` | SCM Toolbar, Commit Input Box & Palette |
 | `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
+| `devshelf.openSnapshotStudio` | `DevShelf: Open Code-to-Image & Snapshot Studio` | Command Palette |
+| `devshelf.openCommandCenter` | `DevShelf: Open 1-Click Project Command Center` | Command Palette |
+| `devshelf.openCssDesigner` | `DevShelf: Open Frontend & CSS Live Design Toolkit` | Command Palette |
+| `devshelf.openCacheCleaner` | `DevShelf: Open Dev Junk & Cache Obliterator` | Command Palette |
+| `devshelf.openMobilePreview` | `DevShelf: Open Responsive Multi-Device Preview Panel` | Command Palette |
+| `devshelf.generateCommitMessage` | `DevShelf: Generate Conventional Commit Message` | SCM Toolbar, Commit Input Box & Palette |
 | `devshelf.openGitWizard` | `DevShelf: Open Git Command Wizard` | Command Palette |
 | `devshelf.gitCheatSheet` | `DevShelf: Git Rescue Cheat Sheet` | Command Palette |
 | `devshelf.openDockerDeck` | `DevShelf: Open Docker Quick Deck` | Command Palette |
@@ -210,11 +255,17 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 ├── media/
 │   ├── commit-icon-dark.svg     # SCM commit toolbar icon (dark themes)
 │   ├── commit-icon-light.svg    # SCM commit toolbar icon (light themes)
+│   ├── commit-icon.svg          # SCM commit toolbar icon
 │   └── devshelf-icon.svg        # Activity Bar icon
 ├── src/
 │   ├── extension.ts             # Host entry point, commands & SCM commit hook
 │   ├── providers/
 │   │   └── SidebarProvider.ts   # WebviewViewProvider with strict CSP
+│   ├── services/
+│   │   ├── codeSnapshotService.ts # Editor code extractor & PNG image saver
+│   │   ├── commandCenterService.ts # Multi-ecosystem task discovery & terminal runner
+│   │   ├── cacheCleanerService.ts  # Directory size calculator & cache purger
+│   │   └── mobilePreviewPanel.ts   # Responsive multi-device simulator WebviewPanel
 │   ├── utils/
 │   │   ├── jalali.ts            # Pure astronomical Jalali calendar math
 │   │   ├── persianSanitizer.ts  # Persian/Arabic char & ZWNJ normalizer
@@ -237,14 +288,15 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
-│       ├── i18n.ts              # Full English & Persian dictionary
+│       ├── i18n.ts              # Full English & Persian dictionary (18 tools)
 │       ├── icons.ts             # Clean inline SVG Codicons
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   └── testRunner.ts            # 19 unit test suites
+│   ├── testRunner.ts            # 24 comprehensive unit test suites
+│   └── mockVscode.ts            # VS Code API mock for standalone test runner
 ├── esbuild.js                   # Fast bundler config
-├── package.json                 # Extension manifest & contributions
+├── package.json                 # Extension manifest & contributions (v1.5.0)
 ├── tsconfig.json                # Strict TypeScript configuration
 └── README.md                    # Documentation
 ```

@@ -18,6 +18,8 @@ import { translations } from './webview/i18n';
 import { MockServerService } from './utils/mockServerService';
 import { TunnelService } from './utils/tunnelService';
 import { LoadTesterService } from './utils/loadTesterService';
+import { MobilePreviewPanel } from './services/mobilePreviewPanel';
+import { CommandCenterService } from './services/commandCenterService';
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
@@ -501,6 +503,45 @@ export function activate(context: vscode.ExtensionContext) {
       sidebarProvider.switchTab('loadtest');
     })
   );
+
+  // Command 21: Open Code Snapshot Studio
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openSnapshotStudio', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('snapshot');
+    })
+  );
+
+  // Command 22: Open Project Command Center
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openCommandCenter', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('commandcenter');
+    })
+  );
+
+  // Command 23: Open Frontend & CSS Live Design Toolkit
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openCssDesigner', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('cssdesign');
+    })
+  );
+
+  // Command 24: Open Dev Junk & Cache Obliterator
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openCacheCleaner', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('cleaner');
+    })
+  );
+
+  // Command 25: Open Responsive Multi-Device Preview
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openMobilePreview', () => {
+      MobilePreviewPanel.createOrShow(context.extensionUri);
+    })
+  );
 }
 
 export function deactivate() {
@@ -512,5 +553,8 @@ export function deactivate() {
   } catch {}
   try {
     LoadTesterService.getInstance().abort();
+  } catch {}
+  try {
+    CommandCenterService.getInstance().stopAllTasks();
   } catch {}
 }

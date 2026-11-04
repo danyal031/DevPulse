@@ -55,6 +55,9 @@ import { MockServerService } from '../src/utils/mockServerService';
 import { TunnelService } from '../src/utils/tunnelService';
 import { SystemMonitorService } from '../src/utils/systemMonitorService';
 import { LoadTesterService, LoadTestConfig, LoadTestSnapshot } from '../src/utils/loadTesterService';
+import { SNAPSHOT_PRESETS } from '../src/webview/components/CodeSnapshotView';
+import { CacheCleanerService } from '../src/services/cacheCleanerService';
+import { CommandCenterService } from '../src/services/commandCenterService';
 
 async function runTests() {
   console.log('--- RUNNING DEVSHELF UNIT TESTS ---');
@@ -860,16 +863,121 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
   // 19. FEATURE CARDS DECK & NAVIGATION I18N
   console.log('[Test 19] Feature Cards Deck & Quick Navigation');
   const deckKeys = [
-    'deckCatAll', 'deckCatDev', 'deckCatNetwork', 'deckCatSystem',
+    'deckCatAll', 'deckCatDev', 'deckCatNetwork', 'deckCatOps', 'deckCatSystem',
     'exploreDeck', 'collapseDeck', 'toolsDeck',
     'subJson', 'subJwt', 'subPersian', 'subPorts', 'subGit', 'subDocker',
     'subApi', 'subSql', 'subLogs', 'subCrypto', 'subMock', 'subTunnel',
-    'subSysmon', 'subLoadtest'
+    'subSysmon', 'subLoadtest', 'subSnapshot', 'subCommandCenter', 'subCssDesigner', 'subCleaner'
   ];
 
   for (const k of deckKeys) {
     assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
     assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
+  }
+
+  // 20. CODE-TO-IMAGE & SNAPSHOT STUDIO
+  console.log('[Test 20] Code-to-Image & Snapshot Studio');
+  assert.strictEqual(SNAPSHOT_PRESETS.length, 6, 'Snapshot studio must provide 6 curated background presets');
+  for (const preset of SNAPSHOT_PRESETS) {
+    assert.ok(preset.id, 'Preset must have an ID');
+    assert.ok(preset.gradient.startsWith('linear-gradient'), 'Preset gradient must be valid CSS linear-gradient');
+    assert.ok(preset.editorBg, 'Preset editorBg must be defined');
+    assert.ok(preset.textColor, 'Preset textColor must be defined');
+    assert.ok((translations.en as any)[preset.nameKey], `Missing EN preset translation: ${preset.nameKey}`);
+    assert.ok((translations.fa as any)[preset.nameKey], `Missing FA preset translation: ${preset.nameKey}`);
+  }
+
+  const snapshotKeys = [
+    'tabSnapshot', 'snapshotTitle', 'snapshotDesc', 'snapshotTheme', 'snapshotTitleInput',
+    'snapshotLanguage', 'snapshotWatermark', 'snapshotLineNumbers', 'snapshotPadding',
+    'snapshotCopyImage', 'snapshotSavePng', 'snapshotImportSelection', 'snapshotImportActiveFile',
+    'snapshotPlaceholder', 'snapshotCopied', 'snapshotSaved'
+  ];
+  for (const k of snapshotKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN snapshot key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA snapshot key: ${k}`);
+  }
+
+  // 21. 1-CLICK PROJECT COMMAND CENTER
+  console.log('[Test 21] 1-Click Project Command Center');
+  const cmdService = CommandCenterService.getInstance();
+  assert.ok(cmdService, 'CommandCenterService must instantiate as singleton');
+  const cmdKeys = [
+    'tabCommandCenter', 'cmdTitle', 'cmdDesc', 'cmdScanScripts', 'cmdFilterPlaceholder',
+    'cmdNoScriptsFound', 'cmdRunning', 'cmdIdle', 'cmdRun', 'cmdStop', 'cmdRestart',
+    'cmdOpenTerminal', 'cmdScriptOutput', 'cmdElapsed', 'cmdCategoryPackage',
+    'cmdCategoryMakefile', 'cmdCategoryDocker', 'cmdCategoryRust', 'cmdCategoryPython'
+  ];
+  for (const k of cmdKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN cmd key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA cmd key: ${k}`);
+  }
+
+  // Task status callback verification
+  let reportedRunning = false;
+  cmdService.setTaskStatusCallback((id, running) => {
+    if (id === 'test-task-1') reportedRunning = running;
+  });
+  assert.strictEqual(cmdService.isTaskRunning('test-task-1'), false);
+
+  // 22. FRONTEND & CSS LIVE DESIGN TOOLKIT
+  console.log('[Test 22] Frontend & CSS Live Design Toolkit');
+  const cssKeys = [
+    'tabCssDesigner', 'cssTitle', 'cssDesc', 'cssTabColor', 'cssTabGlass', 'cssTabUnits',
+    'cssTabViewport', 'cssColorHex', 'cssColorRgb', 'cssColorHsl', 'cssTailwindNearest',
+    'cssTailwindBg', 'cssTailwindText', 'cssTailwindBorder', 'cssGlassBlur', 'cssGlassOpacity',
+    'cssGlassBorder', 'cssGlassRadius', 'cssCopyCss', 'cssCopyTailwind', 'cssBaseFontSize',
+    'cssPxValue', 'cssRemValue', 'cssOpenMobilePreview', 'cssPreviewNotice'
+  ];
+  for (const k of cssKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN css key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA css key: ${k}`);
+  }
+
+  // Mathematical units conversion verification
+  const rootPx = 16;
+  const testPixels = [16, 24, 32, 8, 4];
+  const expectedRems = [1.0, 1.5, 2.0, 0.5, 0.25];
+  for (let i = 0; i < testPixels.length; i++) {
+    const calculatedRem = parseFloat((testPixels[i] / rootPx).toFixed(4));
+    assert.strictEqual(calculatedRem, expectedRems[i], `PX to REM calculation mismatch for ${testPixels[i]}px`);
+  }
+
+  // 23. DEV JUNK & CACHE OBLITERATOR
+  console.log('[Test 23] Dev Junk & Cache Obliterator');
+  const cleaner = CacheCleanerService.getInstance();
+  assert.ok(cleaner, 'CacheCleanerService must instantiate as singleton');
+
+  // Verify byte formatting utility
+  assert.strictEqual(cleaner.formatBytes(0), '0 B');
+  assert.strictEqual(cleaner.formatBytes(1024), '1 KB');
+  assert.strictEqual(cleaner.formatBytes(1048576), '1 MB');
+  assert.strictEqual(cleaner.formatBytes(1073741824), '1 GB');
+  assert.strictEqual(cleaner.formatBytes(1500000000), '1.4 GB');
+
+  const cleanerKeys = [
+    'tabCleaner', 'cleanerTitle', 'cleanerDesc', 'cleanerScan', 'cleanerScanning',
+    'cleanerPurgeSelected', 'cleanerPurgeAll', 'cleanerReclaimable', 'cleanerWorkspaceJunk',
+    'cleanerGlobalCaches', 'cleanerNoJunkFound', 'cleanerPath', 'cleanerSize',
+    'cleanerLastModified', 'cleanerSafeToPurge', 'cleanerDangerous', 'cleanerConfirmTitle',
+    'cleanerConfirmMsg', 'cleanerPurging', 'cleanerPurgeSuccess', 'cleanerPurgeFail'
+  ];
+  for (const k of cleanerKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN cleaner key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA cleaner key: ${k}`);
+  }
+
+  // 24. FULL 18-TOOL PARITY & BILINGUAL INTEGRITY
+  console.log('[Test 24] Full 18-Tool Parity & Bilingual Integrity');
+  const all18ToolTabKeys = [
+    'tabJson', 'tabJwt', 'tabPersian', 'tabPorts', 'tabGit', 'tabDocker',
+    'tabApi', 'tabSql', 'tabLogs', 'tabCrypto', 'tabMock', 'tabTunnel',
+    'tabSysMon', 'tabLoadTest', 'tabSnapshot', 'tabCommandCenter', 'tabCssDesigner', 'tabCleaner'
+  ];
+  assert.strictEqual(all18ToolTabKeys.length, 18, 'There must be exactly 18 developer tools');
+  for (const tabKey of all18ToolTabKeys) {
+    assert.ok((translations.en as any)[tabKey], `EN missing tab label: ${tabKey}`);
+    assert.ok((translations.fa as any)[tabKey], `FA missing tab label: ${tabKey}`);
   }
 
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');

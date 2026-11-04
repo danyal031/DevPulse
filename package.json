@@ -2,7 +2,7 @@
   "name": "devshelf",
   "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "publisher": "danial031",
   "license": "MIT",
   "repository": {
@@ -50,6 +50,17 @@
     "benchmarking",
     "stress-test",
     "rps",
+    "code-snapshot",
+    "rayso",
+    "carbon",
+    "command-center",
+    "scripts-runner",
+    "css-toolkit",
+    "glassmorphism",
+    "tailwind-colors",
+    "mobile-preview",
+    "cache-cleaner",
+    "node_modules-cleaner",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -74,7 +85,12 @@
     "onCommand:devshelf.openMockServer",
     "onCommand:devshelf.openTunnel",
     "onCommand:devshelf.openSystemMonitor",
-    "onCommand:devshelf.openLoadTester"
+    "onCommand:devshelf.openLoadTester",
+    "onCommand:devshelf.openSnapshotStudio",
+    "onCommand:devshelf.openCommandCenter",
+    "onCommand:devshelf.openCssDesigner",
+    "onCommand:devshelf.openCacheCleaner",
+    "onCommand:devshelf.openMobilePreview"
   ],
   "contributes": {
     "viewsContainers": {
@@ -200,6 +216,31 @@
         "command": "devshelf.openLoadTester",
         "title": "Open Mini Load Tester & API Stress Benchmarker",
         "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openSnapshotStudio",
+        "title": "Open Code-to-Image & Snapshot Studio",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openCommandCenter",
+        "title": "Open 1-Click Project Command Center",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openCssDesigner",
+        "title": "Open Frontend & CSS Live Design Toolkit",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openCacheCleaner",
+        "title": "Open Dev Junk & Cache Obliterator",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openMobilePreview",
+        "title": "Open Responsive Multi-Device Preview Panel",
+        "category": "DevShelf"
       }
     ],
     "menus": {
@@ -246,7 +287,7 @@
     "compile": "node esbuild.js",
     "watch": "node esbuild.js --watch",
     "build": "node esbuild.js --production",
-    "test": "node -e \"require('esbuild').buildSync({entryPoints: ['test/testRunner.ts'], outfile: 'test/testBundle.tmp.js', bundle: true, platform: 'node', format: 'cjs'}); require('./test/testBundle.tmp.js'); require('fs').unlinkSync('./test/testBundle.tmp.js');\"",
+    "test": "node -e \"require('esbuild').buildSync({entryPoints: ['test/testRunner.ts'], outfile: 'test/testBundle.tmp.js', bundle: true, platform: 'node', format: 'cjs', alias: {'vscode': './test/mockVscode.ts'}}); require('./test/testBundle.tmp.js'); require('fs').unlinkSync('./test/testBundle.tmp.js');\"",
     "package": "vsce package"
   },
   "devDependencies": {
