@@ -23,9 +23,41 @@ declare function acquireVsCodeApi(): {
 
 const vscode = acquireVsCodeApi();
 
+interface FeatureTool {
+  id: string;
+  category: 'dev' | 'network' | 'system';
+  icon: string;
+  titleKey: keyof typeof translations['en'];
+  subKey: keyof typeof translations['en'];
+}
+
+const FEATURE_TOOLS: FeatureTool[] = [
+  // Dev & Data (5)
+  { id: 'json', category: 'dev', icon: ICONS.brackets, titleKey: 'tabJson', subKey: 'subJson' },
+  { id: 'jwt', category: 'dev', icon: ICONS.shield, titleKey: 'tabJwt', subKey: 'subJwt' },
+  { id: 'persian', category: 'dev', icon: ICONS.calendar, titleKey: 'tabPersian', subKey: 'subPersian' },
+  { id: 'crypto', category: 'dev', icon: ICONS.key, titleKey: 'tabCrypto', subKey: 'subCrypto' },
+  { id: 'sql', category: 'dev', icon: ICONS.database, titleKey: 'tabSql', subKey: 'subSql' },
+
+  // Network & API (4)
+  { id: 'api', category: 'network', icon: ICONS.send, titleKey: 'tabApi', subKey: 'subApi' },
+  { id: 'mock', category: 'network', icon: ICONS.webhook, titleKey: 'tabMock', subKey: 'subMock' },
+  { id: 'tunnel', category: 'network', icon: ICONS.tunnel, titleKey: 'tabTunnel', subKey: 'subTunnel' },
+  { id: 'loadtest', category: 'network', icon: ICONS.speed, titleKey: 'tabLoadTest', subKey: 'subLoadtest' },
+
+  // System & Git (5)
+  { id: 'ports', category: 'system', icon: ICONS.server, titleKey: 'tabPorts', subKey: 'subPorts' },
+  { id: 'docker', category: 'system', icon: ICONS.docker, titleKey: 'tabDocker', subKey: 'subDocker' },
+  { id: 'sysmon', category: 'system', icon: ICONS.cpu, titleKey: 'tabSysMon', subKey: 'subSysmon' },
+  { id: 'logs', category: 'system', icon: ICONS.fileText, titleKey: 'tabLogs', subKey: 'subLogs' },
+  { id: 'git', category: 'system', icon: ICONS.git, titleKey: 'tabGit', subKey: 'subGit' }
+];
+
 class DevShelfApp {
   private currentLang: Language = 'en';
   private activeTab: string = 'json';
+  private isDeckExpanded: boolean = true;
+  private selectedCategory: string = 'all';
 
   private jsonView!: JsonTsZodView;
   private jwtView!: JwtView;
@@ -60,6 +92,12 @@ class DevShelfApp {
       if (state.activeTab) {
         this.activeTab = state.activeTab;
       }
+      if (typeof state.isDeckExpanded === 'boolean') {
+        this.isDeckExpanded = state.isDeckExpanded;
+      }
+      if (state.selectedCategory) {
+        this.selectedCategory = state.selectedCategory;
+      }
     }
   }
 
@@ -67,6 +105,8 @@ class DevShelfApp {
     vscode.setState({
       lang: this.currentLang,
       activeTab: this.activeTab,
+      isDeckExpanded: this.isDeckExpanded,
+      selectedCategory: this.selectedCategory,
       jsonState: this.jsonView ? this.jsonView.getState() : undefined,
       jwtState: this.jwtView ? this.jwtView.getState() : undefined,
       persianState: this.persianView ? this.persianView.getState() : undefined,
@@ -83,8 +123,33 @@ class DevShelfApp {
     });
   }
 
+  private renderFeatureCardsHtml(): string {
+    return FEATURE_TOOLS.map((tool) => {
+      const isVisible = this.selectedCategory === 'all' || tool.category === this.selectedCategory;
+      const isActive = this.activeTab === tool.id;
+      return `
+        <button class="feature-card tab-btn ${isActive ? 'active' : ''} ${!isVisible ? 'hidden' : ''}" 
+                data-tab="${tool.id}" 
+                data-cat="${tool.category}" 
+                id="feature-card-${tool.id}"
+                title="${t(tool.titleKey, this.currentLang)} — ${t(tool.subKey, this.currentLang)}">
+          <div class="feature-card-indicator"></div>
+          <div class="feature-card-icon-box">
+            ${tool.icon}
+          </div>
+          <div class="feature-card-content">
+            <div class="feature-card-title">${t(tool.titleKey, this.currentLang)}</div>
+            <div class="feature-card-sub">${t(tool.subKey, this.currentLang)}</div>
+          </div>
+        </button>
+      `;
+    }).join('');
+  }
+
   private initDom() {
     const root = document.getElementById('app-root')!;
+    const currentTool = FEATURE_TOOLS.find((t) => t.id === this.activeTab) || FEATURE_TOOLS[0];
+
     root.innerHTML = `
       <header class="header-bar">
         <div class="brand-wrapper">
@@ -99,66 +164,53 @@ class DevShelfApp {
         </div>
       </header>
 
-      <div class="tabs-nav-container">
-        <nav class="tabs-nav" id="tabs-nav-bar">
-          <button class="tab-btn active" data-tab="json" id="tab-nav-json">
-            <span class="tab-icon">${ICONS.brackets}</span>
-            <span class="tab-label">${t('tabJson', this.currentLang)}</span>
+      <!-- Feature Cards Deck Navigation -->
+      <section class="cards-deck-wrapper" id="cards-deck-wrapper">
+        <!-- Deck Header / Active Tool Summary -->
+        <div class="deck-header-bar">
+          <button class="deck-active-pill" id="deck-active-pill" title="${t('exploreDeck', this.currentLang)}">
+            <span class="deck-active-icon" id="deck-active-icon">${currentTool.icon}</span>
+            <div class="deck-active-meta">
+              <span class="deck-active-title" id="deck-active-title">${t(currentTool.titleKey, this.currentLang)}</span>
+              <span class="deck-active-sub" id="deck-active-sub">${t(currentTool.subKey, this.currentLang)}</span>
+            </div>
           </button>
-          <button class="tab-btn" data-tab="jwt" id="tab-nav-jwt">
-            <span class="tab-icon">${ICONS.shield}</span>
-            <span class="tab-label">${t('tabJwt', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="persian" id="tab-nav-persian">
-            <span class="tab-icon">${ICONS.calendar}</span>
-            <span class="tab-label">${t('tabPersian', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="ports" id="tab-nav-ports">
-            <span class="tab-icon">${ICONS.server}</span>
-            <span class="tab-label">${t('tabPorts', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="git" id="tab-nav-git">
-            <span class="tab-icon">${ICONS.git}</span>
-            <span class="tab-label">${t('tabGit', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="docker" id="tab-nav-docker">
-            <span class="tab-icon">${ICONS.docker}</span>
-            <span class="tab-label">${t('tabDocker', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="api" id="tab-nav-api">
-            <span class="tab-icon">${ICONS.send}</span>
-            <span class="tab-label">${t('tabApi', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="sql" id="tab-nav-sql">
-            <span class="tab-icon">${ICONS.database}</span>
-            <span class="tab-label">${t('tabSql', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="logs" id="tab-nav-logs">
-            <span class="tab-icon">${ICONS.fileText}</span>
-            <span class="tab-label">${t('tabLogs', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="crypto" id="tab-nav-crypto">
-            <span class="tab-icon">${ICONS.key}</span>
-            <span class="tab-label">${t('tabCrypto', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="mock" id="tab-nav-mock">
-            <span class="tab-icon">${ICONS.webhook}</span>
-            <span class="tab-label">${t('tabMock', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="tunnel" id="tab-nav-tunnel">
-            <span class="tab-icon">${ICONS.tunnel}</span>
-            <span class="tab-label">${t('tabTunnel', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="sysmon" id="tab-nav-sysmon">
-            <span class="tab-icon">${ICONS.cpu}</span>
-            <span class="tab-label">${t('tabSysMon', this.currentLang)}</span>
-          </button>
-          <button class="tab-btn" data-tab="loadtest" id="tab-nav-loadtest">
-            <span class="tab-icon">${ICONS.speed}</span>
-            <span class="tab-label">${t('tabLoadTest', this.currentLang)}</span>
-          </button>
-        </nav>
-      </div>
+          <div class="deck-header-controls">
+            <button id="deck-toggle-btn" class="deck-toggle-btn" title="${this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang)}">
+              <span class="deck-toggle-icon" id="deck-toggle-icon">${this.isDeckExpanded ? ICONS.chevronUp : ICONS.apps}</span>
+              <span class="deck-toggle-label" id="deck-toggle-label">${this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang)}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Cards Deck Body -->
+        <div class="deck-body ${this.isDeckExpanded ? 'expanded' : 'collapsed'}" id="deck-body">
+          <!-- Category Chips Filter -->
+          <div class="deck-categories-bar" id="deck-categories-bar">
+            <button class="deck-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
+              <span>${t('deckCatAll', this.currentLang)}</span>
+              <span class="cat-count">14</span>
+            </button>
+            <button class="deck-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
+              <span>${t('deckCatDev', this.currentLang)}</span>
+              <span class="cat-count">5</span>
+            </button>
+            <button class="deck-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
+              <span>${t('deckCatNetwork', this.currentLang)}</span>
+              <span class="cat-count">4</span>
+            </button>
+            <button class="deck-cat-chip ${this.selectedCategory === 'system' ? 'active' : ''}" data-cat="system">
+              <span>${t('deckCatSystem', this.currentLang)}</span>
+              <span class="cat-count">5</span>
+            </button>
+          </div>
+
+          <!-- 2-Column Responsive Cards Grid -->
+          <div class="feature-cards-grid" id="feature-cards-grid">
+            ${this.renderFeatureCardsHtml()}
+          </div>
+        </div>
+      </section>
 
       <main class="main-content-area">
         <div id="view-json" class="view-panel active"></div>
@@ -173,6 +225,9 @@ class DevShelfApp {
         <div id="view-crypto" class="view-panel"></div>
         <div id="view-mock" class="view-panel"></div>
         <div id="view-tunnel" class="view-panel"></div>
+        <div id="view-sysmon" class="view-panel"></div>
+        <div id="view-loadtest" class="view-panel"></div>
+      </main>
         <div id="view-sysmon" class="view-panel"></div>
         <div id="view-loadtest" class="view-panel"></div>
       </main>
@@ -240,11 +295,28 @@ class DevShelfApp {
       vscode.postMessage({ type: 'languageChanged', lang: this.currentLang });
     });
 
-    // Tab navigation
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const tab = (btn as HTMLElement).getAttribute('data-tab');
+    // Deck Toggle (collapse / expand)
+    document.getElementById('deck-toggle-btn')?.addEventListener('click', () => {
+      this.toggleDeck();
+    });
+    document.getElementById('deck-active-pill')?.addEventListener('click', () => {
+      this.toggleDeck();
+    });
+
+    // Category Filter Chips
+    const catChips = document.querySelectorAll('.deck-cat-chip');
+    catChips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const cat = chip.getAttribute('data-cat') || 'all';
+        this.setCategory(cat);
+      });
+    });
+
+    // Feature Card Click Navigation
+    const cards = document.querySelectorAll('.feature-card');
+    cards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const tab = (card as HTMLElement).getAttribute('data-tab');
         if (tab) {
           this.switchTab(tab);
         }
@@ -372,6 +444,52 @@ class DevShelfApp {
     });
   }
 
+  private toggleDeck() {
+    this.isDeckExpanded = !this.isDeckExpanded;
+    const body = document.getElementById('deck-body');
+    const toggleIcon = document.getElementById('deck-toggle-icon');
+    const toggleLabel = document.getElementById('deck-toggle-label');
+
+    if (body) {
+      if (this.isDeckExpanded) {
+        body.classList.remove('collapsed');
+        body.classList.add('expanded');
+      } else {
+        body.classList.remove('expanded');
+        body.classList.add('collapsed');
+      }
+    }
+
+    if (toggleIcon) {
+      toggleIcon.innerHTML = this.isDeckExpanded ? ICONS.chevronUp : ICONS.apps;
+    }
+    if (toggleLabel) {
+      toggleLabel.textContent = this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang);
+    }
+    this.saveCurrentState();
+  }
+
+  private setCategory(cat: string) {
+    this.selectedCategory = cat;
+    document.querySelectorAll('.deck-cat-chip').forEach((chip) => {
+      if ((chip as HTMLElement).getAttribute('data-cat') === cat) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.feature-card').forEach((card) => {
+      const cardCat = (card as HTMLElement).getAttribute('data-cat');
+      if (cat === 'all' || cardCat === cat) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+    this.saveCurrentState();
+  }
+
   private updateLanguageUI() {
     const isFa = this.currentLang === 'fa';
     document.documentElement.setAttribute('dir', isFa ? 'rtl' : 'ltr');
@@ -383,30 +501,43 @@ class DevShelfApp {
     const langLabel = document.getElementById('lang-toggle-label');
     if (langLabel) langLabel.textContent = this.currentLang === 'en' ? 'FA' : 'EN';
 
-    const setTabLabel = (id: string, text: string) => {
-      const el = document.getElementById(id);
-      const label = el?.querySelector('.tab-label');
-      if (label) {
-        label.textContent = text;
-      } else if (el) {
-        el.textContent = text;
+    const toggleLabel = document.getElementById('deck-toggle-label');
+    if (toggleLabel) {
+      toggleLabel.textContent = this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang);
+    }
+
+    // Update Category Chips
+    const setCatText = (cat: string, labelKey: keyof typeof translations['en'], count: number) => {
+      const el = document.querySelector(`.deck-cat-chip[data-cat="${cat}"]`);
+      if (el) {
+        el.innerHTML = `<span>${t(labelKey, this.currentLang)}</span><span class="cat-count">${count}</span>`;
       }
     };
+    setCatText('all', 'deckCatAll', 14);
+    setCatText('dev', 'deckCatDev', 5);
+    setCatText('network', 'deckCatNetwork', 4);
+    setCatText('system', 'deckCatSystem', 5);
 
-    setTabLabel('tab-nav-json', t('tabJson', this.currentLang));
-    setTabLabel('tab-nav-jwt', t('tabJwt', this.currentLang));
-    setTabLabel('tab-nav-persian', t('tabPersian', this.currentLang));
-    setTabLabel('tab-nav-ports', t('tabPorts', this.currentLang));
-    setTabLabel('tab-nav-git', t('tabGit', this.currentLang));
-    setTabLabel('tab-nav-docker', t('tabDocker', this.currentLang));
-    setTabLabel('tab-nav-api', t('tabApi', this.currentLang));
-    setTabLabel('tab-nav-sql', t('tabSql', this.currentLang));
-    setTabLabel('tab-nav-logs', t('tabLogs', this.currentLang));
-    setTabLabel('tab-nav-crypto', t('tabCrypto', this.currentLang));
-    setTabLabel('tab-nav-mock', t('tabMock', this.currentLang));
-    setTabLabel('tab-nav-tunnel', t('tabTunnel', this.currentLang));
-    setTabLabel('tab-nav-sysmon', t('tabSysMon', this.currentLang));
-    setTabLabel('tab-nav-loadtest', t('tabLoadTest', this.currentLang));
+    // Update all cards in the deck
+    FEATURE_TOOLS.forEach((tool) => {
+      const card = document.getElementById(`feature-card-${tool.id}`);
+      if (card) {
+        const titleEl = card.querySelector('.feature-card-title');
+        const subEl = card.querySelector('.feature-card-sub');
+        if (titleEl) titleEl.textContent = t(tool.titleKey, this.currentLang);
+        if (subEl) subEl.textContent = t(tool.subKey, this.currentLang);
+        card.setAttribute('title', `${t(tool.titleKey, this.currentLang)} — ${t(tool.subKey, this.currentLang)}`);
+      }
+    });
+
+    // Update active summary pill
+    const currentTool = FEATURE_TOOLS.find((t) => t.id === this.activeTab) || FEATURE_TOOLS[0];
+    const activeIcon = document.getElementById('deck-active-icon');
+    const activeTitle = document.getElementById('deck-active-title');
+    const activeSub = document.getElementById('deck-active-sub');
+    if (activeIcon) activeIcon.innerHTML = currentTool.icon;
+    if (activeTitle) activeTitle.textContent = t(currentTool.titleKey, this.currentLang);
+    if (activeSub) activeSub.textContent = t(currentTool.subKey, this.currentLang);
 
     this.jsonView.setLanguage(this.currentLang);
     this.jwtView.setLanguage(this.currentLang);
@@ -427,15 +558,24 @@ class DevShelfApp {
   private switchTab(tabName: string) {
     this.activeTab = tabName;
 
-    // Update tab button styles
-    document.querySelectorAll('.tab-btn').forEach((btn) => {
-      if ((btn as HTMLElement).getAttribute('data-tab') === tabName) {
-        btn.classList.add('active');
-        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    // Update feature card active styles
+    document.querySelectorAll('.feature-card').forEach((card) => {
+      if ((card as HTMLElement).getAttribute('data-tab') === tabName) {
+        card.classList.add('active');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else {
-        btn.classList.remove('active');
+        card.classList.remove('active');
       }
     });
+
+    // Update active summary pill
+    const currentTool = FEATURE_TOOLS.find((t) => t.id === tabName) || FEATURE_TOOLS[0];
+    const activeIcon = document.getElementById('deck-active-icon');
+    const activeTitle = document.getElementById('deck-active-title');
+    const activeSub = document.getElementById('deck-active-sub');
+    if (activeIcon) activeIcon.innerHTML = currentTool.icon;
+    if (activeTitle) activeTitle.textContent = t(currentTool.titleKey, this.currentLang);
+    if (activeSub) activeSub.textContent = t(currentTool.subKey, this.currentLang);
 
     // Update view panels
     document.querySelectorAll('.view-panel').forEach((panel) => {

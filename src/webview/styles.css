@@ -130,86 +130,363 @@ body {
   transform: scale(0.96);
 }
 
-/* Sleek Horizontal Pill Tabs Navigation */
-.tabs-nav-container {
-  position: relative;
+/* ==========================================================================
+   FEATURE CARDS DECK NAVIGATION (v1.4.0)
+   ========================================================================== */
+.cards-deck-wrapper {
   margin-bottom: 10px;
-  border-bottom: 1px solid var(--devshelf-border);
+  border-bottom: 1px solid var(--devshelf-border, rgba(128, 128, 128, 0.2));
+  background: var(--vscode-sideBar-background);
 }
 
-.tabs-nav {
+/* Active Tool Summary Header Bar */
+.deck-header-bar {
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  gap: 4px;
-  padding: 2px 2px 8px 2px;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.tabs-nav::-webkit-scrollbar {
-  display: none;
-}
-
-.tab-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--devshelf-radius-pill);
-  color: var(--vscode-descriptionForeground);
-  font-size: 11px;
-  font-weight: 500;
-  padding: 4px 9px;
-  cursor: pointer;
-  display: inline-flex;
   align-items: center;
-  gap: 5px;
-  white-space: nowrap;
-  flex-shrink: 0;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 2px 7px 2px;
+}
+
+.deck-active-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--vscode-input-background, rgba(128, 128, 128, 0.1));
+  border: 1px solid var(--devshelf-border, rgba(128, 128, 128, 0.25));
+  border-radius: var(--devshelf-radius-sm, 6px);
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  text-align: start;
   transition: all var(--devshelf-transition-fast);
-  user-select: none;
   outline: none;
 }
 
-.tab-btn:hover {
-  color: var(--vscode-foreground);
-  background-color: var(--vscode-list-hoverBackground);
+.deck-active-pill:hover {
+  background: var(--vscode-list-hoverBackground);
+  border-color: var(--vscode-focusBorder);
 }
 
-.tab-btn:focus-visible {
-  outline: 1px solid var(--vscode-focusBorder);
-  outline-offset: 1px;
-}
-
-.tab-btn.active {
-  color: var(--vscode-button-foreground, #ffffff);
-  background-color: var(--vscode-button-background);
-  border-color: var(--vscode-button-border, transparent);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
-  font-weight: 600;
-}
-
-.tab-btn:active {
-  transform: scale(0.96);
-}
-
-.tab-icon {
+.deck-active-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground, #ffffff);
+  flex-shrink: 0;
 }
 
-.tab-icon svg {
-  width: 14px;
-  height: 14px;
+.deck-active-icon svg {
+  width: 13px;
+  height: 13px;
 }
 
-.tab-label {
+.deck-active-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.deck-active-title {
   font-size: 11px;
+  font-weight: 700;
+  color: var(--vscode-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.deck-active-sub {
+  font-size: 9px;
+  color: var(--vscode-descriptionForeground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.1;
+}
+
+.deck-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.deck-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--vscode-button-secondaryBackground, rgba(128, 128, 128, 0.15));
+  color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+  border: 1px solid var(--devshelf-border, rgba(128, 128, 128, 0.25));
+  border-radius: var(--devshelf-radius-sm, 6px);
+  cursor: pointer;
+  transition: all var(--devshelf-transition-fast);
+  outline: none;
+  white-space: nowrap;
+}
+
+.deck-toggle-btn:hover {
+  background: var(--vscode-button-secondaryHoverBackground, rgba(128, 128, 128, 0.25));
+  border-color: var(--vscode-focusBorder);
+}
+
+.deck-toggle-btn:active {
+  transform: scale(0.96);
+}
+
+.deck-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+}
+
+.deck-toggle-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Collapsible Deck Body */
+.deck-body {
+  transition: max-height 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease;
+  overflow: hidden;
+}
+
+.deck-body.collapsed {
+  display: none;
+}
+
+.deck-body.expanded {
+  display: block;
+  animation: deckExpand 0.18s ease-out;
+}
+
+@keyframes deckExpand {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Category Chips Filter Bar */
+.deck-categories-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 1px 1px 3px 1px;
+}
+
+.deck-categories-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.deck-cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: var(--devshelf-radius-pill, 12px);
+  background: transparent;
+  color: var(--vscode-descriptionForeground);
+  border: 1px solid var(--devshelf-border, rgba(128, 128, 128, 0.2));
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--devshelf-transition-fast);
+  outline: none;
+}
+
+.deck-cat-chip:hover {
+  color: var(--vscode-foreground);
+  background: var(--vscode-list-hoverBackground);
+  border-color: var(--vscode-focusBorder);
+}
+
+.deck-cat-chip.active {
+  color: var(--vscode-button-foreground, #ffffff);
+  background: var(--vscode-button-background);
+  border-color: var(--vscode-button-border, transparent);
+  font-weight: 600;
+}
+
+.deck-cat-chip .cat-count {
+  font-size: 8.5px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: rgba(128, 128, 128, 0.2);
+  line-height: 1.2;
+}
+
+.deck-cat-chip.active .cat-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* 2-Column Responsive Cards Grid */
+.feature-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 2px 2px 7px 2px;
+  scrollbar-width: thin;
+}
+
+.feature-cards-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.feature-cards-grid::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background);
+  border-radius: 4px;
+}
+
+/* Individual Feature Card */
+.feature-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 7px;
+  background: var(--vscode-sideBar-background);
+  border: 1px solid var(--devshelf-border, rgba(128, 128, 128, 0.2));
+  border-radius: var(--devshelf-radius-sm, 6px);
+  cursor: pointer;
+  text-align: start;
+  outline: none;
+  transition: all 0.15s ease;
+  user-select: none;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.feature-card.hidden {
+  display: none !important;
+}
+
+.feature-card:hover {
+  background: var(--vscode-list-hoverBackground);
+  border-color: var(--vscode-focusBorder);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.feature-card:active {
+  transform: scale(0.98);
+}
+
+.feature-card.active {
+  background: var(--vscode-list-activeSelectionBackground, rgba(56, 139, 253, 0.12));
+  border-color: var(--vscode-focusBorder, #388bfd);
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder, #388bfd) inset, 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Left Accent Indicator Bar on Active Card */
+.feature-card .feature-card-indicator {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background: transparent;
+  border-radius: 2px;
+  transition: background 0.15s ease;
+}
+
+.feature-card.active .feature-card-indicator {
+  background: var(--vscode-focusBorder, #388bfd);
+}
+
+/* Card Icon Box */
+.feature-card-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  background: var(--vscode-input-background, rgba(128, 128, 128, 0.1));
+  color: var(--vscode-textLink-foreground, #388bfd);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.feature-card:hover .feature-card-icon-box {
+  color: var(--vscode-focusBorder, #388bfd);
+}
+
+.feature-card.active .feature-card-icon-box {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground, #ffffff);
+}
+
+.feature-card-icon-box svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Card Text Content */
+.feature-card-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.feature-card-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+
+.feature-card.active .feature-card-title {
+  font-weight: 700;
+}
+
+.feature-card-sub {
+  font-size: 9px;
+  color: var(--vscode-descriptionForeground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.15;
+  margin-top: 1px;
+}
+
+.feature-card.active .feature-card-sub {
+  color: var(--vscode-foreground);
+  opacity: 0.85;
+}
+
+/* Responsive Narrow Sidebar */
+@media (max-width: 250px) {
+  .feature-cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* View Containers */

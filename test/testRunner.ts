@@ -857,6 +857,21 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
   assert.strictEqual((receivedSnapshot as any).isRunning, false, 'Final snapshot isRunning must be false');
   assert.strictEqual((receivedSnapshot as any).isCompleted, false, 'Snapshot isCompleted must be false when aborted');
 
+  // 19. FEATURE CARDS DECK & NAVIGATION I18N
+  console.log('[Test 19] Feature Cards Deck & Quick Navigation');
+  const deckKeys = [
+    'deckCatAll', 'deckCatDev', 'deckCatNetwork', 'deckCatSystem',
+    'exploreDeck', 'collapseDeck', 'toolsDeck',
+    'subJson', 'subJwt', 'subPersian', 'subPorts', 'subGit', 'subDocker',
+    'subApi', 'subSql', 'subLogs', 'subCrypto', 'subMock', 'subTunnel',
+    'subSysmon', 'subLoadtest'
+  ];
+
+  for (const k of deckKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
+  }
+
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');
 }
 
