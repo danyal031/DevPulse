@@ -10,6 +10,9 @@ import { ApiTesterView } from './components/ApiTesterView';
 import { SqlPlaygroundView } from './components/SqlPlaygroundView';
 import { LogAnalyzerView } from './components/LogAnalyzerView';
 import { CryptoMockView } from './components/CryptoMockView';
+import { MockServerView } from './components/MockServerView';
+import { TunnelView } from './components/TunnelView';
+import { SystemMonitorView } from './components/SystemMonitorView';
 
 declare function acquireVsCodeApi(): {
   postMessage(message: unknown): void;
@@ -33,6 +36,9 @@ class DevShelfApp {
   private sqlView!: SqlPlaygroundView;
   private logsView!: LogAnalyzerView;
   private cryptoView!: CryptoMockView;
+  private mockView!: MockServerView;
+  private tunnelView!: TunnelView;
+  private sysmonView!: SystemMonitorView;
 
   constructor() {
     this.restoreState();
@@ -67,7 +73,10 @@ class DevShelfApp {
       apiState: this.apiView ? this.apiView.getState() : undefined,
       sqlState: this.sqlView ? this.sqlView.getState() : undefined,
       logsState: this.logsView ? this.logsView.getState() : undefined,
-      cryptoState: this.cryptoView ? this.cryptoView.getState() : undefined
+      cryptoState: this.cryptoView ? this.cryptoView.getState() : undefined,
+      mockState: this.mockView ? this.mockView.getState() : undefined,
+      tunnelState: this.tunnelView ? this.tunnelView.getState() : undefined,
+      sysmonState: this.sysmonView ? this.sysmonView.getState() : undefined
     });
   }
 
@@ -129,6 +138,18 @@ class DevShelfApp {
             <span class="tab-icon">${ICONS.key}</span>
             <span class="tab-label">${t('tabCrypto', this.currentLang)}</span>
           </button>
+          <button class="tab-btn" data-tab="mock" id="tab-nav-mock">
+            <span class="tab-icon">${ICONS.webhook}</span>
+            <span class="tab-label">${t('tabMock', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="tunnel" id="tab-nav-tunnel">
+            <span class="tab-icon">${ICONS.tunnel}</span>
+            <span class="tab-label">${t('tabTunnel', this.currentLang)}</span>
+          </button>
+          <button class="tab-btn" data-tab="sysmon" id="tab-nav-sysmon">
+            <span class="tab-icon">${ICONS.cpu}</span>
+            <span class="tab-label">${t('tabSysMon', this.currentLang)}</span>
+          </button>
         </nav>
       </div>
 
@@ -143,6 +164,9 @@ class DevShelfApp {
         <div id="view-sql" class="view-panel"></div>
         <div id="view-logs" class="view-panel"></div>
         <div id="view-crypto" class="view-panel"></div>
+        <div id="view-mock" class="view-panel"></div>
+        <div id="view-tunnel" class="view-panel"></div>
+        <div id="view-sysmon" class="view-panel"></div>
       </main>
     `;
   }
@@ -160,6 +184,9 @@ class DevShelfApp {
     const sqlContainer = document.getElementById('view-sql')!;
     const logsContainer = document.getElementById('view-logs')!;
     const cryptoContainer = document.getElementById('view-crypto')!;
+    const mockContainer = document.getElementById('view-mock')!;
+    const tunnelContainer = document.getElementById('view-tunnel')!;
+    const sysmonContainer = document.getElementById('view-sysmon')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
     this.jwtView = new JwtView(jwtContainer, this.currentLang, postToHost);
@@ -171,6 +198,9 @@ class DevShelfApp {
     this.sqlView = new SqlPlaygroundView(sqlContainer, this.currentLang, postToHost);
     this.logsView = new LogAnalyzerView(logsContainer, this.currentLang, postToHost);
     this.cryptoView = new CryptoMockView(cryptoContainer, this.currentLang, postToHost);
+    this.mockView = new MockServerView(mockContainer, this.currentLang, postToHost);
+    this.tunnelView = new TunnelView(tunnelContainer, this.currentLang, postToHost);
+    this.sysmonView = new SystemMonitorView(sysmonContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
     if (state) {
@@ -183,6 +213,9 @@ class DevShelfApp {
       if (state.sqlState) this.sqlView.restoreState(state.sqlState);
       if (state.logsState) this.logsView.restoreState(state.logsState);
       if (state.cryptoState) this.cryptoView.restoreState(state.cryptoState);
+      if (state.mockState) this.mockView.restoreState(state.mockState);
+      if (state.tunnelState) this.tunnelView.restoreState(state.tunnelState);
+      if (state.sysmonState) this.sysmonView.restoreState(state.sysmonState);
     }
   }
 
@@ -273,6 +306,37 @@ class DevShelfApp {
         case 'activeEditorText':
           this.logsView.setLogText(message.text || '');
           break;
+        case 'mockStatus':
+          this.mockView.updateStatus(message.status);
+          break;
+        case 'mockRoutes':
+          this.mockView.setRoutes(message.routes || []);
+          break;
+        case 'mockCapturedRequest':
+          this.mockView.addCapturedRequest(message.request);
+          break;
+        case 'mockCapturedList':
+          this.mockView.setCapturedRequests(message.requests || []);
+          break;
+        case 'tunnelStatus':
+          this.tunnelView.setStatus(message.status);
+          break;
+        case 'tunnelLog':
+          this.tunnelView.appendLog(message.line);
+          break;
+        case 'sysmonTelemetry':
+          this.sysmonView.setTelemetry(message.telemetry);
+          break;
+        case 'sysmonProcesses':
+          this.sysmonView.setProcesses(message.processes || []);
+          break;
+        case 'sysmonProcessKilled':
+          this.sysmonView.handleProcessKilled(message.pid, message.success, message.message);
+          break;
+        case 'replayInApiTester':
+          this.switchTab('api');
+          this.apiView.prefillRequest(message.request);
+          break;
         case 'setLanguage':
           if (message.lang && message.lang !== this.currentLang) {
             this.currentLang = message.lang;
@@ -325,6 +389,9 @@ class DevShelfApp {
     setTabLabel('tab-nav-sql', t('tabSql', this.currentLang));
     setTabLabel('tab-nav-logs', t('tabLogs', this.currentLang));
     setTabLabel('tab-nav-crypto', t('tabCrypto', this.currentLang));
+    setTabLabel('tab-nav-mock', t('tabMock', this.currentLang));
+    setTabLabel('tab-nav-tunnel', t('tabTunnel', this.currentLang));
+    setTabLabel('tab-nav-sysmon', t('tabSysMon', this.currentLang));
 
     this.jsonView.setLanguage(this.currentLang);
     this.jwtView.setLanguage(this.currentLang);
@@ -336,6 +403,9 @@ class DevShelfApp {
     this.sqlView.setLanguage(this.currentLang);
     this.logsView.setLanguage(this.currentLang);
     this.cryptoView.setLanguage(this.currentLang);
+    this.mockView.setLanguage(this.currentLang);
+    this.tunnelView.setLanguage(this.currentLang);
+    this.sysmonView.setLanguage(this.currentLang);
   }
 
   private switchTab(tabName: string) {
@@ -364,6 +434,14 @@ class DevShelfApp {
       this.portView.requestScan();
     } else if (tabName === 'docker') {
       this.dockerView.refreshContainers();
+    } else if (tabName === 'sysmon') {
+      this.sysmonView.requestData();
+    } else if (tabName === 'mock') {
+      vscode.postMessage({ type: 'mockGetStatus' });
+      vscode.postMessage({ type: 'mockGetRoutes' });
+      vscode.postMessage({ type: 'mockGetRequests' });
+    } else if (tabName === 'tunnel') {
+      vscode.postMessage({ type: 'tunnelGetStatus' });
     }
 
     this.saveCurrentState();

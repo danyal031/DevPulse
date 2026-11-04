@@ -66,6 +66,18 @@ export class ApiTesterView {
     this.render();
   }
 
+  public prefillRequest(req: { method?: string; url?: string; headers?: Record<string, string>; body?: string }) {
+    if (req.method) this.method = req.method;
+    if (req.url) this.url = req.url;
+    if (req.body) this.body = req.body;
+    if (req.headers) {
+      this.headers = Object.entries(req.headers)
+        .filter(([k]) => !['host', 'connection', 'content-length'].includes(k.toLowerCase()))
+        .map(([key, value], idx) => ({ id: `hdr-${Date.now()}-${idx}`, key, value, enabled: true }));
+    }
+    this.render();
+  }
+
   public getState(): ApiTesterState {
     return {
       method: this.method,

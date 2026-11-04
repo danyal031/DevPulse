@@ -2,7 +2,7 @@
   "name": "devshelf",
   "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
-  "version": "1.2.5",
+  "version": "1.3.0",
   "publisher": "danial031",
   "license": "MIT",
   "repository": {
@@ -40,6 +40,12 @@
     "curl",
     "sql-generator",
     "log-analyzer",
+    "mock-server",
+    "webhook",
+    "tunnel",
+    "qr-code",
+    "system-monitor",
+    "process-killer",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -60,7 +66,10 @@
     "onCommand:devshelf.openDockerDeck",
     "onCommand:devshelf.openApiTester",
     "onCommand:devshelf.openSqlPlayground",
-    "onCommand:devshelf.openLogAnalyzer"
+    "onCommand:devshelf.openLogAnalyzer",
+    "onCommand:devshelf.openMockServer",
+    "onCommand:devshelf.openTunnel",
+    "onCommand:devshelf.openSystemMonitor"
   ],
   "contributes": {
     "viewsContainers": {
@@ -165,6 +174,21 @@
       {
         "command": "devshelf.openLogAnalyzer",
         "title": "Open Log File Analyzer & Highlighter",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openMockServer",
+        "title": "Open Mock Server & Webhook Catcher",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openTunnel",
+        "title": "Open Public Tunnel & QR Share",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openSystemMonitor",
+        "title": "Open System Resource Monitor & Zombie Killer",
         "category": "DevShelf"
       }
     ],

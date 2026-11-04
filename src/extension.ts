@@ -15,6 +15,8 @@ import { getSystemNetworkInfo } from './utils/networkInfo';
 import { getGitChanges, getGitDiff, generateConventionalCommit } from './utils/gitCommit';
 import { GIT_CHEAT_SHEET } from './utils/gitScenarios';
 import { translations } from './webview/i18n';
+import { MockServerService } from './utils/mockServerService';
+import { TunnelService } from './utils/tunnelService';
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
@@ -466,6 +468,37 @@ export function activate(context: vscode.ExtensionContext) {
       sidebarProvider.switchTab('logs');
     })
   );
+
+  // Command 17: Open Instant Mock Server & Webhook Catcher
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openMockServer', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('mock');
+    })
+  );
+
+  // Command 18: Open Public Tunnel & QR Share
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openTunnel', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('tunnel');
+    })
+  );
+
+  // Command 19: Open System Resource Monitor
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openSystemMonitor', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('sysmon');
+    })
+  );
 }
 
-export function deactivate() {}
+export function deactivate() {
+  try {
+    MockServerService.getInstance().stopServer();
+  } catch {}
+  try {
+    TunnelService.getInstance().stopTunnel();
+  } catch {}
+}

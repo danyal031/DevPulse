@@ -124,6 +124,40 @@ A full-featured Docker Desktop client alternative integrated directly into the V
   - Real-time keyword filter across log messages and timestamps.
 - **Clean Error Summary Exporter:** Aggregates unique issues, occurrence counts, and sample stack traces into a clean Markdown error report ready to share with teams or paste into issue trackers.
 
+### 12. Instant Mock Server & Live Webhook Catcher (شبیه‌ساز فوری سرور موقت و شکارچی وبهوک)
+- **Local Embedded HTTP Server:** Spin up a lightweight Node.js HTTP server right inside the Extension Host on your desired port (default `4040`), featuring an interactive Start/Stop switch and live pulsing connection dot.
+- **Custom Dynamic Endpoints:**
+  - Define custom routes with standard HTTP methods (`ANY`, `GET`, `POST`, `PUT`, `PATCH`, `DELETE`) and URL paths.
+  - Simulate real-world frontend network conditions with an artificial latency slider (`0ms` to `5000ms`).
+  - Configure custom HTTP status codes (`200`, `201`, `400`, `401`, `500`) and mock JSON/text response payloads.
+- **Universal Zero-CORS Architecture:** Pre-configured with automatic CORS headers (`Access-Control-Allow-Origin: *`, `OPTIONS` preflight handling) allowing local SPAs (React, Vue, Vite, Next.js) or mobile apps to test without CORS barriers.
+- **Real-Time Webhook Inspector:**
+  - Live inbound request stream showing Timestamp, Method, Path, Client IP, Query Params, Headers, and Payload Body.
+  - One-click **Copy Payload** and **Replay in API Tester** to immediately test or debug received webhooks.
+
+### 13. One-Click Public Tunnel & QR Share (تونل‌ساز عمومی لوکال‌هاست و اشتراک‌گذاری با QR Code)
+- **Instant Port Forwarding to the Internet:** Expose any local development server (Vite, Next.js, Django, FastAPI, or DevShelf Mock Server) to the public web with zero complex configuration.
+- **Multi-Provider Support:**
+  - **Cloudflare Quick Tunnel:** Free, zero-configuration `trycloudflare.com` tunnel without requiring an account or API key (`npx --yes cloudflared tunnel --url http://localhost:<port>`).
+  - **Localtunnel:** Direct public tunnel via `loca.lt`.
+  - **Ngrok:** Seamless integration for developers with local `ngrok` CLI configured.
+- **Offline Pure-TS SVG QR Code:**
+  - Generates a sharp, responsive SVG QR Code directly in the sidebar without external API calls or npm dependencies.
+  - Instant mobile phone camera scanning for responsive testing on real iOS / Android devices.
+- **Clean Process Management:** Process tree termination ensures no background orphaned `npx` or child processes linger after disconnection.
+
+### 14. System Resource Monitor & Zombie Process Killer (مانیتور زنده منابع سیستم و قاتل پروسه‌های رم‌خوار)
+- **Real-Time Hardware Telemetry Gauges:**
+  - Dynamic visual progress bars for real-time CPU load (%) and RAM usage (Used GB / Total GB + %).
+  - System architecture, CPU cores count, and system uptime readout.
+  - Auto-refresh polling every 3 seconds with manual refresh toggle.
+- **Top Memory Hogs & Developer Filter:**
+  - Lists top resource-consuming processes across Windows (`Get-Process`), Linux, and macOS (`ps aux`).
+  - Dedicated **Developer Processes Only** filter highlighting `node`, `python`, `docker`, `java`, `postgres`, `go`, and `code`.
+- **Runaway Process & Orphan Terminator:**
+  - Two-step safe inline **Kill Process** button (`taskkill /F /PID` on Windows, `kill -9` on Unix).
+  - Quick-action **Kill Orphan Node/Python Processes** button to safely clean up dangling development servers with a single click.
+
 ---
 
 ## Command Palette & Context Menu Contributions
@@ -138,6 +172,9 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 | `devshelf.openApiTester` | `DevShelf: Open Mini API Tester` | Command Palette |
 | `devshelf.openSqlPlayground` | `DevShelf: Open SQL Query & Schema Playground` | Command Palette |
 | `devshelf.openLogAnalyzer` | `DevShelf: Open Log File Analyzer & Highlighter` | Command Palette |
+| `devshelf.openMockServer` | `DevShelf: Open Mock Server & Webhook Catcher` | Command Palette |
+| `devshelf.openTunnel` | `DevShelf: Open Public Tunnel & QR Share` | Command Palette |
+| `devshelf.openSystemMonitor` | `DevShelf: Open System Resource Monitor & Zombie Killer` | Command Palette |
 | `devshelf.copySystemIp` | `DevShelf: Copy Local System IP` | Command Palette |
 | `devshelf.formatJson` | `DevShelf: Format JSON in Selection` | Editor Context Menu & Command Palette |
 | `devshelf.normalizePersianSelection` | `DevShelf: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
@@ -178,6 +215,10 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │   │   ├── apiTester.ts         # Zero-CORS Node.js HTTP request client
 │   │   ├── sqlBuilder.ts        # SQL DDL dialect generator & sample query builder
 │   │   ├── logAnalyzer.ts       # Log parser, level classifier & error report exporter
+│   │   ├── mockServerService.ts # Embedded HTTP server & webhook interceptor
+│   │   ├── tunnelService.ts     # Cloudflare/Localtunnel/Ngrok child process manager
+│   │   ├── qrCode.ts            # Pure-TS zero-dependency QR matrix & SVG generator
+│   │   ├── systemMonitorService.ts # Hardware telemetry & process tree killer
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
@@ -186,7 +227,7 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   └── testRunner.ts            # 13 unit test suites
+│   └── testRunner.ts            # 17 unit test suites
 ├── esbuild.js                   # Fast bundler config
 ├── package.json                 # Extension manifest & contributions
 ├── tsconfig.json                # Strict TypeScript configuration

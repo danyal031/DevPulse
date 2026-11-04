@@ -21,6 +21,9 @@ import {
   dockerSystemPrune
 } from '../utils/dockerManager';
 import { executeApiRequest } from '../utils/apiTester';
+import { MockServerService } from '../utils/mockServerService';
+import { TunnelService } from '../utils/tunnelService';
+import { SystemMonitorService } from '../utils/systemMonitorService';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'devshelf.sidebarView';
@@ -438,7 +441,155 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           await this._context.globalState.update('devshelf.language', data.lang);
           break;
         }
+
+        // Mock Server Messages
+        case 'mockStartServer': {
+          const res = await MockServerService.getInstance().startServer(data.port || 4040);
+          this.postMessage({ type: 'mockStatus', status: MockServerService.getInstance().getStatus() });
+          if (res.success) {
+            vscode.window.showInformationMessage(`DevShelf: Mock server listening on http://localhost:${res.port}`);
+          } else {
+            vscode.window.showErrorMessage(`DevShelf Mock Server: ${res.error}`);
+          }
+          break;
+        }
+
+        case 'mockStopServer': {
+          await MockServerService.getInstance().stopServer();
+          this.postMessage({ type: 'mockStatus', status: MockServerService.getInstance().getStatus() });
+          vscode.window.showInformationMessage('DevShelf: Mock server stopped.');
+          break;
+        }
+
+        case 'mockGetStatus': {
+          this.postMessage({ type: 'mockStatus', status: MockServerService.getInstance().getStatus() });
+          break;
+        }
+
+        case 'mockGetRoutes': {
+          this.postMessage({ type: 'mockRoutes', routes: MockServerService.getInstance().getRoutes() });
+          break;
+        }
+
+        case 'mockSaveRoute': {
+          MockServerService.getInstance().addRoute(data.route);
+          this.postMessage({ type: 'mockRoutes', routes: MockServerService.getInstance().getRoutes() });
+          break;
+        }
+
+        case 'mockUpdateRoute': {
+          MockServerService.getInstance().updateRoute(data.route);
+          this.postMessage({ type: 'mockRoutes', routes: MockServerService.getInstance().getRoutes() });
+          break;
+        }
+
+        case 'mockDeleteRoute': {
+          MockServerService.getInstance().deleteRoute(data.id);
+          this.postMessage({ type: 'mockRoutes', routes: MockServerService.getInstance().getRoutes() });
+          break;
+        }
+
+        case 'mockGetRequests': {
+          this.postMessage({ type: 'mockCapturedList', requests: MockServerService.getInstance().getCapturedRequests() });
+          break;
+        }
+
+        case 'mockClearRequests': {
+          MockServerService.getInstance().clearCapturedRequests();
+          this.postMessage({ type: 'mockCapturedList', requests: [] });
+          break;
+        }
+
+        // Tunnel Messages
+        case 'tunnelStart': {
+          try {
+            const status = await TunnelService.getInstance().startTunnel(data.provider, data.port);
+            this.postMessage({ type: 'tunnelStatus', status });
+            if (status.publicUrl) {
+              vscode.window.showInformationMessage(`DevShelf: Public tunnel active: ${status.publicUrl}`);
+            } else if (status.error) {
+              vscode.window.showErrorMessage(`DevShelf Tunnel: ${status.error}`);
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Tunnel Error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'tunnelStop': {
+          await TunnelService.getInstance().stopTunnel();
+          this.postMessage({ type: 'tunnelStatus', status: TunnelService.getInstance().getStatus() });
+          vscode.window.showInformationMessage('DevShelf: Public tunnel disconnected.');
+          break;
+        }
+
+        case 'tunnelGetStatus': {
+          this.postMessage({ type: 'tunnelStatus', status: TunnelService.getInstance().getStatus() });
+          break;
+        }
+
+        case 'openExternalUrl': {
+          if (data.url) {
+            vscode.env.openExternal(vscode.Uri.parse(data.url));
+          }
+          break;
+        }
+
+        // System Monitor Messages
+        case 'sysmonGetTelemetry': {
+          try {
+            const telemetry = SystemMonitorService.getInstance().getTelemetry();
+            this.postMessage({ type: 'sysmonTelemetry', telemetry });
+          } catch {}
+          break;
+        }
+
+        case 'sysmonGetProcesses': {
+          try {
+            const processes = await SystemMonitorService.getInstance().getTopProcesses(25);
+            this.postMessage({ type: 'sysmonProcesses', processes });
+          } catch {}
+          break;
+        }
+
+        case 'sysmonKillProcess': {
+          const res = await SystemMonitorService.getInstance().killProcess(data.pid);
+          this.postMessage({
+            type: 'sysmonProcessKilled',
+            pid: data.pid,
+            success: res.success,
+            message: res.message
+          });
+          if (res.success) {
+            vscode.window.showInformationMessage(`DevShelf: ${res.message}`);
+          } else {
+            vscode.window.showErrorMessage(`DevShelf: ${res.message}`);
+          }
+          break;
+        }
+
+        case 'sysmonKillOrphans': {
+          const res = await SystemMonitorService.getInstance().killDevOrphans(data.targetType || 'all');
+          if (res.success) {
+            vscode.window.showInformationMessage(`DevShelf: ${res.message}`);
+          } else {
+            vscode.window.showErrorMessage(`DevShelf: ${res.message}`);
+          }
+          const processes = await SystemMonitorService.getInstance().getTopProcesses(25);
+          this.postMessage({ type: 'sysmonProcesses', processes });
+          break;
+        }
       }
+    });
+
+    // Wire callbacks for MockServer and Tunnel live events
+    MockServerService.getInstance().setCallbacks(
+      (captured) => this.postMessage({ type: 'mockCapturedRequest', request: captured }),
+      (status) => this.postMessage({ type: 'mockStatus', status })
+    );
+
+    TunnelService.getInstance().setCallback((status) => {
+      this.postMessage({ type: 'tunnelStatus', status });
     });
 
     // Send initial saved language if exists
