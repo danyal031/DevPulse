@@ -24,6 +24,7 @@ import { executeApiRequest } from '../utils/apiTester';
 import { MockServerService } from '../utils/mockServerService';
 import { TunnelService } from '../utils/tunnelService';
 import { SystemMonitorService } from '../utils/systemMonitorService';
+import { LoadTesterService } from '../utils/loadTesterService';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'devshelf.sidebarView';
@@ -579,10 +580,41 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           this.postMessage({ type: 'sysmonProcesses', processes });
           break;
         }
+
+        // Load Tester Messages
+        case 'loadTesterStart': {
+          try {
+            await LoadTesterService.getInstance().start(data.config);
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf Load Tester: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'loadTesterAbort': {
+          LoadTesterService.getInstance().abort();
+          vscode.window.showInformationMessage('DevShelf: Load test aborted.');
+          break;
+        }
+
+        case 'loadTesterExportReport': {
+          try {
+            const snapshot = LoadTesterService.getInstance().getSnapshot();
+            const config = LoadTesterService.getInstance().getCurrentConfig();
+            if (snapshot && config) {
+              const markdown = LoadTesterService.getInstance().generateMarkdownReport(snapshot, config);
+              await vscode.env.clipboard.writeText(markdown);
+              vscode.window.showInformationMessage('DevShelf: Load benchmark report copied to clipboard!');
+            }
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf: Failed to export report: ${err.message}`);
+          }
+          break;
+        }
       }
     });
 
-    // Wire callbacks for MockServer and Tunnel live events
+    // Wire callbacks for MockServer, Tunnel, and LoadTester live events
     MockServerService.getInstance().setCallbacks(
       (captured) => this.postMessage({ type: 'mockCapturedRequest', request: captured }),
       (status) => this.postMessage({ type: 'mockStatus', status })
@@ -590,6 +622,15 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     TunnelService.getInstance().setCallback((status) => {
       this.postMessage({ type: 'tunnelStatus', status });
+    });
+
+    LoadTesterService.getInstance().setCallbacks(
+      (snapshot) => this.postMessage({ type: 'loadTesterSnapshot', snapshot }),
+      (snapshot) => this.postMessage({ type: 'loadTesterSnapshot', snapshot })
+    );
+
+    webviewView.onDidDispose(() => {
+      LoadTesterService.getInstance().abort();
     });
 
     // Send initial saved language if exists

@@ -2,7 +2,7 @@
   "name": "devshelf",
   "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "publisher": "danial031",
   "license": "MIT",
   "repository": {
@@ -46,6 +46,10 @@
     "qr-code",
     "system-monitor",
     "process-killer",
+    "load-tester",
+    "benchmarking",
+    "stress-test",
+    "rps",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -69,7 +73,8 @@
     "onCommand:devshelf.openLogAnalyzer",
     "onCommand:devshelf.openMockServer",
     "onCommand:devshelf.openTunnel",
-    "onCommand:devshelf.openSystemMonitor"
+    "onCommand:devshelf.openSystemMonitor",
+    "onCommand:devshelf.openLoadTester"
   ],
   "contributes": {
     "viewsContainers": {
@@ -189,6 +194,11 @@
       {
         "command": "devshelf.openSystemMonitor",
         "title": "Open System Resource Monitor & Zombie Killer",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openLoadTester",
+        "title": "Open Mini Load Tester & API Stress Benchmarker",
         "category": "DevShelf"
       }
     ],

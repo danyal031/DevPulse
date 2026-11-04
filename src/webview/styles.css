@@ -2946,3 +2946,150 @@ select.input-text:focus {
   background-color: var(--vscode-charts-green, #3fb950);
   display: inline-block;
 }
+
+/* ==========================================================================
+   Mini Load Tester & API Stress Benchmarker Styles
+   ========================================================================== */
+.load-view-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.load-config-card {
+  background-color: var(--devshelf-editor-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: var(--devshelf-radius-md);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.load-url-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.load-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  background-color: var(--devshelf-panel-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: var(--devshelf-radius-sm);
+  padding: 2px;
+}
+
+.load-mode-btn {
+  background: transparent;
+  border: none;
+  border-radius: var(--devshelf-radius-xs);
+  padding: 4px 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  transition: all var(--devshelf-transition-fast);
+  outline: none;
+}
+
+.load-mode-btn:hover {
+  color: var(--vscode-foreground);
+}
+
+.load-mode-btn.active {
+  background-color: var(--vscode-button-secondaryBackground, rgba(128, 128, 128, 0.2));
+  color: var(--vscode-foreground);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.load-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pulse-action {
+  animation: pulseButton 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseButton {
+  0% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.6); }
+  70% { box-shadow: 0 0 0 6px rgba(248, 81, 73, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0); }
+}
+
+.load-telemetry-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.load-status-bar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.load-status-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.load-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.load-kpi-card {
+  background-color: var(--devshelf-editor-bg);
+  border: 1px solid var(--devshelf-border);
+  border-radius: var(--devshelf-radius-sm);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+}
+
+.load-kpi-card.highlight-blue {
+  border-color: rgba(56, 139, 253, 0.35);
+  background-color: rgba(56, 139, 253, 0.05);
+}
+
+.kpi-label {
+  font-size: 9.5px;
+  color: var(--vscode-descriptionForeground);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+}
+
+.kpi-value {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.kpi-sub {
+  font-size: 9.5px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.load-histogram-container {
+  padding: 8px 10px;
+  background-color: var(--devshelf-editor-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.histogram-bar-group rect {
+  transition: height 0.3s ease, y 0.3s ease;
+}

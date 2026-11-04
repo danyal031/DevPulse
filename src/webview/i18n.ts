@@ -20,6 +20,7 @@ export const translations = {
     tabMock: 'Mock Server',
     tabTunnel: 'Public Tunnel',
     tabSysMon: 'Resource Monitor',
+    tabLoadTest: 'Load Tester',
 
     // Common Actions
     copy: 'Copy',
@@ -477,7 +478,39 @@ export const translations = {
     sysmonKillOrphans: 'Kill Orphan Node / Python',
     sysmonConfirmOrphans: 'Terminate all background Node/Python processes?',
     sysmonAutoRefresh: 'Auto Refresh (3s)',
-    sysmonNoProcesses: 'No matching processes found.'
+    sysmonNoProcesses: 'No matching processes found.',
+
+    // New Module 4: Mini Load Tester & API Stress Benchmarker
+    loadTitle: 'Mini Load Tester & API Stress Benchmarker',
+    loadDesc: 'High-precision HTTP load generator with live RPS, percentile latency telemetry (P50/P95/P99), and SVG distribution histograms.',
+    loadTargetUrl: 'Target URL',
+    loadConcurrency: 'Concurrency (Virtual Users)',
+    loadMode: 'Load Mode',
+    loadDurationMode: 'Duration (Seconds)',
+    loadRequestsMode: 'Total Requests',
+    loadDurationSeconds: 'Duration (s)',
+    loadTotalRequests: 'Total Requests',
+    loadTimeout: 'Timeout (ms)',
+    loadStart: 'Start Benchmark',
+    loadAbort: 'Abort / Stop Test',
+    loadReset: 'Reset Metrics',
+    loadRps: 'Throughput (RPS)',
+    loadAvgLatency: 'Avg Latency',
+    loadP50: 'P50 (Median)',
+    loadP95: 'P95',
+    loadP99: 'P99',
+    loadMinMax: 'Min / Max',
+    loadSuccessRate: 'Success Rate',
+    loadLatencyDistribution: 'Latency Distribution',
+    loadStatusCodes: 'Status Codes Breakdown',
+    loadExportReport: 'Copy Markdown Report',
+    loadHeaders: 'Custom Headers',
+    loadBody: 'Request Body (JSON)',
+    loadRunning: 'Running Benchmark...',
+    loadFinished: 'Benchmark Completed',
+    loadAborted: 'Benchmark Aborted',
+    loadIdle: 'Ready to start benchmark',
+    loadKeepAlive: 'Keep-Alive Connections'
   },
   fa: {
     appName: 'دِوشلف (DevShelf)',
@@ -498,6 +531,7 @@ export const translations = {
     tabMock: 'سرور موقت',
     tabTunnel: 'تونل عمومی',
     tabSysMon: 'مانیتور منابع',
+    tabLoadTest: 'تستر بار',
 
     // Common Actions
     copy: 'کپی',
@@ -955,7 +989,39 @@ export const translations = {
     sysmonKillOrphans: 'خاتمه پروسه‌های نود و پایتون سرگردان',
     sysmonConfirmOrphans: 'آیا تمام پروسه‌های پس‌زمینه Node و Python خاتمه یابند؟',
     sysmonAutoRefresh: 'بروزرسانی خودکار (۳ ثانیه)',
-    sysmonNoProcesses: 'هیچ پروسه منطبقی پیدا نشد.'
+    sysmonNoProcesses: 'هیچ پروسه منطبقی پیدا نشد.',
+
+    // New Module 4: Mini Load Tester & API Stress Benchmarker
+    loadTitle: 'تستر بار و بنچمارک سرعت اندپوینت‌ها',
+    loadDesc: 'موتور دقیق تولید بار و استرس HTTP با مانیتور زنده RPS، صدک‌های تاخیر (P50/P95/P99) و نمودارهای تفکیک توزیع پاسخ.',
+    loadTargetUrl: 'آدرس اندپوینت هدف',
+    loadConcurrency: 'کاربران همزمان (Concurrency)',
+    loadMode: 'حالت اجرای تست',
+    loadDurationMode: 'بر اساس زمان (ثانیه)',
+    loadRequestsMode: 'بر اساس تعداد کل درخواست',
+    loadDurationSeconds: 'مدت زمان (ثانیه)',
+    loadTotalRequests: 'تعداد کل درخواست‌ها',
+    loadTimeout: 'مهلت زمانی (میلی‌ثانیه)',
+    loadStart: 'شروع بنچمارک',
+    loadAbort: 'توقف اضطراری تست',
+    loadReset: 'ریست آمار',
+    loadRps: 'نرخ پردازش (RPS)',
+    loadAvgLatency: 'میانگین تاخیر',
+    loadP50: 'صدک ۵۰ (میانه)',
+    loadP95: 'صدک ۹۵',
+    loadP99: 'صدک ۹۹',
+    loadMinMax: 'کمترین / بیشترین',
+    loadSuccessRate: 'نرخ موفقیت',
+    loadLatencyDistribution: 'توزیع زمان پاسخ (میلی‌ثانیه)',
+    loadStatusCodes: 'تفکیک کدهای وضعیت و خطاها',
+    loadExportReport: 'کپی گزارش مارک‌داون',
+    loadHeaders: 'هدرهای سفارشی',
+    loadBody: 'بدنه درخواست (JSON)',
+    loadRunning: 'درحال اجرای بنچمارک...',
+    loadFinished: 'بنچمارک با موفقیت پایان یافت',
+    loadAborted: 'بنچمارک متوقف شد',
+    loadIdle: 'آماده شروع بنچمارک',
+    loadKeepAlive: 'اتصال مداوم (Keep-Alive)'
   }
 } as const;
 

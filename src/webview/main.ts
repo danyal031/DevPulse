@@ -13,6 +13,7 @@ import { CryptoMockView } from './components/CryptoMockView';
 import { MockServerView } from './components/MockServerView';
 import { TunnelView } from './components/TunnelView';
 import { SystemMonitorView } from './components/SystemMonitorView';
+import { LoadTesterView } from './components/LoadTesterView';
 
 declare function acquireVsCodeApi(): {
   postMessage(message: unknown): void;
@@ -39,6 +40,7 @@ class DevShelfApp {
   private mockView!: MockServerView;
   private tunnelView!: TunnelView;
   private sysmonView!: SystemMonitorView;
+  private loadTesterView!: LoadTesterView;
 
   constructor() {
     this.restoreState();
@@ -76,7 +78,8 @@ class DevShelfApp {
       cryptoState: this.cryptoView ? this.cryptoView.getState() : undefined,
       mockState: this.mockView ? this.mockView.getState() : undefined,
       tunnelState: this.tunnelView ? this.tunnelView.getState() : undefined,
-      sysmonState: this.sysmonView ? this.sysmonView.getState() : undefined
+      sysmonState: this.sysmonView ? this.sysmonView.getState() : undefined,
+      loadTesterState: this.loadTesterView ? this.loadTesterView.getState() : undefined
     });
   }
 
@@ -150,6 +153,10 @@ class DevShelfApp {
             <span class="tab-icon">${ICONS.cpu}</span>
             <span class="tab-label">${t('tabSysMon', this.currentLang)}</span>
           </button>
+          <button class="tab-btn" data-tab="loadtest" id="tab-nav-loadtest">
+            <span class="tab-icon">${ICONS.speed}</span>
+            <span class="tab-label">${t('tabLoadTest', this.currentLang)}</span>
+          </button>
         </nav>
       </div>
 
@@ -167,6 +174,7 @@ class DevShelfApp {
         <div id="view-mock" class="view-panel"></div>
         <div id="view-tunnel" class="view-panel"></div>
         <div id="view-sysmon" class="view-panel"></div>
+        <div id="view-loadtest" class="view-panel"></div>
       </main>
     `;
   }
@@ -187,6 +195,7 @@ class DevShelfApp {
     const mockContainer = document.getElementById('view-mock')!;
     const tunnelContainer = document.getElementById('view-tunnel')!;
     const sysmonContainer = document.getElementById('view-sysmon')!;
+    const loadtestContainer = document.getElementById('view-loadtest')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
     this.jwtView = new JwtView(jwtContainer, this.currentLang, postToHost);
@@ -201,6 +210,7 @@ class DevShelfApp {
     this.mockView = new MockServerView(mockContainer, this.currentLang, postToHost);
     this.tunnelView = new TunnelView(tunnelContainer, this.currentLang, postToHost);
     this.sysmonView = new SystemMonitorView(sysmonContainer, this.currentLang, postToHost);
+    this.loadTesterView = new LoadTesterView(loadtestContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
     if (state) {
@@ -216,6 +226,7 @@ class DevShelfApp {
       if (state.mockState) this.mockView.restoreState(state.mockState);
       if (state.tunnelState) this.tunnelView.restoreState(state.tunnelState);
       if (state.sysmonState) this.sysmonView.restoreState(state.sysmonState);
+      if (state.loadTesterState) this.loadTesterView.restoreState(state.loadTesterState);
     }
   }
 
@@ -333,6 +344,9 @@ class DevShelfApp {
         case 'sysmonProcessKilled':
           this.sysmonView.handleProcessKilled(message.pid, message.success, message.message);
           break;
+        case 'loadTesterSnapshot':
+          this.loadTesterView.updateTelemetry(message.snapshot);
+          break;
         case 'replayInApiTester':
           this.switchTab('api');
           this.apiView.prefillRequest(message.request);
@@ -392,6 +406,7 @@ class DevShelfApp {
     setTabLabel('tab-nav-mock', t('tabMock', this.currentLang));
     setTabLabel('tab-nav-tunnel', t('tabTunnel', this.currentLang));
     setTabLabel('tab-nav-sysmon', t('tabSysMon', this.currentLang));
+    setTabLabel('tab-nav-loadtest', t('tabLoadTest', this.currentLang));
 
     this.jsonView.setLanguage(this.currentLang);
     this.jwtView.setLanguage(this.currentLang);
@@ -406,6 +421,7 @@ class DevShelfApp {
     this.mockView.setLanguage(this.currentLang);
     this.tunnelView.setLanguage(this.currentLang);
     this.sysmonView.setLanguage(this.currentLang);
+    this.loadTesterView.setLanguage(this.currentLang);
   }
 
   private switchTab(tabName: string) {

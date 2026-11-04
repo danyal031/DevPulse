@@ -158,6 +158,19 @@ A full-featured Docker Desktop client alternative integrated directly into the V
   - Two-step safe inline **Kill Process** button (`taskkill /F /PID` on Windows, `kill -9` on Unix).
   - Quick-action **Kill Orphan Node/Python Processes** button to safely clean up dangling development servers with a single click.
 
+### 15. Mini Load Tester & API Stress Benchmarker (تستر بار و بنچمارک سرعت اندپوینت‌ها)
+- **High-Precision Async Load Engine:**
+  - Concurrent virtual users worker pool (1 to 200 concurrent promises) running in Node.js without blocking the main event loop.
+  - Dual test modes: **Duration-Based Mode** (5s, 10s, 30s, 60s) or **Total Requests Mode** (100, 500, 1,000, 5,000 requests).
+  - Configurable HTTP methods (`GET`, `POST`, `PUT`, `DELETE`, `PATCH`), custom request headers, JSON payloads, request timeouts, and HTTP/HTTPS connection keep-alive toggle.
+  - Emergency 1-click **Abort Benchmark** powered by native `AbortController` and instant socket pool teardown.
+- **Real-Time Telemetry Dashboard:**
+  - **Live Animated Progress Bar:** Sub-millisecond tracking with elapsed and total duration readouts.
+  - **6 Core KPI Metric Cards:** Real-time throughput in blue (`RPS`), Average Latency, P50 (Median), P95, P99, and Success Rate (%).
+  - **Pure-SVG Latency Distribution Histogram:** Zero-dependency, lightweight SVG chart visualizing latency brackets (`<50ms`, `50-150ms`, `150-300ms`, `300-500ms`, `>500ms`) with color-coded warning thresholds and share percentages.
+  - **Status Codes Breakdown Table:** Detailed breakdown of response HTTP status codes (2xx, 3xx, 4xx, 5xx) and connection errors (e.g. `ECONNREFUSED`, `ETIMEDOUT`).
+  - **1-Click Markdown Benchmark Report:** Instant export of complete benchmark telemetry to clipboard formatted for GitHub issues, PRs, and Slack.
+
 ---
 
 ## Command Palette & Context Menu Contributions
@@ -175,6 +188,7 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 | `devshelf.openMockServer` | `DevShelf: Open Mock Server & Webhook Catcher` | Command Palette |
 | `devshelf.openTunnel` | `DevShelf: Open Public Tunnel & QR Share` | Command Palette |
 | `devshelf.openSystemMonitor` | `DevShelf: Open System Resource Monitor & Zombie Killer` | Command Palette |
+| `devshelf.openLoadTester` | `DevShelf: Open Mini Load Tester & API Stress Benchmarker` | Command Palette |
 | `devshelf.copySystemIp` | `DevShelf: Copy Local System IP` | Command Palette |
 | `devshelf.formatJson` | `DevShelf: Format JSON in Selection` | Editor Context Menu & Command Palette |
 | `devshelf.normalizePersianSelection` | `DevShelf: Normalize Persian Text & Digits in Selection` | Editor Context Menu & Command Palette |
@@ -219,6 +233,7 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │   │   ├── tunnelService.ts     # Cloudflare/Localtunnel/Ngrok child process manager
 │   │   ├── qrCode.ts            # Pure-TS zero-dependency QR matrix & SVG generator
 │   │   ├── systemMonitorService.ts # Hardware telemetry & process tree killer
+│   │   ├── loadTesterService.ts # Async HTTP load engine, worker pool & percentiles
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
@@ -227,7 +242,7 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   └── testRunner.ts            # 17 unit test suites
+│   └── testRunner.ts            # 18 unit test suites
 ├── esbuild.js                   # Fast bundler config
 ├── package.json                 # Extension manifest & contributions
 ├── tsconfig.json                # Strict TypeScript configuration

@@ -54,6 +54,7 @@ import { generateQrMatrix, generateQrSvg } from '../src/utils/qrCode';
 import { MockServerService } from '../src/utils/mockServerService';
 import { TunnelService } from '../src/utils/tunnelService';
 import { SystemMonitorService } from '../src/utils/systemMonitorService';
+import { LoadTesterService, LoadTestConfig, LoadTestSnapshot } from '../src/utils/loadTesterService';
 
 async function runTests() {
   console.log('--- RUNNING DEVSHELF UNIT TESTS ---');
@@ -757,6 +758,76 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
   ];
 
   for (const k of newModuleKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
+  }
+
+  // 18. MINI LOAD TESTER ENGINE & PERCENTILES
+  console.log('[Test 18] Mini Load Tester Engine & Percentiles');
+  const loadTester = LoadTesterService.getInstance();
+  assert.ok(loadTester, 'LoadTesterService singleton must exist');
+  assert.strictEqual(loadTester.isTestRunning(), false, 'Load tester must not be running initially');
+
+  // Verify Markdown Report Generator with sample synthetic snapshot
+  const mockConfig: LoadTestConfig = {
+    url: 'http://localhost:3000/api/users',
+    method: 'GET',
+    concurrency: 10,
+    mode: 'requests',
+    totalRequests: 250,
+    keepAlive: true
+  };
+
+  const mockSnapshot: LoadTestSnapshot = {
+    isRunning: false,
+    isCompleted: true,
+    elapsedMs: 2500,
+    totalDurationMs: 0,
+    progressPercent: 100,
+    activeWorkers: 0,
+    completedRequests: 250,
+    targetRequests: 250,
+    rps: 100,
+    minLatencyMs: 12,
+    maxLatencyMs: 310,
+    avgLatencyMs: 45.6,
+    p50LatencyMs: 32,
+    p95LatencyMs: 145,
+    p99LatencyMs: 290,
+    successCount: 248,
+    errorCount: 2,
+    successRate: 99.2,
+    statusCodes: { '200': 248, '500': 2 },
+    buckets: [
+      { label: '< 50ms', minMs: 0, maxMs: 50, count: 180, percentage: 72 },
+      { label: '50-150ms', minMs: 50, maxMs: 150, count: 50, percentage: 20 },
+      { label: '150-300ms', minMs: 150, maxMs: 300, count: 18, percentage: 7.2 },
+      { label: '300-500ms', minMs: 300, maxMs: 500, count: 2, percentage: 0.8 },
+      { label: '> 500ms', minMs: 500, maxMs: Infinity, count: 0, percentage: 0 }
+    ],
+    recentErrors: ['500 Internal Server Error']
+  };
+
+  const report = loadTester.generateMarkdownReport(mockSnapshot, mockConfig);
+  assert.ok(report.includes('DevShelf Load Benchmark Report'), 'Report must include title');
+  assert.ok(report.includes('100 req/sec'), 'Report must include RPS');
+  assert.ok(report.includes('P50 (Median)'), 'Report must include P50');
+  assert.ok(report.includes('32 ms'), 'Report must include P50 latency value');
+  assert.ok(report.includes('99.2%'), 'Report must include success rate');
+  assert.ok(report.includes('`200`'), 'Report must include HTTP 200 breakdown');
+
+  // Verify all Load Tester i18n keys
+  const loadTesterKeys = [
+    'tabLoadTest', 'loadTitle', 'loadDesc', 'loadTargetUrl', 'loadConcurrency', 'loadMode',
+    'loadDurationMode', 'loadRequestsMode', 'loadDurationSeconds', 'loadTotalRequests',
+    'loadTimeout', 'loadStart', 'loadAbort', 'loadReset', 'loadRps', 'loadAvgLatency',
+    'loadP50', 'loadP95', 'loadP99', 'loadMinMax', 'loadSuccessRate',
+    'loadLatencyDistribution', 'loadStatusCodes', 'loadExportReport',
+    'loadHeaders', 'loadBody', 'loadRunning', 'loadFinished', 'loadAborted', 'loadIdle',
+    'loadKeepAlive'
+  ];
+
+  for (const k of loadTesterKeys) {
     assert.ok((translations.en as any)[k], `Missing EN key: ${k}`);
     assert.ok((translations.fa as any)[k], `Missing FA key: ${k}`);
   }

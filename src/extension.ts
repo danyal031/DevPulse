@@ -17,6 +17,7 @@ import { GIT_CHEAT_SHEET } from './utils/gitScenarios';
 import { translations } from './webview/i18n';
 import { MockServerService } from './utils/mockServerService';
 import { TunnelService } from './utils/tunnelService';
+import { LoadTesterService } from './utils/loadTesterService';
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
@@ -492,6 +493,14 @@ export function activate(context: vscode.ExtensionContext) {
       sidebarProvider.switchTab('sysmon');
     })
   );
+
+  // Command 20: Open Mini Load Tester & Stress Benchmarker
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openLoadTester', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('loadtest');
+    })
+  );
 }
 
 export function deactivate() {
@@ -500,5 +509,8 @@ export function deactivate() {
   } catch {}
   try {
     TunnelService.getInstance().stopTunnel();
+  } catch {}
+  try {
+    LoadTesterService.getInstance().abort();
   } catch {}
 }
