@@ -6,7 +6,7 @@
 
 ## Key Highlights
 
-- **Feature Cards Deck & Quick Navigator (v1.5.0):** Hyper-modern card-based navigation featuring a responsive 2-column card deck with distinct icon badges, high-contrast typography, and sub-labels. Includes 1-click category filtering (`All Tools [18]`, `Dev & Design [7]`, `Network & API [4]`, `Project & Ops [3]`, `System & Cleanup [4]`) and collapsible active tool summary banner.
+- **Feature Cards Deck & Quick Navigator (v1.6.0):** Hyper-modern card-based navigation featuring a responsive 2-column card deck with distinct icon badges, high-contrast typography, and sub-labels. Includes 1-click category filtering (`All Tools [19]`, `Dev & Design [7]`, `Network & API [5]`, `Project & Ops [3]`, `System & Cleanup [4]`) and collapsible active tool summary banner.
 - **100% Offline-First:** Runs entirely inside your local VS Code environment without transmitting tokens, data, or source code over the network.
 - **Native VS Code Theming:** Built exclusively with native VS Code CSS variables (`var(--vscode-sideBar-background)`, `var(--vscode-input-background)`, `var(--vscode-editor-background)`, `var(--vscode-focusBorder)`, etc.). Adapts seamlessly to Light, Dark, High Contrast, and custom community themes.
 - **Minimalist Codicon Aesthetic:** Zero emoji clutter. Crisp, modern SVG Codicons matching VS Code's desktop design system.
@@ -211,6 +211,20 @@ A full-featured Docker Desktop client alternative integrated directly into the V
   - Categorizes targets with safety badges (`Safe to Delete` vs `Reinstall Required`).
   - Safe confirmation modal with item counts and total reclaimable space calculation before permanent deletion.
 
+### 20. Smart DNS Benchmarker, Anti-Sanction Switcher & MTR Radar (رادار ضدتحریم، بنچمارک DNS و مسیریاب شبکه)
+- **High-Precision Concurrent DNS Benchmarker:**
+  - Parallel DNS resolve4 + fallback TCP handshake on port 53 testing across popular anti-sanction providers (Shecan, 403.online, Electro, Radar Game, Begzar), global resolvers (Cloudflare, Google, Quad9), and custom user-defined DNS servers.
+  - Color-coded animated latency bars (`<80ms` Green, `80-200ms` Yellow, `>200ms` Red) with fastest provider winner badge.
+  - 1-click OS apply command generator (PowerShell, CMD, Bash) copied directly to clipboard.
+  - 1-click OS DNS cache flusher (`ipconfig /flushdns` on Windows, `dscacheutil` on macOS, `resolvectl` on Linux).
+- **Sanction & Reachability Matrix:**
+  - Probes essential developer endpoints (GitHub, Docker Hub, NPM Registry, Android SDK, OpenAI API, Cloudflare Edge) and classifies reachability (`200 OK` vs `403/451 Sanctioned` vs `Timeout/Blocked`).
+  - Color-coded badges indicating whether anti-sanction DNS is required for specific development workflows.
+- **Package Registry Switcher:**
+  - Instant inspection and switching between official NPM registry (`https://registry.npmjs.org/`) and high-speed developer mirrors (`npmmirror.com`, Cloudflare).
+- **Visual MTR & Traceroute Radar:**
+  - Real-time cross-platform hop-by-hop network trace with hop counter, router IP/hostname, triple RTT samples, average latency, and packet loss metrics rendered in a step-by-step visual timeline.
+
 ---
 
 ## Command Palette & Context Menu Contributions
@@ -218,6 +232,7 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 | Command | Title | Context |
 | :--- | :--- | :--- |
 | `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
+| `devshelf.openDnsRadar` | `DevShelf: Open Smart DNS Benchmarker & Anti-Sanction Radar` | Command Palette |
 | `devshelf.openSnapshotStudio` | `DevShelf: Open Code-to-Image & Snapshot Studio` | Command Palette |
 | `devshelf.openCommandCenter` | `DevShelf: Open 1-Click Project Command Center` | Command Palette |
 | `devshelf.openCssDesigner` | `DevShelf: Open Frontend & CSS Live Design Toolkit` | Command Palette |
@@ -262,7 +277,8 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │   ├── providers/
 │   │   └── SidebarProvider.ts   # WebviewViewProvider with strict CSP
 │   ├── services/
-│   │   ├── codeSnapshotService.ts # Editor code extractor & PNG image saver
+│   │   ├── dnsRadarService.ts      # DNS benchmarker, anti-sanction tester & traceroute engine
+│   │   ├── codeSnapshotService.ts  # Editor code extractor & PNG image saver
 │   │   ├── commandCenterService.ts # Multi-ecosystem task discovery & terminal runner
 │   │   ├── cacheCleanerService.ts  # Directory size calculator & cache purger
 │   │   └── mobilePreviewPanel.ts   # Responsive multi-device simulator WebviewPanel
@@ -288,15 +304,15 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
-│       ├── i18n.ts              # Full English & Persian dictionary (18 tools)
+│       ├── i18n.ts              # Full English & Persian dictionary (19 tools)
 │       ├── icons.ts             # Clean inline SVG Codicons
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   ├── testRunner.ts            # 24 comprehensive unit test suites
+│   ├── testRunner.ts            # 25 comprehensive unit test suites
 │   └── mockVscode.ts            # VS Code API mock for standalone test runner
 ├── esbuild.js                   # Fast bundler config
-├── package.json                 # Extension manifest & contributions (v1.5.0)
+├── package.json                 # Extension manifest & contributions (v1.6.0)
 ├── tsconfig.json                # Strict TypeScript configuration
 └── README.md                    # Documentation
 ```

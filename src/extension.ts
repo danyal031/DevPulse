@@ -20,6 +20,7 @@ import { TunnelService } from './utils/tunnelService';
 import { LoadTesterService } from './utils/loadTesterService';
 import { MobilePreviewPanel } from './services/mobilePreviewPanel';
 import { CommandCenterService } from './services/commandCenterService';
+import { DnsRadarService } from './services/dnsRadarService';
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
@@ -542,6 +543,14 @@ export function activate(context: vscode.ExtensionContext) {
       MobilePreviewPanel.createOrShow(context.extensionUri);
     })
   );
+
+  // Command 26: Open Smart DNS Benchmarker & Anti-Sanction Radar
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openDnsRadar', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('dnsradar');
+    })
+  );
 }
 
 export function deactivate() {
@@ -556,5 +565,8 @@ export function deactivate() {
   } catch {}
   try {
     CommandCenterService.getInstance().stopAllTasks();
+  } catch {}
+  try {
+    DnsRadarService.getInstance().stopTraceroute();
   } catch {}
 }

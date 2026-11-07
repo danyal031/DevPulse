@@ -25,6 +25,7 @@ export const translations = {
     tabCommandCenter: 'Command Center',
     tabCssDesigner: 'CSS & Design',
     tabCleaner: 'Cache Cleaner',
+    tabDnsRadar: 'DNS & Anti-Sanction Radar',
 
     // Feature Cards Deck & Categories
     deckCatAll: 'All Tools',
@@ -53,6 +54,7 @@ export const translations = {
     subCommandCenter: 'Run Scripts & Tasks',
     subCssDesigner: 'Tailwind & Glassmorphism',
     subCleaner: 'Purge Cache & node_modules',
+    subDnsRadar: 'Benchmark, Switcher & MTR',
 
     // Common Actions
     copy: 'Copy',
@@ -633,7 +635,46 @@ export const translations = {
     cleanerConfirmMsg: 'Are you sure you want to permanently delete the selected targets? This action cannot be undone.',
     cleanerPurging: 'Purging selected items...',
     cleanerPurgeSuccess: 'Successfully freed disk space!',
-    cleanerPurgeFail: 'Failed to purge some items'
+    cleanerPurgeFail: 'Failed to purge some items',
+
+    // Module: Smart DNS Benchmarker & Anti-Sanction Radar
+    dnsRadarTitle: 'Smart DNS Benchmarker & Anti-Sanction Radar',
+    dnsRadarDesc: 'High-precision concurrent DNS latency benchmarker, developer registry switcher, sanction reachability matrix, and visual traceroute radar.',
+    dnsSectionBenchmark: 'DNS & Anti-Sanction Benchmarker',
+    dnsSectionMatrix: 'Sanction & Connectivity Matrix',
+    dnsSectionTraceroute: 'Visual MTR & Traceroute Radar',
+    dnsSectionRegistry: 'Developer Registry Mirror Switcher',
+    dnsRunBenchmark: 'Run DNS Benchmark',
+    dnsBenchmarking: 'Benchmarking Providers...',
+    dnsFastestWinner: 'Fastest / Recommended',
+    dnsFlushCache: 'Flush OS DNS Cache',
+    dnsCacheFlushed: 'OS DNS Cache Flushed Successfully',
+    dnsApplyCommand: 'Copy Setup Command',
+    dnsApplySuccess: 'Setup command copied to clipboard!',
+    dnsCustomAdd: 'Add Custom DNS',
+    dnsCustomName: 'Provider Name',
+    dnsCustomPrimary: 'Primary IP (IPv4)',
+    dnsCustomSecondary: 'Secondary IP (Optional)',
+    dnsCustomSave: 'Add DNS',
+    dnsCustomCancel: 'Cancel',
+    dnsNpmRegistryLabel: 'Active NPM Registry:',
+    dnsRegistryOfficial: 'Official (npmjs.org)',
+    dnsRegistryMirror: 'Fast Mirror (npmmirror.com)',
+    dnsRegistrySwitching: 'Switching Registry...',
+    dnsMatrixCheckAll: 'Probe All Endpoints',
+    dnsMatrixProbing: 'Probing Endpoints...',
+    dnsStatusReachable: 'Reachable',
+    dnsStatusSanctioned: 'Sanctioned / Geo-Blocked',
+    dnsStatusBlocked: 'Blocked / Timeout',
+    dnsTraceTarget: 'Target IP or Hostname',
+    dnsTraceStart: 'Start Traceroute',
+    dnsTraceStop: 'Stop Trace',
+    dnsTraceRunning: 'Tracing Hops...',
+    dnsTraceCompleted: 'Traceroute Finished',
+    dnsHop: 'Hop',
+    dnsLoss: 'Loss',
+    dnsAvgRtt: 'Avg RTT',
+    dnsNoHops: 'No traceroute data yet. Enter a host and click Start Traceroute.'
   },
   fa: {
     appName: 'دِوشلف (DevShelf)',
@@ -659,6 +700,7 @@ export const translations = {
     tabCommandCenter: 'داشبورد دستورات',
     tabCssDesigner: 'طراحی CSS و فرانت',
     tabCleaner: 'پاک‌کننده کش و دیسک',
+    tabDnsRadar: 'رادار ضدتحریم و DNS',
 
     // Feature Cards Deck & Categories
     deckCatAll: 'همه ابزارها',
@@ -687,6 +729,7 @@ export const translations = {
     subCommandCenter: 'اجرای تسک‌ها با ۱ کلیک',
     subCssDesigner: 'رنگ، گلس و پریویو موبایل',
     subCleaner: 'پاکسازی کش و ماژول‌ها',
+    subDnsRadar: 'تست DNS، رفع تحریم و مسیریاب',
 
     // Common Actions
     copy: 'کپی',
@@ -1267,7 +1310,46 @@ export const translations = {
     cleanerConfirmMsg: 'آیا از حذف دائمی موارد انتخاب‌شده اطمینان دارید؟ این عملیات قابل بازگشت نیست.',
     cleanerPurging: 'درحال حذف موارد انتخابی...',
     cleanerPurgeSuccess: 'فضای دیسک با موفقیت آزاد شد!',
-    cleanerPurgeFail: 'خطا در حذف برخی موارد'
+    cleanerPurgeFail: 'خطا در حذف برخی موارد',
+
+    // Module: Smart DNS Benchmarker & Anti-Sanction Radar
+    dnsRadarTitle: 'رادار ضدتحریم، بنچمارک DNS و مسیریاب شبکه',
+    dnsRadarDesc: 'بنچمارک همزمان پینگ و پاسخ DNSهای ضدتحریم، تغییر سریع مخازن پکیج‌منیجر، ماتریس رفع تحریم و ردگیری گره‌های شبکه.',
+    dnsSectionBenchmark: 'بنچمارک DNS و سرویس‌های ضدتحریم',
+    dnsSectionMatrix: 'ماتریس دسترسی و تحریم سرویس‌ها',
+    dnsSectionTraceroute: 'مسیریاب بصری و رادار Traceroute',
+    dnsSectionRegistry: 'سوییچ مخازن پکیج‌منیجر (Mirror)',
+    dnsRunBenchmark: 'شروع بنچمارک DNS',
+    dnsBenchmarking: 'درحال تست و اندازه‌گیری پینگ...',
+    dnsFastestWinner: 'سریع‌ترین / پیشنهادی',
+    dnsFlushCache: 'خالی کردن کش DNS سیستم',
+    dnsCacheFlushed: 'کش DNS سیستم با موفقیت پاکسازی شد',
+    dnsApplyCommand: 'کپی دستور تنظیم در سیستم',
+    dnsApplySuccess: 'دستور تنظیم در کلیپ‌بورد کپی شد!',
+    dnsCustomAdd: 'افزودن DNS دلخواه',
+    dnsCustomName: 'نام سرویس',
+    dnsCustomPrimary: 'آی‌پی اصلی (IPv4)',
+    dnsCustomSecondary: 'آی‌پی کمکی (اختیاری)',
+    dnsCustomSave: 'افزودن DNS',
+    dnsCustomCancel: 'انصراف',
+    dnsNpmRegistryLabel: 'مخزن فعال NPM:',
+    dnsRegistryOfficial: 'مخزن رسمی (npmjs.org)',
+    dnsRegistryMirror: 'میرور سریع (npmmirror.com)',
+    dnsRegistrySwitching: 'درحال تغییر مخزن...',
+    dnsMatrixCheckAll: 'بررسی مجدد تمام سرویس‌ها',
+    dnsMatrixProbing: 'درحال بررسی دسترسی...',
+    dnsStatusReachable: 'در دسترس',
+    dnsStatusSanctioned: 'تحریم شده (نیاز به ضدتحریم)',
+    dnsStatusBlocked: 'مسدود یا خطای اتصال',
+    dnsTraceTarget: 'دامنه یا آی‌پی هدف',
+    dnsTraceStart: 'شروع ردگیری مسیر',
+    dnsTraceStop: 'توقف ردگیری',
+    dnsTraceRunning: 'درحال ردیابی گره‌های شبکه...',
+    dnsTraceCompleted: 'ردگیری مسیر به پایان رسید',
+    dnsHop: 'گره',
+    dnsLoss: 'اتلاف',
+    dnsAvgRtt: 'میانگین پینگ',
+    dnsNoHops: 'هنوز تستی انجام نشده است. دامنه هدف را وارد کرده و روی شروع کلیک کنید.'
   }
 } as const;
 

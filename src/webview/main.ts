@@ -18,6 +18,7 @@ import { CodeSnapshotView } from './components/CodeSnapshotView';
 import { CommandCenterView } from './components/CommandCenterView';
 import { CssDesignerView } from './components/CssDesignerView';
 import { CacheCleanerView } from './components/CacheCleanerView';
+import { DnsRadarView } from './components/DnsRadarView';
 
 declare function acquireVsCodeApi(): {
   postMessage(message: unknown): void;
@@ -45,11 +46,12 @@ const FEATURE_TOOLS: FeatureTool[] = [
   { id: 'snapshot', category: 'dev', icon: ICONS.camera, titleKey: 'tabSnapshot', subKey: 'subSnapshot' },
   { id: 'cssdesign', category: 'dev', icon: ICONS.palette, titleKey: 'tabCssDesigner', subKey: 'subCssDesigner' },
 
-  // Network & API (4)
+  // Network & API (5)
   { id: 'api', category: 'network', icon: ICONS.send, titleKey: 'tabApi', subKey: 'subApi' },
   { id: 'mock', category: 'network', icon: ICONS.webhook, titleKey: 'tabMock', subKey: 'subMock' },
   { id: 'tunnel', category: 'network', icon: ICONS.tunnel, titleKey: 'tabTunnel', subKey: 'subTunnel' },
   { id: 'loadtest', category: 'network', icon: ICONS.speed, titleKey: 'tabLoadTest', subKey: 'subLoadtest' },
+  { id: 'dnsradar', category: 'network', icon: ICONS.radar, titleKey: 'tabDnsRadar', subKey: 'subDnsRadar' },
 
   // Project & Ops (3)
   { id: 'commandcenter', category: 'ops', icon: ICONS.playCircle, titleKey: 'tabCommandCenter', subKey: 'subCommandCenter' },
@@ -87,6 +89,7 @@ class DevShelfApp {
   private commandCenterView!: CommandCenterView;
   private cssDesignerView!: CssDesignerView;
   private cleanerView!: CacheCleanerView;
+  private dnsRadarView!: DnsRadarView;
 
   constructor() {
     this.restoreState();
@@ -137,7 +140,8 @@ class DevShelfApp {
       snapshotState: this.snapshotView ? this.snapshotView.getState() : undefined,
       commandCenterState: this.commandCenterView ? this.commandCenterView.getState() : undefined,
       cssDesignerState: this.cssDesignerView ? this.cssDesignerView.getState() : undefined,
-      cleanerState: this.cleanerView ? this.cleanerView.getState() : undefined
+      cleanerState: this.cleanerView ? this.cleanerView.getState() : undefined,
+      dnsRadarState: this.dnsRadarView ? this.dnsRadarView.getState() : undefined
     });
   }
 
@@ -207,7 +211,7 @@ class DevShelfApp {
           <div class="deck-categories-bar" id="deck-categories-bar">
             <button class="deck-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
               <span>${t('deckCatAll', this.currentLang)}</span>
-              <span class="cat-count">18</span>
+              <span class="cat-count">19</span>
             </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
               <span>${t('deckCatDev', this.currentLang)}</span>
@@ -215,7 +219,7 @@ class DevShelfApp {
             </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
               <span>${t('deckCatNetwork', this.currentLang)}</span>
-              <span class="cat-count">4</span>
+              <span class="cat-count">5</span>
             </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'ops' ? 'active' : ''}" data-cat="ops">
               <span>${t('deckCatOps', this.currentLang)}</span>
@@ -253,6 +257,7 @@ class DevShelfApp {
         <div id="view-commandcenter" class="view-panel"></div>
         <div id="view-cssdesign" class="view-panel"></div>
         <div id="view-cleaner" class="view-panel"></div>
+        <div id="view-dnsradar" class="view-panel"></div>
       </main>
     `;
   }
@@ -278,6 +283,7 @@ class DevShelfApp {
     const cmdCenterContainer = document.getElementById('view-commandcenter')!;
     const cssDesignContainer = document.getElementById('view-cssdesign')!;
     const cleanerContainer = document.getElementById('view-cleaner')!;
+    const dnsRadarContainer = document.getElementById('view-dnsradar')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
     this.jwtView = new JwtView(jwtContainer, this.currentLang, postToHost);
@@ -297,6 +303,7 @@ class DevShelfApp {
     this.commandCenterView = new CommandCenterView(cmdCenterContainer, this.currentLang, postToHost);
     this.cssDesignerView = new CssDesignerView(cssDesignContainer, this.currentLang, postToHost);
     this.cleanerView = new CacheCleanerView(cleanerContainer, this.currentLang, postToHost);
+    this.dnsRadarView = new DnsRadarView(dnsRadarContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
     if (state) {
@@ -317,6 +324,7 @@ class DevShelfApp {
       if (state.commandCenterState) this.commandCenterView.restoreState(state.commandCenterState);
       if (state.cssDesignerState) this.cssDesignerView.restoreState(state.cssDesignerState);
       if (state.cleanerState) this.cleanerView.restoreState(state.cleanerState);
+      if (state.dnsRadarState) this.dnsRadarView.restoreState(state.dnsRadarState);
     }
   }
 
@@ -469,6 +477,31 @@ class DevShelfApp {
         case 'junkPurgeResult':
           this.cleanerView.onPurgeSuccess(message.freedBytes || 0);
           break;
+        case 'dnsProvidersList':
+        case 'dnsBenchmarkResult':
+          this.dnsRadarView.setProviders(message.providers || []);
+          break;
+        case 'dnsCacheFlushed':
+          this.dnsRadarView.showNotice(message.message || t('dnsCacheFlushed', this.currentLang));
+          break;
+        case 'dnsApplyCommandCopied':
+          this.dnsRadarView.showNotice(t('dnsApplySuccess', this.currentLang));
+          break;
+        case 'npmRegistryResult':
+          this.dnsRadarView.setRegistry(message.registry || '');
+          break;
+        case 'connectivityTargetsList':
+          this.dnsRadarView.setConnectivityTargets(message.targets || []);
+          break;
+        case 'connectivityTargetUpdate':
+          this.dnsRadarView.setTargetResult(message.target);
+          break;
+        case 'tracerouteHop':
+          this.dnsRadarView.addTracerouteHop(message.hop);
+          break;
+        case 'tracerouteComplete':
+          this.dnsRadarView.onTracerouteComplete(message.code);
+          break;
         case 'replayInApiTester':
           this.switchTab('api');
           this.apiView.prefillRequest(message.request);
@@ -563,9 +596,9 @@ class DevShelfApp {
         el.innerHTML = `<span>${t(labelKey, this.currentLang)}</span><span class="cat-count">${count}</span>`;
       }
     };
-    setCatText('all', 'deckCatAll', 18);
+    setCatText('all', 'deckCatAll', 19);
     setCatText('dev', 'deckCatDev', 7);
-    setCatText('network', 'deckCatNetwork', 4);
+    setCatText('network', 'deckCatNetwork', 5);
     setCatText('ops', 'deckCatOps', 3);
     setCatText('system', 'deckCatSystem', 4);
 
@@ -608,6 +641,7 @@ class DevShelfApp {
     this.commandCenterView.setLanguage(this.currentLang);
     this.cssDesignerView.setLanguage(this.currentLang);
     this.cleanerView.setLanguage(this.currentLang);
+    this.dnsRadarView.setLanguage(this.currentLang);
   }
 
   private switchTab(tabName: string) {
@@ -659,6 +693,9 @@ class DevShelfApp {
       vscode.postMessage({ command: 'scanJunk' });
     } else if (tabName === 'snapshot') {
       vscode.postMessage({ command: 'getEditorCode' });
+    } else if (tabName === 'dnsradar') {
+      vscode.postMessage({ command: 'getDnsProviders' });
+      vscode.postMessage({ command: 'getNpmRegistry' });
     }
 
     this.saveCurrentState();

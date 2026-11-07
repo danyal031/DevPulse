@@ -29,6 +29,7 @@ import { getSelectedCodeSnippet, saveSnapshotImage } from '../services/codeSnaps
 import { CommandCenterService } from '../services/commandCenterService';
 import { CacheCleanerService } from '../services/cacheCleanerService';
 import { MobilePreviewPanel } from '../services/mobilePreviewPanel';
+import { DnsRadarService, CONNECTIVITY_TARGETS } from '../services/dnsRadarService';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'devshelf.sidebarView';
@@ -713,6 +714,118 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           }
           break;
         }
+
+        // --- Smart DNS Benchmarker & Anti-Sanction Radar ---
+        case 'getDnsProviders': {
+          const providers = DnsRadarService.getInstance().getProviders();
+          this.postMessage({ type: 'dnsProvidersList', providers });
+          break;
+        }
+
+        case 'runDnsBenchmark': {
+          try {
+            const providers = await DnsRadarService.getInstance().benchmarkAll(data.testDomain || 'google.com');
+            this.postMessage({ type: 'dnsBenchmarkResult', providers });
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf: DNS benchmark error: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'addCustomDns': {
+          if (data.name && data.primary) {
+            DnsRadarService.getInstance().addCustomProvider(data.name, data.primary, data.secondary);
+            const providers = DnsRadarService.getInstance().getProviders();
+            this.postMessage({ type: 'dnsProvidersList', providers });
+          }
+          break;
+        }
+
+        case 'removeCustomDns': {
+          if (data.providerId) {
+            DnsRadarService.getInstance().removeCustomProvider(data.providerId);
+            const providers = DnsRadarService.getInstance().getProviders();
+            this.postMessage({ type: 'dnsProvidersList', providers });
+          }
+          break;
+        }
+
+        case 'applyDnsProvider': {
+          const provider = DnsRadarService.getInstance().getProviders().find(p => p.id === data.providerId);
+          if (provider) {
+            const cmd = DnsRadarService.getInstance().getDnsApplyCommand(provider);
+            const scriptToCopy = process.platform === 'win32' ? cmd.powershell : cmd.bash;
+            await vscode.env.clipboard.writeText(scriptToCopy);
+            this.postMessage({ type: 'dnsApplyCommandCopied' });
+            vscode.window.showInformationMessage(
+              `DevShelf: ${provider.name} DNS setup command copied to clipboard!`
+            );
+          }
+          break;
+        }
+
+        case 'flushDnsCache': {
+          const res = await DnsRadarService.getInstance().flushDnsCache();
+          this.postMessage({ type: 'dnsCacheFlushed', message: res.message });
+          if (res.success) {
+            vscode.window.showInformationMessage(`DevShelf: ${res.message}`);
+          } else {
+            vscode.window.showWarningMessage(`DevShelf: ${res.message}`);
+          }
+          break;
+        }
+
+        case 'getNpmRegistry': {
+          const registry = await DnsRadarService.getInstance().getNpmRegistry();
+          this.postMessage({ type: 'npmRegistryResult', registry });
+          break;
+        }
+
+        case 'setNpmRegistry': {
+          if (data.registryUrl) {
+            const res = await DnsRadarService.getInstance().setNpmRegistry(data.registryUrl);
+            this.postMessage({ type: 'npmRegistryResult', registry: res.registry });
+            if (res.success) {
+              vscode.window.showInformationMessage(`DevShelf: NPM Registry set to ${res.registry}`);
+            } else {
+              vscode.window.showErrorMessage(`DevShelf: Failed to set NPM registry: ${res.message}`);
+            }
+          }
+          break;
+        }
+
+        case 'getConnectivityTargets': {
+          this.postMessage({ type: 'connectivityTargetsList', targets: CONNECTIVITY_TARGETS });
+          break;
+        }
+
+        case 'checkConnectivityMatrix': {
+          CONNECTIVITY_TARGETS.forEach(async (target) => {
+            try {
+              const updated = await DnsRadarService.getInstance().checkTargetReachability(target);
+              this.postMessage({ type: 'connectivityTargetUpdate', target: updated });
+            } catch {
+              this.postMessage({ type: 'connectivityTargetUpdate', target: { ...target, status: 'blocked' } });
+            }
+          });
+          break;
+        }
+
+        case 'startTraceroute': {
+          const targetHost = data.targetHost || '1.1.1.1';
+          DnsRadarService.getInstance().startTraceroute(
+            targetHost,
+            (hop) => this.postMessage({ type: 'tracerouteHop', hop }),
+            (code) => this.postMessage({ type: 'tracerouteComplete', code })
+          );
+          break;
+        }
+
+        case 'stopTraceroute': {
+          DnsRadarService.getInstance().stopTraceroute();
+          this.postMessage({ type: 'tracerouteComplete', code: 0 });
+          break;
+        }
       }
     });
 
@@ -737,6 +850,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     webviewView.onDidDispose(() => {
       LoadTesterService.getInstance().abort();
+      DnsRadarService.getInstance().stopTraceroute();
     });
 
     // Send initial saved language if exists
