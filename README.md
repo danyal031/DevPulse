@@ -6,7 +6,7 @@
 
 ## Key Highlights
 
-- **Feature Cards Deck & Quick Navigator (v1.6.0):** Hyper-modern card-based navigation featuring a responsive 2-column card deck with distinct icon badges, high-contrast typography, and sub-labels. Includes 1-click category filtering (`All Tools [19]`, `Dev & Design [7]`, `Network & API [5]`, `Project & Ops [3]`, `System & Cleanup [4]`) and collapsible active tool summary banner.
+- **Feature Cards Deck & Quick Navigator (v1.7.0):** Hyper-modern card-based navigation featuring a responsive 2-column card deck with distinct icon badges, high-contrast typography, and sub-labels. Includes 1-click category filtering (`All Tools [20]`, `Dev & Design [8]`, `Network & API [5]`, `Project & Ops [3]`, `System & Cleanup [4]`) and collapsible active tool summary banner.
 - **100% Offline-First:** Runs entirely inside your local VS Code environment without transmitting tokens, data, or source code over the network.
 - **Native VS Code Theming:** Built exclusively with native VS Code CSS variables (`var(--vscode-sideBar-background)`, `var(--vscode-input-background)`, `var(--vscode-editor-background)`, `var(--vscode-focusBorder)`, etc.). Adapts seamlessly to Light, Dark, High Contrast, and custom community themes.
 - **Minimalist Codicon Aesthetic:** Zero emoji clutter. Crisp, modern SVG Codicons matching VS Code's desktop design system.
@@ -225,6 +225,35 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 - **Visual MTR & Traceroute Radar:**
   - Real-time cross-platform hop-by-hop network trace with hop counter, router IP/hostname, triple RTT samples, average latency, and packet loss metrics rendered in a step-by-step visual timeline.
 
+### 21. Bundle Size Radar & Package Diet (تحلیلگر حجم پکیج‌ها، رادار سنگینی باندل و پیشنهاددهنده جایگزین‌های سبک)
+- **Dual-Engine Size Resolution (Offline Local + Fast Edge Fallback):**
+  - Auto-discovers `package.json` in root workspace and monorepos.
+  - Automatically calculates physical disk footprint of dependencies directly from `node_modules`.
+  - Asynchronously queries client-side bundle telemetry (`minified` and `gzipped` sizes) via Bundlephobia and Bundlejs APIs with persistent local caching to eliminate redundant network roundtrips.
+  - Graceful fallback with local ratio estimation when offline.
+- **Visual Telemetry Dashboard:**
+  - Interactive SVG radial donut chart illustrating the percentage bundle weight distribution of the Top 5 heaviest dependencies.
+  - Real-time KPI summary cards: Total Estimated Gzip Overhead, Total Minified Size, Dependency counts (Prod vs Dev), and Bloated Packages count (`> 70 KB Gzip`).
+  - Animated horizontal progress bars for every package with color-coded weight classification:
+    - **Lightweight (`< 20 KB Gzip` - Green Badge)**
+    - **Moderate (`20 - 70 KB Gzip` - Yellow/Orange Badge)**
+    - **Bloated (`> 70 KB Gzip` - Red Badge + Glowing Pulse Indicator)**
+- **Smart Alternative Engine (Lighter Package Recommendations):**
+  - Built-in curated intelligence matrix recommending battle-tested, lighter drop-in replacements for notoriously heavy libraries:
+    - `moment` (~72 KB) -> `dayjs` (2 KB, -97%)
+    - `lodash` / `underscore` (~25-70 KB) -> `radash` or native ES2024+ methods
+    - `axios` (~13 KB) -> `ky` (3 KB, -75%) or native `fetch`
+    - `uuid` (~4 KB) -> `nanoid` (130 B, -95%) or `crypto.randomUUID()`
+    - `chalk` (~7 KB) -> `picocolors` (1 KB, -85%)
+    - `faker` (~1.5 MB) -> `@ngneat/falso` or dynamic `import()`
+    - `validator` (~30 KB) -> `zod`
+    - `request` (~500 KB) -> `ky`
+    - `bluebird` (~65 KB) -> native `Promise`
+  - Expandable accordion displaying potential savings, bilingual explanation, and 1-click **Copy Migration Command** or **Run in Terminal** auto-detecting `pnpm`, `yarn`, `bun`, or `npm`.
+- **Inline Import Cost Diagnostics:**
+  - Non-intrusive inline text decorations in active JS/TS/JSX/TSX files displaying live bundle gzip cost at the end of import statements (e.g., `⚡ 2.1 KB (gzip)` in green, or `⚠ 72.4 KB (gzip - bloated)` in red).
+  - 1-click toggle pill directly inside the sidebar controls.
+
 ---
 
 ## Command Palette & Context Menu Contributions
@@ -232,6 +261,7 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 | Command | Title | Context |
 | :--- | :--- | :--- |
 | `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
+| `devshelf.openBundleRadar` | `DevShelf: Open Bundle Size Radar & Package Diet` | Command Palette |
 | `devshelf.openDnsRadar` | `DevShelf: Open Smart DNS Benchmarker & Anti-Sanction Radar` | Command Palette |
 | `devshelf.openSnapshotStudio` | `DevShelf: Open Code-to-Image & Snapshot Studio` | Command Palette |
 | `devshelf.openCommandCenter` | `DevShelf: Open 1-Click Project Command Center` | Command Palette |
@@ -277,6 +307,8 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │   ├── providers/
 │   │   └── SidebarProvider.ts   # WebviewViewProvider with strict CSP
 │   ├── services/
+│   │   ├── bundleRadarService.ts   # Dependency scanner, Bundlephobia API & alternatives matcher
+│   │   ├── importCostService.ts    # Inline active text editor import cost decorator
 │   │   ├── dnsRadarService.ts      # DNS benchmarker, anti-sanction tester & traceroute engine
 │   │   ├── codeSnapshotService.ts  # Editor code extractor & PNG image saver
 │   │   ├── commandCenterService.ts # Multi-ecosystem task discovery & terminal runner
@@ -304,15 +336,15 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 │   │   └── cryptoMock.ts        # UUID, ULID, secrets, hashes & Iranian mock data
 │   └── webview/
 │       ├── main.ts              # Webview state coordinator & message dispatcher
-│       ├── i18n.ts              # Full English & Persian dictionary (19 tools)
+│       ├── i18n.ts              # Full English & Persian dictionary (20 tools)
 │       ├── icons.ts             # Clean inline SVG Codicons
 │       ├── styles.css           # Native VS Code CSS variables with RTL support
 │       └── components/          # Modular component views
 ├── test/
-│   ├── testRunner.ts            # 25 comprehensive unit test suites
+│   ├── testRunner.ts            # 26 comprehensive unit test suites
 │   └── mockVscode.ts            # VS Code API mock for standalone test runner
 ├── esbuild.js                   # Fast bundler config
-├── package.json                 # Extension manifest & contributions (v1.6.0)
+├── package.json                 # Extension manifest & contributions (v1.7.0)
 ├── tsconfig.json                # Strict TypeScript configuration
 └── README.md                    # Documentation
 ```

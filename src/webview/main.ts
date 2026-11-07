@@ -19,6 +19,7 @@ import { CommandCenterView } from './components/CommandCenterView';
 import { CssDesignerView } from './components/CssDesignerView';
 import { CacheCleanerView } from './components/CacheCleanerView';
 import { DnsRadarView } from './components/DnsRadarView';
+import { BundleRadarView } from './components/BundleRadarView';
 
 declare function acquireVsCodeApi(): {
   postMessage(message: unknown): void;
@@ -37,7 +38,7 @@ interface FeatureTool {
 }
 
 const FEATURE_TOOLS: FeatureTool[] = [
-  // Dev & Design (7)
+  // Dev & Design (8)
   { id: 'json', category: 'dev', icon: ICONS.brackets, titleKey: 'tabJson', subKey: 'subJson' },
   { id: 'jwt', category: 'dev', icon: ICONS.shield, titleKey: 'tabJwt', subKey: 'subJwt' },
   { id: 'persian', category: 'dev', icon: ICONS.calendar, titleKey: 'tabPersian', subKey: 'subPersian' },
@@ -45,6 +46,7 @@ const FEATURE_TOOLS: FeatureTool[] = [
   { id: 'sql', category: 'dev', icon: ICONS.database, titleKey: 'tabSql', subKey: 'subSql' },
   { id: 'snapshot', category: 'dev', icon: ICONS.camera, titleKey: 'tabSnapshot', subKey: 'subSnapshot' },
   { id: 'cssdesign', category: 'dev', icon: ICONS.palette, titleKey: 'tabCssDesigner', subKey: 'subCssDesigner' },
+  { id: 'bundleradar', category: 'dev', icon: ICONS.weight, titleKey: 'tabBundleRadar', subKey: 'subBundleRadar' },
 
   // Network & API (5)
   { id: 'api', category: 'network', icon: ICONS.send, titleKey: 'tabApi', subKey: 'subApi' },
@@ -90,6 +92,7 @@ class DevShelfApp {
   private cssDesignerView!: CssDesignerView;
   private cleanerView!: CacheCleanerView;
   private dnsRadarView!: DnsRadarView;
+  private bundleRadarView!: BundleRadarView;
 
   constructor() {
     this.restoreState();
@@ -211,11 +214,11 @@ class DevShelfApp {
           <div class="deck-categories-bar" id="deck-categories-bar">
             <button class="deck-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
               <span>${t('deckCatAll', this.currentLang)}</span>
-              <span class="cat-count">19</span>
+              <span class="cat-count">20</span>
             </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
               <span>${t('deckCatDev', this.currentLang)}</span>
-              <span class="cat-count">7</span>
+              <span class="cat-count">8</span>
             </button>
             <button class="deck-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
               <span>${t('deckCatNetwork', this.currentLang)}</span>
@@ -258,6 +261,7 @@ class DevShelfApp {
         <div id="view-cssdesign" class="view-panel"></div>
         <div id="view-cleaner" class="view-panel"></div>
         <div id="view-dnsradar" class="view-panel"></div>
+        <div id="view-bundleradar" class="view-panel"></div>
       </main>
     `;
   }
@@ -284,6 +288,7 @@ class DevShelfApp {
     const cssDesignContainer = document.getElementById('view-cssdesign')!;
     const cleanerContainer = document.getElementById('view-cleaner')!;
     const dnsRadarContainer = document.getElementById('view-dnsradar')!;
+    const bundleRadarContainer = document.getElementById('view-bundleradar')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
     this.jwtView = new JwtView(jwtContainer, this.currentLang, postToHost);
@@ -304,6 +309,7 @@ class DevShelfApp {
     this.cssDesignerView = new CssDesignerView(cssDesignContainer, this.currentLang, postToHost);
     this.cleanerView = new CacheCleanerView(cleanerContainer, this.currentLang, postToHost);
     this.dnsRadarView = new DnsRadarView(dnsRadarContainer, this.currentLang, postToHost);
+    this.bundleRadarView = new BundleRadarView(bundleRadarContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
     if (state) {
@@ -502,6 +508,15 @@ class DevShelfApp {
         case 'tracerouteComplete':
           this.dnsRadarView.onTracerouteComplete(message.code);
           break;
+        case 'dependenciesList':
+          this.bundleRadarView.setData(message.items || [], message.summary);
+          break;
+        case 'packageSizeResult':
+          this.bundleRadarView.updatePackageItem(message.item);
+          break;
+        case 'migrationCommandCopied':
+          this.bundleRadarView.showNotice(t('bundleMigrationCopied', this.currentLang));
+          break;
         case 'replayInApiTester':
           this.switchTab('api');
           this.apiView.prefillRequest(message.request);
@@ -596,8 +611,8 @@ class DevShelfApp {
         el.innerHTML = `<span>${t(labelKey, this.currentLang)}</span><span class="cat-count">${count}</span>`;
       }
     };
-    setCatText('all', 'deckCatAll', 19);
-    setCatText('dev', 'deckCatDev', 7);
+    setCatText('all', 'deckCatAll', 20);
+    setCatText('dev', 'deckCatDev', 8);
     setCatText('network', 'deckCatNetwork', 5);
     setCatText('ops', 'deckCatOps', 3);
     setCatText('system', 'deckCatSystem', 4);
@@ -642,6 +657,7 @@ class DevShelfApp {
     this.cssDesignerView.setLanguage(this.currentLang);
     this.cleanerView.setLanguage(this.currentLang);
     this.dnsRadarView.setLanguage(this.currentLang);
+    this.bundleRadarView.setLanguage(this.currentLang);
   }
 
   private switchTab(tabName: string) {

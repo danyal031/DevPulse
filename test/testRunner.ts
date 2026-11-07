@@ -59,6 +59,8 @@ import { SNAPSHOT_PRESETS } from '../src/webview/components/CodeSnapshotView';
 import { CacheCleanerService } from '../src/services/cacheCleanerService';
 import { CommandCenterService } from '../src/services/commandCenterService';
 import { DnsRadarService, BUILTIN_DNS_PROVIDERS, CONNECTIVITY_TARGETS } from '../src/services/dnsRadarService';
+import { BundleRadarService, CURATED_ALTERNATIVES, DependencyItem } from '../src/services/bundleRadarService';
+import { ImportCostService } from '../src/services/importCostService';
 
 async function runTests() {
   console.log('--- RUNNING DEVSHELF UNIT TESTS ---');
@@ -968,22 +970,8 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
     assert.ok((translations.fa as any)[k], `Missing FA cleaner key: ${k}`);
   }
 
-  // 24. FULL 19-TOOL PARITY & BILINGUAL INTEGRITY
-  console.log('[Test 24] Full 19-Tool Parity & Bilingual Integrity');
-  const all19ToolTabKeys = [
-    'tabJson', 'tabJwt', 'tabPersian', 'tabPorts', 'tabGit', 'tabDocker',
-    'tabApi', 'tabSql', 'tabLogs', 'tabCrypto', 'tabMock', 'tabTunnel',
-    'tabSysMon', 'tabLoadTest', 'tabSnapshot', 'tabCommandCenter', 'tabCssDesigner', 'tabCleaner',
-    'tabDnsRadar'
-  ];
-  assert.strictEqual(all19ToolTabKeys.length, 19, 'There must be exactly 19 developer tools');
-  for (const tabKey of all19ToolTabKeys) {
-    assert.ok((translations.en as any)[tabKey], `EN missing tab label: ${tabKey}`);
-    assert.ok((translations.fa as any)[tabKey], `FA missing tab label: ${tabKey}`);
-  }
-
-  // 25. SMART DNS BENCHMARKER & ANTI-SANCTION RADAR
-  console.log('[Test 25] Smart DNS Benchmarker & Anti-Sanction Radar');
+  // 24. SMART DNS BENCHMARKER & ANTI-SANCTION RADAR
+  console.log('[Test 24] Smart DNS Benchmarker & Anti-Sanction Radar');
   const dnsRadar = DnsRadarService.getInstance();
   assert.ok(dnsRadar, 'DnsRadarService must instantiate as singleton');
 
@@ -1038,6 +1026,127 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
   for (const k of dnsKeys) {
     assert.ok((translations.en as any)[k], `Missing EN dns key: ${k}`);
     assert.ok((translations.fa as any)[k], `Missing FA dns key: ${k}`);
+  }
+
+  // 25. BUNDLE SIZE RADAR & PACKAGE DIET
+  console.log('[Test 25] Bundle Size Radar & Package Diet');
+  const bundleRadar = BundleRadarService.getInstance();
+  assert.ok(bundleRadar, 'BundleRadarService must instantiate as singleton');
+
+  // Verify curated alternatives matrix
+  assert.ok(CURATED_ALTERNATIVES['moment'], 'Moment alternative must exist');
+  assert.strictEqual(CURATED_ALTERNATIVES['moment'].replacementPackage, 'dayjs');
+  assert.ok(CURATED_ALTERNATIVES['lodash'], 'Lodash alternative must exist');
+  assert.strictEqual(CURATED_ALTERNATIVES['lodash'].replacementPackage, 'radash');
+  assert.ok(CURATED_ALTERNATIVES['axios'], 'Axios alternative must exist');
+  assert.strictEqual(CURATED_ALTERNATIVES['axios'].replacementPackage, 'ky');
+  assert.ok(CURATED_ALTERNATIVES['uuid'], 'UUID alternative must exist');
+  assert.strictEqual(CURATED_ALTERNATIVES['uuid'].replacementPackage, 'nanoid');
+
+  // Verify migration command generation for all package managers
+  const npmCmd = bundleRadar.generateMigrationCommand('npm', 'moment', 'dayjs');
+  assert.strictEqual(npmCmd, 'npm uninstall moment && npm install dayjs');
+
+  const pnpmCmd = bundleRadar.generateMigrationCommand('pnpm', 'moment', 'dayjs');
+  assert.strictEqual(pnpmCmd, 'pnpm remove moment && pnpm add dayjs');
+
+  const yarnCmd = bundleRadar.generateMigrationCommand('yarn', 'moment', 'dayjs');
+  assert.strictEqual(yarnCmd, 'yarn remove moment && yarn add dayjs');
+
+  const bunCmd = bundleRadar.generateMigrationCommand('bun', 'moment', 'dayjs');
+  assert.strictEqual(bunCmd, 'bun remove moment && bun add dayjs');
+
+  // Verify special recommendation handling (dynamic or native)
+  const specialCmd = bundleRadar.generateMigrationCommand('npm', 'bluebird', 'Native Promise');
+  assert.strictEqual(specialCmd, 'npm uninstall bluebird');
+
+  // Verify weight categorization thresholds
+  assert.strictEqual(bundleRadar.categorizeWeight(10 * 1024), 'light'); // 10KB
+  assert.strictEqual(bundleRadar.categorizeWeight(45 * 1024), 'moderate'); // 45KB
+  assert.strictEqual(bundleRadar.categorizeWeight(70 * 1024), 'moderate'); // 70KB
+  assert.strictEqual(bundleRadar.categorizeWeight(85 * 1024), 'bloated'); // 85KB
+
+  // Verify clean version parsing
+  assert.strictEqual(bundleRadar.cleanVersionString('^1.2.3'), '1.2.3');
+  assert.strictEqual(bundleRadar.cleanVersionString('~4.5.6'), '4.5.6');
+  assert.strictEqual(bundleRadar.cleanVersionString('>=2.0.0 <3.0.0'), '2.0.0');
+
+  // Verify byte formatting
+  assert.strictEqual(bundleRadar.formatBytes(512), '512 B');
+  assert.strictEqual(bundleRadar.formatBytes(2048), '2.0 KB');
+  assert.strictEqual(bundleRadar.formatBytes(1048576), '1.00 MB');
+
+  // Verify summary calculation and top 5 package percentage math
+  const mockItems: DependencyItem[] = [
+    {
+      name: 'moment',
+      version: '^2.29.4',
+      isDev: false,
+      localSizeBytes: 300000,
+      minifiedSizeBytes: 200000,
+      gzippedSizeBytes: 72000,
+      status: 'success',
+      category: 'bloated',
+      alternative: bundleRadar.findAlternative('moment', 'npm')
+    },
+    {
+      name: 'dayjs',
+      version: '^1.11.10',
+      isDev: false,
+      localSizeBytes: 15000,
+      minifiedSizeBytes: 6000,
+      gzippedSizeBytes: 2000,
+      status: 'success',
+      category: 'light',
+      alternative: null
+    }
+  ];
+  const summary = bundleRadar.computeSummary(mockItems, 'npm');
+  assert.strictEqual(summary.totalDependencies, 2);
+  assert.strictEqual(summary.bloatedCount, 1);
+  assert.strictEqual(summary.totalGzipBytes, 74000);
+  assert.ok(summary.topPackages.length >= 1);
+  assert.strictEqual(summary.topPackages[0].name, 'moment');
+  assert.ok(summary.topPackages[0].percent > 90);
+
+  // Verify Import Cost package specifier extraction
+  const importCost = ImportCostService.getInstance();
+  assert.strictEqual(importCost.extractPackageName('lodash'), 'lodash');
+  assert.strictEqual(importCost.extractPackageName('lodash/debounce'), 'lodash');
+  assert.strictEqual(importCost.extractPackageName('@angular/core'), '@angular/core');
+  assert.strictEqual(importCost.extractPackageName('./myModule'), null);
+  assert.strictEqual(importCost.extractPackageName('fs'), null);
+  assert.strictEqual(importCost.extractPackageName('node:path'), null);
+
+  // Verify i18n keys for Bundle Size Radar
+  const bundleKeys = [
+    'tabBundleRadar', 'subBundleRadar', 'bundleRadarTitle', 'bundleRadarDesc',
+    'bundleScanDeps', 'bundleScanning', 'bundleIncludeDev', 'bundleFilterPlaceholder',
+    'bundleSortHeaviest', 'bundleSortAlpha', 'bundleSortDisk', 'bundleTotalOverhead',
+    'bundleTotalMinified', 'bundleTotalPkgs', 'bundleBloatedCount', 'bundleTopHeavyDonut',
+    'bundleNoDepsFound', 'bundleStatusLight', 'bundleStatusModerate', 'bundleStatusBloated',
+    'bundleSavings', 'bundleLighterAlternative', 'bundleCopyMigrationCmd',
+    'bundleRunMigrationCmd', 'bundleMigrationCopied', 'bundleNpmLink', 'bundleLocalDisk',
+    'bundleGzipSize', 'bundleMinSize', 'bundleDevBadge', 'bundleProdBadge',
+    'bundleInlineDecoratorToggle', 'bundleNoWorkspaceNotice'
+  ];
+  for (const k of bundleKeys) {
+    assert.ok((translations.en as any)[k], `Missing EN bundle key: ${k}`);
+    assert.ok((translations.fa as any)[k], `Missing FA bundle key: ${k}`);
+  }
+
+  // 26. FULL 20-TOOL PARITY & BILINGUAL INTEGRITY
+  console.log('[Test 26] Full 20-Tool Parity & Bilingual Integrity');
+  const all20ToolTabKeys = [
+    'tabJson', 'tabJwt', 'tabPersian', 'tabPorts', 'tabGit', 'tabDocker',
+    'tabApi', 'tabSql', 'tabLogs', 'tabCrypto', 'tabMock', 'tabTunnel',
+    'tabSysMon', 'tabLoadTest', 'tabSnapshot', 'tabCommandCenter', 'tabCssDesigner', 'tabCleaner',
+    'tabDnsRadar', 'tabBundleRadar'
+  ];
+  assert.strictEqual(all20ToolTabKeys.length, 20, 'There must be exactly 20 developer tools');
+  for (const tabKey of all20ToolTabKeys) {
+    assert.ok((translations.en as any)[tabKey], `EN missing tab label: ${tabKey}`);
+    assert.ok((translations.fa as any)[tabKey], `FA missing tab label: ${tabKey}`);
   }
 
   console.log('--- ALL UNIT TESTS PASSED SUCCESSFULLY! ---');

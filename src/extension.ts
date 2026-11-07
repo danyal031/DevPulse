@@ -21,6 +21,7 @@ import { LoadTesterService } from './utils/loadTesterService';
 import { MobilePreviewPanel } from './services/mobilePreviewPanel';
 import { CommandCenterService } from './services/commandCenterService';
 import { DnsRadarService } from './services/dnsRadarService';
+import { ImportCostService } from './services/importCostService';
 
 export function activate(context: vscode.ExtensionContext) {
   const sidebarProvider = new SidebarProvider(context.extensionUri, context);
@@ -551,6 +552,17 @@ export function activate(context: vscode.ExtensionContext) {
       sidebarProvider.switchTab('dnsradar');
     })
   );
+
+  // Command 27: Open Bundle Size Radar & Package Diet
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openBundleRadar', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('bundleradar');
+    })
+  );
+
+  // Initialize Import Cost Inline Preview Decorator
+  ImportCostService.getInstance().init(context);
 }
 
 export function deactivate() {
@@ -568,5 +580,8 @@ export function deactivate() {
   } catch {}
   try {
     DnsRadarService.getInstance().stopTraceroute();
+  } catch {}
+  try {
+    ImportCostService.getInstance().dispose();
   } catch {}
 }

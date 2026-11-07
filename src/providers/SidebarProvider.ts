@@ -30,6 +30,8 @@ import { CommandCenterService } from '../services/commandCenterService';
 import { CacheCleanerService } from '../services/cacheCleanerService';
 import { MobilePreviewPanel } from '../services/mobilePreviewPanel';
 import { DnsRadarService, CONNECTIVITY_TARGETS } from '../services/dnsRadarService';
+import { BundleRadarService } from '../services/bundleRadarService';
+import { ImportCostService } from '../services/importCostService';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'devshelf.sidebarView';
@@ -53,6 +55,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     };
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+
+    BundleRadarService.getInstance().setPersistentState(this._context.globalState);
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       const actionType = data.type || data.command;
@@ -824,6 +828,63 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         case 'stopTraceroute': {
           DnsRadarService.getInstance().stopTraceroute();
           this.postMessage({ type: 'tracerouteComplete', code: 0 });
+          break;
+        }
+
+        // --- Bundle Size Radar & Package Diet ---
+        case 'scanDependencies': {
+          try {
+            const includeDev = !!data.includeDev;
+            const { items, packageManager } = await BundleRadarService.getInstance().scanWorkspaceDependencies(undefined, includeDev);
+
+            // Send initial summary calculated from local disk or fast heuristic
+            const initialSummary = BundleRadarService.getInstance().computeSummary(items, packageManager);
+            this.postMessage({ type: 'dependenciesList', items, summary: initialSummary });
+
+            // Stream size resolution for each item
+            items.forEach(async (item) => {
+              try {
+                const sizeRes = await BundleRadarService.getInstance().resolvePackageSize(item.name, item.version, item.localSizeBytes);
+                item.minifiedSizeBytes = sizeRes.minBytes;
+                item.gzippedSizeBytes = sizeRes.gzipBytes;
+                item.status = sizeRes.status;
+                item.category = BundleRadarService.getInstance().categorizeWeight(sizeRes.gzipBytes);
+
+                this.postMessage({ type: 'packageSizeResult', item });
+              } catch {}
+            });
+
+            // Recompute final summary after remote telemetry
+            setTimeout(() => {
+              const finalSummary = BundleRadarService.getInstance().computeSummary(items, packageManager);
+              this.postMessage({ type: 'dependenciesList', items, summary: finalSummary });
+            }, 1800);
+          } catch (err: any) {
+            vscode.window.showErrorMessage(`DevShelf: Failed to scan dependencies: ${err.message}`);
+          }
+          break;
+        }
+
+        case 'toggleInlineDecorator': {
+          ImportCostService.getInstance().setEnabled(!!data.enabled);
+          break;
+        }
+
+        case 'copyMigrationCommand': {
+          if (data.commandText) {
+            await vscode.env.clipboard.writeText(data.commandText);
+            this.postMessage({ type: 'migrationCommandCopied' });
+            vscode.window.showInformationMessage('DevShelf: Migration command copied to clipboard!');
+          }
+          break;
+        }
+
+        case 'runMigrationCommand': {
+          if (data.commandText) {
+            const terminal = vscode.window.createTerminal({ name: 'DevShelf Package Migration' });
+            terminal.show(true);
+            terminal.sendText(data.commandText);
+          }
           break;
         }
       }

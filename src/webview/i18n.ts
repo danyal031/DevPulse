@@ -26,6 +26,7 @@ export const translations = {
     tabCssDesigner: 'CSS & Design',
     tabCleaner: 'Cache Cleaner',
     tabDnsRadar: 'DNS & Anti-Sanction Radar',
+    tabBundleRadar: 'Bundle Radar',
 
     // Feature Cards Deck & Categories
     deckCatAll: 'All Tools',
@@ -55,6 +56,7 @@ export const translations = {
     subCssDesigner: 'Tailwind & Glassmorphism',
     subCleaner: 'Purge Cache & node_modules',
     subDnsRadar: 'Benchmark, Switcher & MTR',
+    subBundleRadar: 'Package Diet & Size Telemetry',
 
     // Common Actions
     copy: 'Copy',
@@ -674,7 +676,40 @@ export const translations = {
     dnsHop: 'Hop',
     dnsLoss: 'Loss',
     dnsAvgRtt: 'Avg RTT',
-    dnsNoHops: 'No traceroute data yet. Enter a host and click Start Traceroute.'
+    dnsNoHops: 'No traceroute data yet. Enter a host and click Start Traceroute.',
+
+    // Module: Bundle Size Radar & Package Diet
+    bundleRadarTitle: 'Bundle Size Radar & Package Diet',
+    bundleRadarDesc: 'Analyze production bundle footprint, detect bloated dependencies, and discover lightweight drop-in replacements.',
+    bundleScanDeps: 'Scan Dependencies',
+    bundleScanning: 'Scanning Dependencies & Telemetry...',
+    bundleIncludeDev: 'Include devDependencies',
+    bundleFilterPlaceholder: 'Filter packages by name...',
+    bundleSortHeaviest: 'Heaviest Gzip',
+    bundleSortAlpha: 'Alphabetical',
+    bundleSortDisk: 'Largest Disk',
+    bundleTotalOverhead: 'Est. Production Gzip',
+    bundleTotalMinified: 'Total Minified',
+    bundleTotalPkgs: 'Total Dependencies',
+    bundleBloatedCount: 'Bloated Packages (>70KB)',
+    bundleTopHeavyDonut: 'Top 5 Heaviest Packages Share',
+    bundleNoDepsFound: 'No dependencies detected in package.json.',
+    bundleStatusLight: 'Light (<20KB)',
+    bundleStatusModerate: 'Moderate (20-70KB)',
+    bundleStatusBloated: 'Bloated (>70KB)',
+    bundleSavings: 'Potential Savings',
+    bundleLighterAlternative: 'Lighter Drop-in Alternative',
+    bundleCopyMigrationCmd: 'Copy Migration Command',
+    bundleRunMigrationCmd: 'Run in Terminal',
+    bundleMigrationCopied: 'Migration command copied to clipboard!',
+    bundleNpmLink: 'NPM Package',
+    bundleLocalDisk: 'Disk Size',
+    bundleGzipSize: 'Gzip Size',
+    bundleMinSize: 'Min Size',
+    bundleDevBadge: 'DEV',
+    bundleProdBadge: 'PROD',
+    bundleInlineDecoratorToggle: 'Inline Import Size Preview',
+    bundleNoWorkspaceNotice: 'Please open a workspace containing a package.json file.'
   },
   fa: {
     appName: 'دِوشلف (DevShelf)',
@@ -701,6 +736,7 @@ export const translations = {
     tabCssDesigner: 'طراحی CSS و فرانت',
     tabCleaner: 'پاک‌کننده کش و دیسک',
     tabDnsRadar: 'رادار ضدتحریم و DNS',
+    tabBundleRadar: 'رادار حجم باندل',
 
     // Feature Cards Deck & Categories
     deckCatAll: 'همه ابزارها',
@@ -730,6 +766,7 @@ export const translations = {
     subCssDesigner: 'رنگ، گلس و پریویو موبایل',
     subCleaner: 'پاکسازی کش و ماژول‌ها',
     subDnsRadar: 'تست DNS، رفع تحریم و مسیریاب',
+    subBundleRadar: 'کاهش وزن پکیج‌ها و تله‌متری باندل',
 
     // Common Actions
     copy: 'کپی',
@@ -1349,7 +1386,40 @@ export const translations = {
     dnsHop: 'گره',
     dnsLoss: 'اتلاف',
     dnsAvgRtt: 'میانگین پینگ',
-    dnsNoHops: 'هنوز تستی انجام نشده است. دامنه هدف را وارد کرده و روی شروع کلیک کنید.'
+    dnsNoHops: 'هنوز تستی انجام نشده است. دامنه هدف را وارد کرده و روی شروع کلیک کنید.',
+
+    // Module: Bundle Size Radar & Package Diet
+    bundleRadarTitle: 'رادار سنگینی باندل و رژیم حجم پکیج‌ها',
+    bundleRadarDesc: 'تحلیل دقیق حجم باندل، شناسایی پکیج‌های سنگین و پیشنهاد جایگزین‌های سبک و مدرن.',
+    bundleScanDeps: 'اسکن پکیج‌های پروژه',
+    bundleScanning: 'درحال اسکن و محاسبه حجم باندل...',
+    bundleIncludeDev: 'شامل devDependencies',
+    bundleFilterPlaceholder: 'فیلتر بر اساس نام پکیج...',
+    bundleSortHeaviest: 'سنگین‌ترین Gzip',
+    bundleSortAlpha: 'حروف الفبا',
+    bundleSortDisk: 'بزرگترین دیسک',
+    bundleTotalOverhead: 'تخمین وزن Gzip نهایی',
+    bundleTotalMinified: 'مجموع حجم Minified',
+    bundleTotalPkgs: 'تعداد کل وابستگی‌ها',
+    bundleBloatedCount: 'پکیج‌های پرحجم (>۷۰KB)',
+    bundleTopHeavyDonut: 'سهم ۵ پکیج سنگین در باندل',
+    bundleNoDepsFound: 'هیچ وابستگی در package.json یافت نشد.',
+    bundleStatusLight: 'سبک (<۲۰KB)',
+    bundleStatusModerate: 'متوسط (۲۰-۷۰KB)',
+    bundleStatusBloated: 'سنگین (>۷۰KB)',
+    bundleSavings: 'صرفه‌جویی قابل دستیابی',
+    bundleLighterAlternative: 'جایگزین پیشنهادی سبک‌تر',
+    bundleCopyMigrationCmd: 'کپی دستور مهاجرت',
+    bundleRunMigrationCmd: 'اجرا در ترمینال',
+    bundleMigrationCopied: 'دستور مهاجرت در کلیپ‌بورد کپی شد!',
+    bundleNpmLink: 'صفحه NPM',
+    bundleLocalDisk: 'حجم دیسک',
+    bundleGzipSize: 'حجم Gzip',
+    bundleMinSize: 'حجم Minified',
+    bundleDevBadge: 'DEV',
+    bundleProdBadge: 'PROD',
+    bundleInlineDecoratorToggle: 'پیش‌نمایش حجم ایمپورت در ادیتور',
+    bundleNoWorkspaceNotice: 'لطفاً یک ورک‌اسپیس حاوی فایل package.json را باز کنید.'
   }
 } as const;
 
