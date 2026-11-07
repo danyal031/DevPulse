@@ -18,7 +18,6 @@ import { CodeSnapshotView } from './components/CodeSnapshotView';
 import { CommandCenterView } from './components/CommandCenterView';
 import { CssDesignerView } from './components/CssDesignerView';
 import { CacheCleanerView } from './components/CacheCleanerView';
-import { DnsRadarView } from './components/DnsRadarView';
 import { BundleRadarView } from './components/BundleRadarView';
 
 declare function acquireVsCodeApi(): {
@@ -35,43 +34,43 @@ interface FeatureTool {
   icon: string;
   titleKey: keyof typeof translations['en'];
   subKey: keyof typeof translations['en'];
+  guideKey: keyof typeof translations['en'];
 }
 
 const FEATURE_TOOLS: FeatureTool[] = [
   // Dev & Design (8)
-  { id: 'json', category: 'dev', icon: ICONS.brackets, titleKey: 'tabJson', subKey: 'subJson' },
-  { id: 'jwt', category: 'dev', icon: ICONS.shield, titleKey: 'tabJwt', subKey: 'subJwt' },
-  { id: 'persian', category: 'dev', icon: ICONS.calendar, titleKey: 'tabPersian', subKey: 'subPersian' },
-  { id: 'crypto', category: 'dev', icon: ICONS.key, titleKey: 'tabCrypto', subKey: 'subCrypto' },
-  { id: 'sql', category: 'dev', icon: ICONS.database, titleKey: 'tabSql', subKey: 'subSql' },
-  { id: 'snapshot', category: 'dev', icon: ICONS.camera, titleKey: 'tabSnapshot', subKey: 'subSnapshot' },
-  { id: 'cssdesign', category: 'dev', icon: ICONS.palette, titleKey: 'tabCssDesigner', subKey: 'subCssDesigner' },
-  { id: 'bundleradar', category: 'dev', icon: ICONS.weight, titleKey: 'tabBundleRadar', subKey: 'subBundleRadar' },
+  { id: 'json', category: 'dev', icon: ICONS.brackets, titleKey: 'tabJson', subKey: 'subJson', guideKey: 'guide_json' },
+  { id: 'jwt', category: 'dev', icon: ICONS.shield, titleKey: 'tabJwt', subKey: 'subJwt', guideKey: 'guide_jwt' },
+  { id: 'persian', category: 'dev', icon: ICONS.calendar, titleKey: 'tabPersian', subKey: 'subPersian', guideKey: 'guide_persian' },
+  { id: 'crypto', category: 'dev', icon: ICONS.key, titleKey: 'tabCrypto', subKey: 'subCrypto', guideKey: 'guide_crypto' },
+  { id: 'sql', category: 'dev', icon: ICONS.database, titleKey: 'tabSql', subKey: 'subSql', guideKey: 'guide_sql' },
+  { id: 'snapshot', category: 'dev', icon: ICONS.camera, titleKey: 'tabSnapshot', subKey: 'subSnapshot', guideKey: 'guide_snapshot' },
+  { id: 'cssdesign', category: 'dev', icon: ICONS.palette, titleKey: 'tabCssDesigner', subKey: 'subCssDesigner', guideKey: 'guide_cssdesign' },
+  { id: 'bundleradar', category: 'dev', icon: ICONS.weight, titleKey: 'tabBundleRadar', subKey: 'subBundleRadar', guideKey: 'guide_bundleradar' },
 
-  // Network & API (5)
-  { id: 'api', category: 'network', icon: ICONS.send, titleKey: 'tabApi', subKey: 'subApi' },
-  { id: 'mock', category: 'network', icon: ICONS.webhook, titleKey: 'tabMock', subKey: 'subMock' },
-  { id: 'tunnel', category: 'network', icon: ICONS.tunnel, titleKey: 'tabTunnel', subKey: 'subTunnel' },
-  { id: 'loadtest', category: 'network', icon: ICONS.speed, titleKey: 'tabLoadTest', subKey: 'subLoadtest' },
-  { id: 'dnsradar', category: 'network', icon: ICONS.radar, titleKey: 'tabDnsRadar', subKey: 'subDnsRadar' },
+  // Network & API (4)
+  { id: 'api', category: 'network', icon: ICONS.send, titleKey: 'tabApi', subKey: 'subApi', guideKey: 'guide_api' },
+  { id: 'mock', category: 'network', icon: ICONS.webhook, titleKey: 'tabMock', subKey: 'subMock', guideKey: 'guide_mock' },
+  { id: 'tunnel', category: 'network', icon: ICONS.tunnel, titleKey: 'tabTunnel', subKey: 'subTunnel', guideKey: 'guide_tunnel' },
+  { id: 'loadtest', category: 'network', icon: ICONS.speed, titleKey: 'tabLoadTest', subKey: 'subLoadtest', guideKey: 'guide_loadtest' },
 
   // Project & Ops (3)
-  { id: 'commandcenter', category: 'ops', icon: ICONS.playCircle, titleKey: 'tabCommandCenter', subKey: 'subCommandCenter' },
-  { id: 'docker', category: 'ops', icon: ICONS.docker, titleKey: 'tabDocker', subKey: 'subDocker' },
-  { id: 'git', category: 'ops', icon: ICONS.git, titleKey: 'tabGit', subKey: 'subGit' },
+  { id: 'commandcenter', category: 'ops', icon: ICONS.playCircle, titleKey: 'tabCommandCenter', subKey: 'subCommandCenter', guideKey: 'guide_commandcenter' },
+  { id: 'docker', category: 'ops', icon: ICONS.docker, titleKey: 'tabDocker', subKey: 'subDocker', guideKey: 'guide_docker' },
+  { id: 'git', category: 'ops', icon: ICONS.git, titleKey: 'tabGit', subKey: 'subGit', guideKey: 'guide_git' },
 
   // System & Cleanup (4)
-  { id: 'ports', category: 'system', icon: ICONS.server, titleKey: 'tabPorts', subKey: 'subPorts' },
-  { id: 'sysmon', category: 'system', icon: ICONS.cpu, titleKey: 'tabSysMon', subKey: 'subSysmon' },
-  { id: 'logs', category: 'system', icon: ICONS.fileText, titleKey: 'tabLogs', subKey: 'subLogs' },
-  { id: 'cleaner', category: 'system', icon: ICONS.broom, titleKey: 'tabCleaner', subKey: 'subCleaner' }
+  { id: 'ports', category: 'system', icon: ICONS.server, titleKey: 'tabPorts', subKey: 'subPorts', guideKey: 'guide_ports' },
+  { id: 'sysmon', category: 'system', icon: ICONS.cpu, titleKey: 'tabSysMon', subKey: 'subSysmon', guideKey: 'guide_sysmon' },
+  { id: 'logs', category: 'system', icon: ICONS.fileText, titleKey: 'tabLogs', subKey: 'subLogs', guideKey: 'guide_logs' },
+  { id: 'cleaner', category: 'system', icon: ICONS.broom, titleKey: 'tabCleaner', subKey: 'subCleaner', guideKey: 'guide_cleaner' }
 ];
 
 class DevShelfApp {
   private currentLang: Language = 'en';
-  private activeTab: string = 'json';
-  private isDeckExpanded: boolean = true;
+  private activeTab: string = 'hub';
   private selectedCategory: string = 'all';
+  private searchQuery: string = '';
 
   private jsonView!: JsonTsZodView;
   private jwtView!: JwtView;
@@ -91,7 +90,6 @@ class DevShelfApp {
   private commandCenterView!: CommandCenterView;
   private cssDesignerView!: CssDesignerView;
   private cleanerView!: CacheCleanerView;
-  private dnsRadarView!: DnsRadarView;
   private bundleRadarView!: BundleRadarView;
 
   constructor() {
@@ -112,9 +110,6 @@ class DevShelfApp {
       if (state.activeTab) {
         this.activeTab = state.activeTab;
       }
-      if (typeof state.isDeckExpanded === 'boolean') {
-        this.isDeckExpanded = state.isDeckExpanded;
-      }
       if (state.selectedCategory) {
         this.selectedCategory = state.selectedCategory;
       }
@@ -125,7 +120,6 @@ class DevShelfApp {
     vscode.setState({
       lang: this.currentLang,
       activeTab: this.activeTab,
-      isDeckExpanded: this.isDeckExpanded,
       selectedCategory: this.selectedCategory,
       jsonState: this.jsonView ? this.jsonView.getState() : undefined,
       jwtState: this.jwtView ? this.jwtView.getState() : undefined,
@@ -144,36 +138,48 @@ class DevShelfApp {
       commandCenterState: this.commandCenterView ? this.commandCenterView.getState() : undefined,
       cssDesignerState: this.cssDesignerView ? this.cssDesignerView.getState() : undefined,
       cleanerState: this.cleanerView ? this.cleanerView.getState() : undefined,
-      dnsRadarState: this.dnsRadarView ? this.dnsRadarView.getState() : undefined
+      bundleRadarState: this.bundleRadarView ? this.bundleRadarView.getState() : undefined
     });
   }
 
-  private renderFeatureCardsHtml(): string {
+  private renderHubCardsHtml(): string {
+    const q = this.searchQuery.trim().toLowerCase();
     return FEATURE_TOOLS.map((tool) => {
-      const isVisible = this.selectedCategory === 'all' || tool.category === this.selectedCategory;
-      const isActive = this.activeTab === tool.id;
+      const matchesCat = this.selectedCategory === 'all' || tool.category === this.selectedCategory;
+      const title = t(tool.titleKey, this.currentLang).toLowerCase();
+      const sub = t(tool.subKey, this.currentLang).toLowerCase();
+      const guide = t(tool.guideKey, this.currentLang).toLowerCase();
+      const matchesSearch = !q || title.includes(q) || sub.includes(q) || guide.includes(q) || tool.id.toLowerCase().includes(q);
+      const isVisible = matchesCat && matchesSearch;
       return `
-        <button class="feature-card tab-btn ${isActive ? 'active' : ''} ${!isVisible ? 'hidden' : ''}" 
-                data-tab="${tool.id}" 
-                data-cat="${tool.category}" 
-                id="feature-card-${tool.id}"
-                title="${t(tool.titleKey, this.currentLang)} — ${t(tool.subKey, this.currentLang)}">
-          <div class="feature-card-indicator"></div>
-          <div class="feature-card-icon-box">
-            ${tool.icon}
+        <div class="hub-card cat-${tool.category} ${!isVisible ? 'hidden' : ''}" 
+             data-tab="${tool.id}" 
+             id="hub-card-${tool.id}"
+             role="button"
+             tabindex="0"
+             title="${t(tool.titleKey, this.currentLang)} — ${t(tool.subKey, this.currentLang)}">
+          <div class="hub-card-top">
+            <div class="hub-card-icon-box">
+              ${tool.icon}
+            </div>
+            <span class="hub-card-cat-badge">${tool.category.toUpperCase()}</span>
           </div>
-          <div class="feature-card-content">
-            <div class="feature-card-title">${t(tool.titleKey, this.currentLang)}</div>
-            <div class="feature-card-sub">${t(tool.subKey, this.currentLang)}</div>
+          <div class="hub-card-body">
+            <div class="hub-card-title">${t(tool.titleKey, this.currentLang)}</div>
+            <div class="hub-card-sub">${t(tool.subKey, this.currentLang)}</div>
+            <div class="hub-card-guide">${t(tool.guideKey, this.currentLang)}</div>
           </div>
-        </button>
+          <div class="hub-card-footer">
+            <span class="hub-card-action">${this.currentLang === 'fa' ? 'ورود به ابزار' : 'Launch Workspace'}</span>
+            <span class="hub-card-chevron">${this.currentLang === 'fa' ? ICONS.chevronLeft : ICONS.chevronRight}</span>
+          </div>
+        </div>
       `;
     }).join('');
   }
 
   private initDom() {
     const root = document.getElementById('app-root')!;
-    const currentTool = FEATURE_TOOLS.find((t) => t.id === this.activeTab) || FEATURE_TOOLS[0];
 
     root.innerHTML = `
       <header class="header-bar">
@@ -189,80 +195,107 @@ class DevShelfApp {
         </div>
       </header>
 
-      <!-- Feature Cards Deck Navigation -->
-      <section class="cards-deck-wrapper" id="cards-deck-wrapper">
-        <!-- Deck Header / Active Tool Summary -->
-        <div class="deck-header-bar">
-          <button class="deck-active-pill" id="deck-active-pill" title="${t('exploreDeck', this.currentLang)}">
-            <span class="deck-active-icon" id="deck-active-icon">${currentTool.icon}</span>
-            <div class="deck-active-meta">
-              <span class="deck-active-title" id="deck-active-title">${t(currentTool.titleKey, this.currentLang)}</span>
-              <span class="deck-active-sub" id="deck-active-sub">${t(currentTool.subKey, this.currentLang)}</span>
-            </div>
-          </button>
-          <div class="deck-header-controls">
-            <button id="deck-toggle-btn" class="deck-toggle-btn" title="${this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang)}">
-              <span class="deck-toggle-icon" id="deck-toggle-icon">${this.isDeckExpanded ? ICONS.chevronUp : ICONS.apps}</span>
-              <span class="deck-toggle-label" id="deck-toggle-label">${this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang)}</span>
-            </button>
+      <!-- Dedicated Hub Page (Visible when activeTab === 'hub') -->
+      <section class="hub-page-container" id="hub-page-container">
+        <div class="hub-hero-card">
+          <div class="hub-hero-meta">
+            <h2 class="hub-hero-title" id="hub-hero-title">${t('hubTitle', this.currentLang)}</h2>
+            <p class="hub-hero-desc" id="hub-hero-desc">${t('hubSubtitle', this.currentLang)}</p>
+          </div>
+          <div class="hub-stats-badge">
+            <span class="hub-count-num">19</span>
+            <span class="hub-count-label" id="hub-count-label">${t('hubToolsCount', this.currentLang)}</span>
           </div>
         </div>
 
-        <!-- Collapsible Cards Deck Body -->
-        <div class="deck-body ${this.isDeckExpanded ? 'expanded' : 'collapsed'}" id="deck-body">
-          <!-- Category Chips Filter -->
-          <div class="deck-categories-bar" id="deck-categories-bar">
-            <button class="deck-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
+        <!-- Hub Search & Filters -->
+        <div class="hub-filter-bar">
+          <div class="hub-search-box">
+            <span class="hub-search-icon">${ICONS.search}</span>
+            <input type="text" id="hub-search-input" class="hub-search-input" placeholder="${t('searchTools', this.currentLang)}" value="${this.searchQuery}" />
+            <button id="hub-search-clear" class="hub-search-clear ${this.searchQuery ? 'visible' : ''}" title="${t('clearSearch', this.currentLang)}">${ICONS.clear}</button>
+          </div>
+
+          <div class="hub-categories-bar" id="hub-categories-bar">
+            <button class="hub-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
               <span>${t('deckCatAll', this.currentLang)}</span>
-              <span class="cat-count">20</span>
+              <span class="cat-count">19</span>
             </button>
-            <button class="deck-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
+            <button class="hub-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
               <span>${t('deckCatDev', this.currentLang)}</span>
               <span class="cat-count">8</span>
             </button>
-            <button class="deck-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
+            <button class="hub-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
               <span>${t('deckCatNetwork', this.currentLang)}</span>
-              <span class="cat-count">5</span>
+              <span class="cat-count">4</span>
             </button>
-            <button class="deck-cat-chip ${this.selectedCategory === 'ops' ? 'active' : ''}" data-cat="ops">
+            <button class="hub-cat-chip ${this.selectedCategory === 'ops' ? 'active' : ''}" data-cat="ops">
               <span>${t('deckCatOps', this.currentLang)}</span>
               <span class="cat-count">3</span>
             </button>
-            <button class="deck-cat-chip ${this.selectedCategory === 'system' ? 'active' : ''}" data-cat="system">
+            <button class="hub-cat-chip ${this.selectedCategory === 'system' ? 'active' : ''}" data-cat="system">
               <span>${t('deckCatSystem', this.currentLang)}</span>
               <span class="cat-count">4</span>
             </button>
           </div>
+        </div>
 
-          <!-- 2-Column Responsive Cards Grid -->
-          <div class="feature-cards-grid" id="feature-cards-grid">
-            ${this.renderFeatureCardsHtml()}
-          </div>
+        <!-- Large, High-Readability Hub Cards Grid -->
+        <div class="hub-cards-grid" id="hub-cards-grid">
+          ${this.renderHubCardsHtml()}
         </div>
       </section>
 
-      <main class="main-content-area">
-        <div id="view-json" class="view-panel active"></div>
-        <div id="view-jwt" class="view-panel"></div>
-        <div id="view-persian" class="view-panel"></div>
-        <div id="view-ports" class="view-panel"></div>
-        <div id="view-git" class="view-panel"></div>
-        <div id="view-docker" class="view-panel"></div>
-        <div id="view-api" class="view-panel"></div>
-        <div id="view-sql" class="view-panel"></div>
-        <div id="view-logs" class="view-panel"></div>
-        <div id="view-crypto" class="view-panel"></div>
-        <div id="view-mock" class="view-panel"></div>
-        <div id="view-tunnel" class="view-panel"></div>
-        <div id="view-sysmon" class="view-panel"></div>
-        <div id="view-loadtest" class="view-panel"></div>
-        <div id="view-snapshot" class="view-panel"></div>
-        <div id="view-commandcenter" class="view-panel"></div>
-        <div id="view-cssdesign" class="view-panel"></div>
-        <div id="view-cleaner" class="view-panel"></div>
-        <div id="view-dnsradar" class="view-panel"></div>
-        <div id="view-bundleradar" class="view-panel"></div>
-      </main>
+      <!-- Dedicated Tool Workspace (Visible when activeTab !== 'hub') -->
+      <section class="tool-workspace-container" id="tool-workspace-container">
+        <!-- Top Tool Navigation Bar with Back Button -->
+        <div class="tool-top-bar" id="tool-top-bar">
+          <button id="btn-back-to-hub" class="btn btn-secondary btn-sm back-to-hub-btn" title="${t('backToHub', this.currentLang)}">
+            <span class="back-icon" id="back-chevron-icon">${this.currentLang === 'fa' ? ICONS.chevronRight : ICONS.chevronLeft}</span>
+            <span id="btn-back-label">${t('backToHub', this.currentLang)}</span>
+          </button>
+
+          <div class="current-tool-badge" id="current-tool-badge">
+            <span class="current-tool-icon" id="current-tool-icon"></span>
+            <span class="current-tool-title" id="current-tool-title"></span>
+            <span class="current-tool-cat" id="current-tool-cat"></span>
+          </div>
+        </div>
+
+        <!-- Tool Scope & Explanatory Guide Banner -->
+        <div class="tool-guide-card" id="tool-guide-card">
+          <div class="tool-guide-header">
+            <div class="tool-guide-title-wrap">
+              <span class="tool-guide-icon">${ICONS.info}</span>
+              <span class="tool-guide-title" id="tool-guide-title">${t('toolGuideTitle', this.currentLang)}</span>
+            </div>
+          </div>
+          <p class="tool-guide-text" id="tool-guide-text"></p>
+        </div>
+
+        <!-- Main View Panels (Only the active one is shown) -->
+        <main class="main-content-area">
+          <div id="view-json" class="view-panel"></div>
+          <div id="view-jwt" class="view-panel"></div>
+          <div id="view-persian" class="view-panel"></div>
+          <div id="view-ports" class="view-panel"></div>
+          <div id="view-git" class="view-panel"></div>
+          <div id="view-docker" class="view-panel"></div>
+          <div id="view-api" class="view-panel"></div>
+          <div id="view-sql" class="view-panel"></div>
+          <div id="view-logs" class="view-panel"></div>
+          <div id="view-crypto" class="view-panel"></div>
+          <div id="view-mock" class="view-panel"></div>
+          <div id="view-tunnel" class="view-panel"></div>
+          <div id="view-sysmon" class="view-panel"></div>
+          <div id="view-loadtest" class="view-panel"></div>
+          <div id="view-snapshot" class="view-panel"></div>
+          <div id="view-commandcenter" class="view-panel"></div>
+          <div id="view-cssdesign" class="view-panel"></div>
+          <div id="view-cleaner" class="view-panel"></div>
+          <div id="view-bundleradar" class="view-panel"></div>
+        </main>
+      </section>
     `;
   }
 
@@ -287,7 +320,6 @@ class DevShelfApp {
     const cmdCenterContainer = document.getElementById('view-commandcenter')!;
     const cssDesignContainer = document.getElementById('view-cssdesign')!;
     const cleanerContainer = document.getElementById('view-cleaner')!;
-    const dnsRadarContainer = document.getElementById('view-dnsradar')!;
     const bundleRadarContainer = document.getElementById('view-bundleradar')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
@@ -308,7 +340,6 @@ class DevShelfApp {
     this.commandCenterView = new CommandCenterView(cmdCenterContainer, this.currentLang, postToHost);
     this.cssDesignerView = new CssDesignerView(cssDesignContainer, this.currentLang, postToHost);
     this.cleanerView = new CacheCleanerView(cleanerContainer, this.currentLang, postToHost);
-    this.dnsRadarView = new DnsRadarView(dnsRadarContainer, this.currentLang, postToHost);
     this.bundleRadarView = new BundleRadarView(bundleRadarContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
@@ -330,7 +361,7 @@ class DevShelfApp {
       if (state.commandCenterState) this.commandCenterView.restoreState(state.commandCenterState);
       if (state.cssDesignerState) this.cssDesignerView.restoreState(state.cssDesignerState);
       if (state.cleanerState) this.cleanerView.restoreState(state.cleanerState);
-      if (state.dnsRadarState) this.dnsRadarView.restoreState(state.dnsRadarState);
+      if (state.bundleRadarState) this.bundleRadarView.restoreState(state.bundleRadarState);
     }
   }
 
@@ -344,16 +375,43 @@ class DevShelfApp {
       vscode.postMessage({ type: 'languageChanged', lang: this.currentLang });
     });
 
-    // Deck Toggle (collapse / expand)
-    document.getElementById('deck-toggle-btn')?.addEventListener('click', () => {
-      this.toggleDeck();
-    });
-    document.getElementById('deck-active-pill')?.addEventListener('click', () => {
-      this.toggleDeck();
+    // Back to Hub Button
+    document.getElementById('btn-back-to-hub')?.addEventListener('click', () => {
+      this.switchTab('hub');
     });
 
-    // Category Filter Chips
-    const catChips = document.querySelectorAll('.deck-cat-chip');
+    // Hub Quick Search Input
+    const searchInput = document.getElementById('hub-search-input') as HTMLInputElement;
+    const clearBtn = document.getElementById('hub-search-clear') as HTMLButtonElement;
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        this.searchQuery = searchInput.value;
+        if (clearBtn) clearBtn.classList.toggle('visible', !!this.searchQuery);
+        this.updateCardsVisibility();
+      });
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          this.searchQuery = '';
+          searchInput.value = '';
+          if (clearBtn) clearBtn.classList.remove('visible');
+          this.updateCardsVisibility();
+        }
+      });
+    }
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.searchQuery = '';
+        if (searchInput) {
+          searchInput.value = '';
+          searchInput.focus();
+        }
+        clearBtn.classList.remove('visible');
+        this.updateCardsVisibility();
+      });
+    }
+
+    // Hub Category Filter Chips
+    const catChips = document.querySelectorAll('.hub-cat-chip');
     catChips.forEach((chip) => {
       chip.addEventListener('click', () => {
         const cat = chip.getAttribute('data-cat') || 'all';
@@ -361,16 +419,8 @@ class DevShelfApp {
       });
     });
 
-    // Feature Card Click Navigation
-    const cards = document.querySelectorAll('.feature-card');
-    cards.forEach((card) => {
-      card.addEventListener('click', () => {
-        const tab = (card as HTMLElement).getAttribute('data-tab');
-        if (tab) {
-          this.switchTab(tab);
-        }
-      });
-    });
+    // Hub Cards Click Navigation
+    this.bindHubCardListeners();
 
     // Host message handling
     window.addEventListener('message', (event) => {
@@ -483,31 +533,6 @@ class DevShelfApp {
         case 'junkPurgeResult':
           this.cleanerView.onPurgeSuccess(message.freedBytes || 0);
           break;
-        case 'dnsProvidersList':
-        case 'dnsBenchmarkResult':
-          this.dnsRadarView.setProviders(message.providers || []);
-          break;
-        case 'dnsCacheFlushed':
-          this.dnsRadarView.showNotice(message.message || t('dnsCacheFlushed', this.currentLang));
-          break;
-        case 'dnsApplyCommandCopied':
-          this.dnsRadarView.showNotice(t('dnsApplySuccess', this.currentLang));
-          break;
-        case 'npmRegistryResult':
-          this.dnsRadarView.setRegistry(message.registry || '');
-          break;
-        case 'connectivityTargetsList':
-          this.dnsRadarView.setConnectivityTargets(message.targets || []);
-          break;
-        case 'connectivityTargetUpdate':
-          this.dnsRadarView.setTargetResult(message.target);
-          break;
-        case 'tracerouteHop':
-          this.dnsRadarView.addTracerouteHop(message.hop);
-          break;
-        case 'tracerouteComplete':
-          this.dnsRadarView.onTracerouteComplete(message.code);
-          break;
         case 'dependenciesList':
           this.bundleRadarView.setData(message.items || [], message.summary);
           break;
@@ -542,34 +567,30 @@ class DevShelfApp {
     });
   }
 
-  private toggleDeck() {
-    this.isDeckExpanded = !this.isDeckExpanded;
-    const body = document.getElementById('deck-body');
-    const toggleIcon = document.getElementById('deck-toggle-icon');
-    const toggleLabel = document.getElementById('deck-toggle-label');
-
-    if (body) {
-      if (this.isDeckExpanded) {
-        body.classList.remove('collapsed');
-        body.classList.add('expanded');
-      } else {
-        body.classList.remove('expanded');
-        body.classList.add('collapsed');
-      }
-    }
-
-    if (toggleIcon) {
-      toggleIcon.innerHTML = this.isDeckExpanded ? ICONS.chevronUp : ICONS.apps;
-    }
-    if (toggleLabel) {
-      toggleLabel.textContent = this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang);
-    }
-    this.saveCurrentState();
+  private bindHubCardListeners() {
+    const cards = document.querySelectorAll('.hub-card');
+    cards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const tab = (card as HTMLElement).getAttribute('data-tab');
+        if (tab) {
+          this.switchTab(tab);
+        }
+      });
+      card.addEventListener('keydown', (e: any) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const tab = (card as HTMLElement).getAttribute('data-tab');
+          if (tab) {
+            this.switchTab(tab);
+          }
+        }
+      });
+    });
   }
 
   private setCategory(cat: string) {
     this.selectedCategory = cat;
-    document.querySelectorAll('.deck-cat-chip').forEach((chip) => {
+    document.querySelectorAll('.hub-cat-chip').forEach((chip) => {
       if ((chip as HTMLElement).getAttribute('data-cat') === cat) {
         chip.classList.add('active');
       } else {
@@ -577,15 +598,23 @@ class DevShelfApp {
       }
     });
 
-    document.querySelectorAll('.feature-card').forEach((card) => {
-      const cardCat = (card as HTMLElement).getAttribute('data-cat');
-      if (cat === 'all' || cardCat === cat) {
-        card.classList.remove('hidden');
-      } else {
-        card.classList.add('hidden');
+    this.updateCardsVisibility();
+    this.saveCurrentState();
+  }
+
+  private updateCardsVisibility() {
+    const q = this.searchQuery.trim().toLowerCase();
+    FEATURE_TOOLS.forEach((tool) => {
+      const card = document.getElementById(`hub-card-${tool.id}`);
+      if (card) {
+        const matchesCat = this.selectedCategory === 'all' || tool.category === this.selectedCategory;
+        const title = t(tool.titleKey, this.currentLang).toLowerCase();
+        const sub = t(tool.subKey, this.currentLang).toLowerCase();
+        const guide = t(tool.guideKey, this.currentLang).toLowerCase();
+        const matchesSearch = !q || title.includes(q) || sub.includes(q) || guide.includes(q) || tool.id.toLowerCase().includes(q);
+        card.classList.toggle('hidden', !(matchesCat && matchesSearch));
       }
     });
-    this.saveCurrentState();
   }
 
   private updateLanguageUI() {
@@ -599,44 +628,63 @@ class DevShelfApp {
     const langLabel = document.getElementById('lang-toggle-label');
     if (langLabel) langLabel.textContent = this.currentLang === 'en' ? 'FA' : 'EN';
 
-    const toggleLabel = document.getElementById('deck-toggle-label');
-    if (toggleLabel) {
-      toggleLabel.textContent = this.isDeckExpanded ? t('collapseDeck', this.currentLang) : t('exploreDeck', this.currentLang);
+    const hubHeroTitle = document.getElementById('hub-hero-title');
+    if (hubHeroTitle) hubHeroTitle.textContent = t('hubTitle', this.currentLang);
+
+    const hubHeroDesc = document.getElementById('hub-hero-desc');
+    if (hubHeroDesc) hubHeroDesc.textContent = t('hubSubtitle', this.currentLang);
+
+    const hubCountLabel = document.getElementById('hub-count-label');
+    if (hubCountLabel) hubCountLabel.textContent = t('hubToolsCount', this.currentLang);
+
+    const searchInput = document.getElementById('hub-search-input') as HTMLInputElement;
+    if (searchInput) {
+      searchInput.placeholder = t('searchTools', this.currentLang);
     }
+
+    const btnBackLabel = document.getElementById('btn-back-label');
+    if (btnBackLabel) btnBackLabel.textContent = t('backToHub', this.currentLang);
+
+    const backChevron = document.getElementById('back-chevron-icon');
+    if (backChevron) backChevron.innerHTML = isFa ? ICONS.chevronRight : ICONS.chevronLeft;
+
+    const toolGuideTitle = document.getElementById('tool-guide-title');
+    if (toolGuideTitle) toolGuideTitle.textContent = t('toolGuideTitle', this.currentLang);
 
     // Update Category Chips
     const setCatText = (cat: string, labelKey: keyof typeof translations['en'], count: number) => {
-      const el = document.querySelector(`.deck-cat-chip[data-cat="${cat}"]`);
+      const el = document.querySelector(`.hub-cat-chip[data-cat="${cat}"]`);
       if (el) {
         el.innerHTML = `<span>${t(labelKey, this.currentLang)}</span><span class="cat-count">${count}</span>`;
       }
     };
-    setCatText('all', 'deckCatAll', 20);
+    setCatText('all', 'deckCatAll', 19);
     setCatText('dev', 'deckCatDev', 8);
-    setCatText('network', 'deckCatNetwork', 5);
+    setCatText('network', 'deckCatNetwork', 4);
     setCatText('ops', 'deckCatOps', 3);
     setCatText('system', 'deckCatSystem', 4);
 
-    // Update all cards in the deck
-    FEATURE_TOOLS.forEach((tool) => {
-      const card = document.getElementById(`feature-card-${tool.id}`);
-      if (card) {
-        const titleEl = card.querySelector('.feature-card-title');
-        const subEl = card.querySelector('.feature-card-sub');
-        if (titleEl) titleEl.textContent = t(tool.titleKey, this.currentLang);
-        if (subEl) subEl.textContent = t(tool.subKey, this.currentLang);
-        card.setAttribute('title', `${t(tool.titleKey, this.currentLang)} — ${t(tool.subKey, this.currentLang)}`);
-      }
-    });
+    // Re-render Hub Cards
+    const hubGrid = document.getElementById('hub-cards-grid');
+    if (hubGrid) {
+      hubGrid.innerHTML = this.renderHubCardsHtml();
+      this.bindHubCardListeners();
+    }
 
-    // Update active summary pill
-    const currentTool = FEATURE_TOOLS.find((t) => t.id === this.activeTab) || FEATURE_TOOLS[0];
-    const activeIcon = document.getElementById('deck-active-icon');
-    const activeTitle = document.getElementById('deck-active-title');
-    const activeSub = document.getElementById('deck-active-sub');
-    if (activeIcon) activeIcon.innerHTML = currentTool.icon;
-    if (activeTitle) activeTitle.textContent = t(currentTool.titleKey, this.currentLang);
-    if (activeSub) activeSub.textContent = t(currentTool.subKey, this.currentLang);
+    // Update active tool info if in tool workspace
+    if (this.activeTab !== 'hub') {
+      const tool = FEATURE_TOOLS.find((t) => t.id === this.activeTab);
+      if (tool) {
+        const titleEl = document.getElementById('current-tool-title');
+        const iconEl = document.getElementById('current-tool-icon');
+        const catEl = document.getElementById('current-tool-cat');
+        const guideEl = document.getElementById('tool-guide-text');
+        if (titleEl) titleEl.textContent = t(tool.titleKey, this.currentLang);
+        if (iconEl) iconEl.innerHTML = tool.icon;
+        if (catEl) catEl.textContent = tool.category.toUpperCase();
+        if (guideEl) guideEl.textContent = t(tool.guideKey, this.currentLang);
+      }
+    }
 
     this.jsonView.setLanguage(this.currentLang);
     this.jwtView.setLanguage(this.currentLang);
@@ -656,62 +704,73 @@ class DevShelfApp {
     this.commandCenterView.setLanguage(this.currentLang);
     this.cssDesignerView.setLanguage(this.currentLang);
     this.cleanerView.setLanguage(this.currentLang);
-    this.dnsRadarView.setLanguage(this.currentLang);
     this.bundleRadarView.setLanguage(this.currentLang);
   }
 
   private switchTab(tabName: string) {
     this.activeTab = tabName;
 
-    // Update feature card active styles
-    document.querySelectorAll('.feature-card').forEach((card) => {
-      if ((card as HTMLElement).getAttribute('data-tab') === tabName) {
-        card.classList.add('active');
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } else {
-        card.classList.remove('active');
+    const hubContainer = document.getElementById('hub-page-container');
+    const toolContainer = document.getElementById('tool-workspace-container');
+
+    if (tabName === 'hub') {
+      if (hubContainer) hubContainer.style.display = 'flex';
+      if (toolContainer) toolContainer.style.display = 'none';
+
+      // Re-render and bind listeners to ensure fresh state
+      const hubGrid = document.getElementById('hub-cards-grid');
+      if (hubGrid) {
+        hubGrid.innerHTML = this.renderHubCardsHtml();
+        this.bindHubCardListeners();
       }
-    });
+    } else {
+      if (hubContainer) hubContainer.style.display = 'none';
+      if (toolContainer) toolContainer.style.display = 'block';
 
-    // Update active summary pill
-    const currentTool = FEATURE_TOOLS.find((t) => t.id === tabName) || FEATURE_TOOLS[0];
-    const activeIcon = document.getElementById('deck-active-icon');
-    const activeTitle = document.getElementById('deck-active-title');
-    const activeSub = document.getElementById('deck-active-sub');
-    if (activeIcon) activeIcon.innerHTML = currentTool.icon;
-    if (activeTitle) activeTitle.textContent = t(currentTool.titleKey, this.currentLang);
-    if (activeSub) activeSub.textContent = t(currentTool.subKey, this.currentLang);
-
-    // Update view panels
-    document.querySelectorAll('.view-panel').forEach((panel) => {
-      if (panel.id === `view-${tabName}`) {
-        panel.classList.add('active');
-      } else {
-        panel.classList.remove('active');
+      // Update current tool info
+      const tool = FEATURE_TOOLS.find((t) => t.id === tabName);
+      if (tool) {
+        const titleEl = document.getElementById('current-tool-title');
+        const iconEl = document.getElementById('current-tool-icon');
+        const catEl = document.getElementById('current-tool-cat');
+        const guideEl = document.getElementById('tool-guide-text');
+        if (titleEl) titleEl.textContent = t(tool.titleKey, this.currentLang);
+        if (iconEl) iconEl.innerHTML = tool.icon;
+        if (catEl) {
+          catEl.textContent = tool.category.toUpperCase();
+          catEl.className = `current-tool-cat cat-${tool.category}`;
+        }
+        if (guideEl) guideEl.textContent = t(tool.guideKey, this.currentLang);
       }
-    });
 
-    if (tabName === 'ports') {
-      this.portView.requestScan();
-    } else if (tabName === 'docker') {
-      this.dockerView.refreshContainers();
-    } else if (tabName === 'sysmon') {
-      this.sysmonView.requestData();
-    } else if (tabName === 'mock') {
-      vscode.postMessage({ type: 'mockGetStatus' });
-      vscode.postMessage({ type: 'mockGetRoutes' });
-      vscode.postMessage({ type: 'mockGetRequests' });
-    } else if (tabName === 'tunnel') {
-      vscode.postMessage({ type: 'tunnelGetStatus' });
-    } else if (tabName === 'commandcenter') {
-      vscode.postMessage({ command: 'scanTasks' });
-    } else if (tabName === 'cleaner') {
-      vscode.postMessage({ command: 'scanJunk' });
-    } else if (tabName === 'snapshot') {
-      vscode.postMessage({ command: 'getEditorCode' });
-    } else if (tabName === 'dnsradar') {
-      vscode.postMessage({ command: 'getDnsProviders' });
-      vscode.postMessage({ command: 'getNpmRegistry' });
+      // Update view panels
+      document.querySelectorAll('.view-panel').forEach((panel) => {
+        if (panel.id === `view-${tabName}`) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+
+      if (tabName === 'ports') {
+        this.portView.requestScan();
+      } else if (tabName === 'docker') {
+        this.dockerView.refreshContainers();
+      } else if (tabName === 'sysmon') {
+        this.sysmonView.requestData();
+      } else if (tabName === 'mock') {
+        vscode.postMessage({ type: 'mockGetStatus' });
+        vscode.postMessage({ type: 'mockGetRoutes' });
+        vscode.postMessage({ type: 'mockGetRequests' });
+      } else if (tabName === 'tunnel') {
+        vscode.postMessage({ type: 'tunnelGetStatus' });
+      } else if (tabName === 'commandcenter') {
+        vscode.postMessage({ command: 'scanTasks' });
+      } else if (tabName === 'cleaner') {
+        vscode.postMessage({ command: 'scanJunk' });
+      } else if (tabName === 'snapshot') {
+        vscode.postMessage({ command: 'getEditorCode' });
+      }
     }
 
     this.saveCurrentState();

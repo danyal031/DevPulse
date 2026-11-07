@@ -58,7 +58,6 @@ import { LoadTesterService, LoadTestConfig, LoadTestSnapshot } from '../src/util
 import { SNAPSHOT_PRESETS } from '../src/webview/components/CodeSnapshotView';
 import { CacheCleanerService } from '../src/services/cacheCleanerService';
 import { CommandCenterService } from '../src/services/commandCenterService';
-import { DnsRadarService, BUILTIN_DNS_PROVIDERS, CONNECTIVITY_TARGETS } from '../src/services/dnsRadarService';
 import { BundleRadarService, CURATED_ALTERNATIVES, DependencyItem } from '../src/services/bundleRadarService';
 import { ImportCostService } from '../src/services/importCostService';
 
@@ -970,66 +969,8 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
     assert.ok((translations.fa as any)[k], `Missing FA cleaner key: ${k}`);
   }
 
-  // 24. SMART DNS BENCHMARKER & ANTI-SANCTION RADAR
-  console.log('[Test 24] Smart DNS Benchmarker & Anti-Sanction Radar');
-  const dnsRadar = DnsRadarService.getInstance();
-  assert.ok(dnsRadar, 'DnsRadarService must instantiate as singleton');
-
-  // Verify built-in providers
-  assert.ok(BUILTIN_DNS_PROVIDERS.length >= 8, 'Must have at least 8 built-in DNS providers');
-  const shecan = BUILTIN_DNS_PROVIDERS.find(p => p.id === 'shecan');
-  assert.ok(shecan, 'Shecan provider must be present');
-  assert.strictEqual(shecan.primary, '178.22.122.100');
-  assert.strictEqual(shecan.category, 'anti-sanction');
-
-  const cf = BUILTIN_DNS_PROVIDERS.find(p => p.id === 'cloudflare');
-  assert.ok(cf, 'Cloudflare DNS must be present');
-  assert.strictEqual(cf.primary, '1.1.1.1');
-  assert.strictEqual(cf.category, 'global');
-
-  // Verify OS apply command generation
-  const cmds = dnsRadar.getDnsApplyCommand(shecan);
-  assert.ok(cmds.powershell.includes('Set-DnsClientServerAddress'), 'PowerShell command must use Set-DnsClientServerAddress');
-  assert.ok(cmds.powershell.includes('178.22.122.100'), 'PowerShell command must include primary IP');
-  assert.ok(cmds.cmd.includes('netsh interface ip'), 'CMD command must use netsh');
-  assert.ok(cmds.bash.includes('networksetup'), 'Bash command must include macOS networksetup');
-
-  // Verify custom provider management
-  const custom = dnsRadar.addCustomProvider('My DNS', '10.0.0.1', '10.0.0.2');
-  assert.strictEqual(custom.name, 'My DNS');
-  assert.strictEqual(custom.primary, '10.0.0.1');
-  assert.strictEqual(custom.category, 'custom');
-  assert.ok(dnsRadar.getProviders().some(p => p.id === custom.id));
-
-  const removed = dnsRadar.removeCustomProvider(custom.id);
-  assert.strictEqual(removed, true);
-  assert.ok(!dnsRadar.getProviders().some(p => p.id === custom.id));
-
-  // Verify Connectivity targets
-  assert.ok(CONNECTIVITY_TARGETS.length >= 6, 'Must have at least 6 connectivity test targets');
-  assert.ok(CONNECTIVITY_TARGETS.some(t => t.id === 'github'));
-  assert.ok(CONNECTIVITY_TARGETS.some(t => t.id === 'docker'));
-  assert.ok(CONNECTIVITY_TARGETS.some(t => t.id === 'openai'));
-
-  // Verify i18n keys for DNS Radar
-  const dnsKeys = [
-    'tabDnsRadar', 'subDnsRadar', 'dnsRadarTitle', 'dnsRadarDesc', 'dnsSectionBenchmark',
-    'dnsSectionMatrix', 'dnsSectionRegistry', 'dnsSectionTraceroute', 'dnsRunBenchmark',
-    'dnsBenchmarking', 'dnsFastestWinner', 'dnsFlushCache', 'dnsCacheFlushed',
-    'dnsApplyCommand', 'dnsApplySuccess', 'dnsCustomAdd', 'dnsCustomName', 'dnsCustomPrimary',
-    'dnsCustomSecondary', 'dnsCustomSave', 'dnsCustomCancel', 'dnsNpmRegistryLabel',
-    'dnsRegistryOfficial', 'dnsRegistryMirror', 'dnsRegistrySwitching', 'dnsMatrixCheckAll',
-    'dnsMatrixProbing', 'dnsStatusReachable', 'dnsStatusSanctioned', 'dnsStatusBlocked',
-    'dnsTraceTarget', 'dnsTraceStart', 'dnsTraceStop', 'dnsTraceRunning', 'dnsTraceCompleted',
-    'dnsHop', 'dnsLoss', 'dnsAvgRtt', 'dnsNoHops'
-  ];
-  for (const k of dnsKeys) {
-    assert.ok((translations.en as any)[k], `Missing EN dns key: ${k}`);
-    assert.ok((translations.fa as any)[k], `Missing FA dns key: ${k}`);
-  }
-
-  // 25. BUNDLE SIZE RADAR & PACKAGE DIET
-  console.log('[Test 25] Bundle Size Radar & Package Diet');
+  // 24. BUNDLE SIZE RADAR & PACKAGE DIET
+  console.log('[Test 24] Bundle Size Radar & Package Diet');
   const bundleRadar = BundleRadarService.getInstance();
   assert.ok(bundleRadar, 'BundleRadarService must instantiate as singleton');
 
@@ -1135,16 +1076,16 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
     assert.ok((translations.fa as any)[k], `Missing FA bundle key: ${k}`);
   }
 
-  // 26. FULL 20-TOOL PARITY & BILINGUAL INTEGRITY
-  console.log('[Test 26] Full 20-Tool Parity & Bilingual Integrity');
-  const all20ToolTabKeys = [
+  // 25. FULL 19-TOOL PARITY & BILINGUAL INTEGRITY
+  console.log('[Test 25] Full 19-Tool Parity & Bilingual Integrity');
+  const all19ToolTabKeys = [
     'tabJson', 'tabJwt', 'tabPersian', 'tabPorts', 'tabGit', 'tabDocker',
     'tabApi', 'tabSql', 'tabLogs', 'tabCrypto', 'tabMock', 'tabTunnel',
     'tabSysMon', 'tabLoadTest', 'tabSnapshot', 'tabCommandCenter', 'tabCssDesigner', 'tabCleaner',
-    'tabDnsRadar', 'tabBundleRadar'
+    'tabBundleRadar'
   ];
-  assert.strictEqual(all20ToolTabKeys.length, 20, 'There must be exactly 20 developer tools');
-  for (const tabKey of all20ToolTabKeys) {
+  assert.strictEqual(all19ToolTabKeys.length, 19, 'There must be exactly 19 developer tools');
+  for (const tabKey of all19ToolTabKeys) {
     assert.ok((translations.en as any)[tabKey], `EN missing tab label: ${tabKey}`);
     assert.ok((translations.fa as any)[tabKey], `FA missing tab label: ${tabKey}`);
   }

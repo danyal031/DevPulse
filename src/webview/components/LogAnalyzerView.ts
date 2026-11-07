@@ -119,6 +119,44 @@ export class LogAnalyzerView {
         </div>
 
         ${this.parsedEntries.length > 0 ? `
+          <!-- Telemetry HUD Grid -->
+          <div class="logs-hud-grid">
+            <div class="logs-hud-card">
+              <div class="logs-hud-header">
+                <span class="logs-hud-label">${t('logsFilterAll', this.currentLang)}</span>
+              </div>
+              <span class="logs-hud-val">${this.logStats.parsedEntries}</span>
+            </div>
+            <div class="logs-hud-card hud-error">
+              <div class="logs-hud-header">
+                <span class="logs-hud-label">${t('logsFilterError', this.currentLang)}</span>
+                <span class="level-dot dot-error"></span>
+              </div>
+              <span class="logs-hud-val">${this.logStats.counts.error}</span>
+            </div>
+            <div class="logs-hud-card hud-warn">
+              <div class="logs-hud-header">
+                <span class="logs-hud-label">${t('logsFilterWarn', this.currentLang)}</span>
+                <span class="level-dot dot-warn"></span>
+              </div>
+              <span class="logs-hud-val">${this.logStats.counts.warn}</span>
+            </div>
+            <div class="logs-hud-card hud-info">
+              <div class="logs-hud-header">
+                <span class="logs-hud-label">${t('logsFilterInfo', this.currentLang)}</span>
+                <span class="level-dot dot-info"></span>
+              </div>
+              <span class="logs-hud-val">${this.logStats.counts.info}</span>
+            </div>
+            <div class="logs-hud-card hud-debug">
+              <div class="logs-hud-header">
+                <span class="logs-hud-label">${t('logsFilterDebug', this.currentLang)}</span>
+                <span class="level-dot dot-debug"></span>
+              </div>
+              <span class="logs-hud-val">${this.logStats.counts.debug}</span>
+            </div>
+          </div>
+
           <!-- Stats Bar / Level Filter Chips -->
           <div class="logs-filter-toolbar">
             <div class="logs-level-chips">

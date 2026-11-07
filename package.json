@@ -2,7 +2,7 @@
   "name": "devshelf",
   "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "publisher": "danial031",
   "license": "MIT",
   "repository": {
@@ -61,13 +61,6 @@
     "mobile-preview",
     "cache-cleaner",
     "node_modules-cleaner",
-    "dns-benchmarker",
-    "anti-sanction",
-    "traceroute",
-    "mtr",
-    "shecan",
-    "403-online",
-    "dns-switcher",
     "bundle-size",
     "bundlephobia",
     "package-diet",
@@ -103,7 +96,6 @@
     "onCommand:devshelf.openCssDesigner",
     "onCommand:devshelf.openCacheCleaner",
     "onCommand:devshelf.openMobilePreview",
-    "onCommand:devshelf.openDnsRadar",
     "onCommand:devshelf.openBundleRadar"
   ],
   "contributes": {
@@ -254,11 +246,6 @@
       {
         "command": "devshelf.openMobilePreview",
         "title": "Open Responsive Multi-Device Preview Panel",
-        "category": "DevShelf"
-      },
-      {
-        "command": "devshelf.openDnsRadar",
-        "title": "Open Smart DNS Benchmarker & Anti-Sanction Radar",
         "category": "DevShelf"
       },
       {

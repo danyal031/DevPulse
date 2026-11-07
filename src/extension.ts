@@ -20,7 +20,6 @@ import { TunnelService } from './utils/tunnelService';
 import { LoadTesterService } from './utils/loadTesterService';
 import { MobilePreviewPanel } from './services/mobilePreviewPanel';
 import { CommandCenterService } from './services/commandCenterService';
-import { DnsRadarService } from './services/dnsRadarService';
 import { ImportCostService } from './services/importCostService';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -545,15 +544,7 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // Command 26: Open Smart DNS Benchmarker & Anti-Sanction Radar
-  context.subscriptions.push(
-    vscode.commands.registerCommand('devshelf.openDnsRadar', () => {
-      vscode.commands.executeCommand('devshelf.sidebarView.focus');
-      sidebarProvider.switchTab('dnsradar');
-    })
-  );
-
-  // Command 27: Open Bundle Size Radar & Package Diet
+  // Command 26: Open Bundle Size Radar & Package Diet
   context.subscriptions.push(
     vscode.commands.registerCommand('devshelf.openBundleRadar', () => {
       vscode.commands.executeCommand('devshelf.sidebarView.focus');
@@ -577,9 +568,6 @@ export function deactivate() {
   } catch {}
   try {
     CommandCenterService.getInstance().stopAllTasks();
-  } catch {}
-  try {
-    DnsRadarService.getInstance().stopTraceroute();
   } catch {}
   try {
     ImportCostService.getInstance().dispose();

@@ -58,6 +58,25 @@ export class BundleRadarView {
     this.render();
   }
 
+  public getState() {
+    return {
+      sortBy: this.sortBy,
+      includeDev: this.includeDev,
+      inlineDecoratorEnabled: this.inlineDecoratorEnabled
+    };
+  }
+
+  public restoreState(state: any) {
+    if (state) {
+      if (state.sortBy) this.sortBy = state.sortBy;
+      if (typeof state.includeDev === 'boolean') this.includeDev = state.includeDev;
+      if (typeof state.inlineDecoratorEnabled === 'boolean') {
+        this.inlineDecoratorEnabled = state.inlineDecoratorEnabled;
+      }
+      this.render();
+    }
+  }
+
   public showNotice(notice: string) {
     this.statusNotice = notice;
     this.render();

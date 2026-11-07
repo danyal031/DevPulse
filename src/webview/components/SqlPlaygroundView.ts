@@ -118,33 +118,45 @@ export class SqlPlaygroundView {
         </div>
 
         <!-- Controls: Table Name & Dialect -->
-        <div class="sql-top-controls">
+        <div class="sql-top-controls card">
           <div class="sql-control-group">
-            <label class="sql-label">${t('sqlDialect', this.currentLang)}</label>
+            <label class="form-label">${t('sqlDialect', this.currentLang)}</label>
             <div class="segmented-pills">
-              <button class="pill-btn ${this.dialect === 'postgres' ? 'active' : ''}" data-dialect="postgres">PostgreSQL</button>
-              <button class="pill-btn ${this.dialect === 'mysql' ? 'active' : ''}" data-dialect="mysql">MySQL</button>
-              <button class="pill-btn ${this.dialect === 'sqlite' ? 'active' : ''}" data-dialect="sqlite">SQLite</button>
+              <button class="pill-btn ${this.dialect === 'postgres' ? 'active' : ''}" data-dialect="postgres">
+                <span class="dialect-dot dot-postgres"></span> PostgreSQL
+              </button>
+              <button class="pill-btn ${this.dialect === 'mysql' ? 'active' : ''}" data-dialect="mysql">
+                <span class="dialect-dot dot-mysql"></span> MySQL
+              </button>
+              <button class="pill-btn ${this.dialect === 'sqlite' ? 'active' : ''}" data-dialect="sqlite">
+                <span class="dialect-dot dot-sqlite"></span> SQLite
+              </button>
             </div>
           </div>
 
           <div class="sql-control-group">
-            <label class="sql-label">${t('sqlTableName', this.currentLang)}</label>
-            <input
-              type="text"
-              id="sql-table-name-input"
-              class="sql-input code-text"
-              value="${this.escapeHtml(this.tableName)}"
-              placeholder="e.g. users or orders"
-            />
+            <label class="form-label">${t('sqlTableName', this.currentLang)}</label>
+            <div class="sql-table-input-wrap">
+              <span class="sql-table-prefix">${ICONS.database}</span>
+              <input
+                type="text"
+                id="sql-table-name-input"
+                class="sql-input code-text input-text"
+                value="${this.escapeHtml(this.tableName)}"
+                placeholder="e.g. users or orders"
+              />
+            </div>
           </div>
         </div>
 
         <!-- Column Designer Table -->
-        <div class="sql-columns-designer">
+        <div class="sql-columns-designer card">
           <div class="columns-designer-header">
-            <span class="designer-title">Table Columns (${this.columns.length})</span>
-            <button id="sql-add-column-btn" class="btn btn-secondary btn-xs">
+            <div class="designer-title-wrap">
+              <span class="designer-title">Table Columns</span>
+              <span class="col-count-pill">${this.columns.length}</span>
+            </div>
+            <button id="sql-add-column-btn" class="btn btn-sm btn-primary">
               ${ICONS.plus} <span>${t('sqlAddColumn', this.currentLang)}</span>
             </button>
           </div>
@@ -155,8 +167,10 @@ export class SqlPlaygroundView {
         </div>
 
         <!-- Query Templates Selector -->
-        <div class="sql-templates-bar">
-          <span class="templates-label">${t('sqlSampleQueries', this.currentLang)}</span>
+        <div class="sql-templates-bar card">
+          <div class="templates-header">
+            <span class="templates-label">${t('sqlSampleQueries', this.currentLang)}</span>
+          </div>
           <div class="templates-chips">
             <button class="tmpl-chip ${this.activeQueryType === 'ddl' ? 'active' : ''}" data-tmpl="ddl">
               CREATE TABLE
@@ -183,14 +197,17 @@ export class SqlPlaygroundView {
         </div>
 
         <!-- Output Code Box -->
-        <div class="sql-output-card">
+        <div class="sql-output-card card">
           <div class="output-header">
-            <span class="output-title">${this.activeQueryType.toUpperCase()}</span>
+            <div class="output-badge-wrap">
+              <span class="output-title-pill">${this.activeQueryType.toUpperCase()}</span>
+              <span class="output-dialect-pill">${this.dialect.toUpperCase()}</span>
+            </div>
             <div class="action-btn-group">
-              <button id="sql-copy-btn" class="btn btn-secondary btn-xs">
+              <button id="sql-copy-btn" class="btn btn-sm">
                 ${ICONS.copy} <span id="sql-copy-text">${t('sqlCopy', this.currentLang)}</span>
               </button>
-              <button id="sql-insert-btn" class="btn btn-secondary btn-xs">
+              <button id="sql-insert-btn" class="btn btn-sm">
                 ${ICONS.insert} <span>${t('sqlInsert', this.currentLang)}</span>
               </button>
             </div>
@@ -206,17 +223,18 @@ export class SqlPlaygroundView {
   private renderColumnRow(col: SqlColumnDef, idx: number): string {
     return `
       <div class="column-card" data-idx="${idx}">
-        <!-- Row 1: Name, Type, Length -->
+        <!-- Row 1: Index Badge, Name, Type, Length, Delete -->
         <div class="col-main-row">
+          <span class="col-idx-badge" title="Column #${idx + 1}">#${idx + 1}</span>
           <input
             type="text"
-            class="col-name-input code-text"
+            class="col-name-input code-text input-text"
             data-idx="${idx}"
             placeholder="${t('sqlColName', this.currentLang)}"
             value="${this.escapeHtml(col.name)}"
           />
 
-          <select class="col-type-select" data-idx="${idx}">
+          <select class="col-type-select input-text" data-idx="${idx}">
             ${COMMON_SQL_DATA_TYPES.map((tName) => `
               <option value="${tName}" ${col.type.toUpperCase() === tName ? 'selected' : ''}>${tName}</option>
             `).join('')}
@@ -224,7 +242,7 @@ export class SqlPlaygroundView {
 
           <input
             type="text"
-            class="col-len-input code-text"
+            class="col-len-input code-text input-text"
             data-idx="${idx}"
             placeholder="Len"
             title="Length or Precision e.g. 255 or 10,2"
@@ -238,31 +256,31 @@ export class SqlPlaygroundView {
 
         <!-- Row 2: Constraints Flags (PK, Auto, NotNull, Unique, Default) -->
         <div class="col-flags-row">
-          <label class="flag-check-label" title="Primary Key">
+          <label class="flag-check-label flag-pk ${col.isPrimaryKey ? 'active-flag' : ''}" title="Primary Key">
             <input type="checkbox" class="col-pk-check" data-idx="${idx}" ${col.isPrimaryKey ? 'checked' : ''} />
-            <span>${t('sqlPk', this.currentLang)}</span>
+            <span class="flag-label-text">${t('sqlPk', this.currentLang)}</span>
           </label>
 
-          <label class="flag-check-label" title="Auto Increment">
+          <label class="flag-check-label flag-auto ${col.isAutoIncrement ? 'active-flag' : ''}" title="Auto Increment">
             <input type="checkbox" class="col-auto-check" data-idx="${idx}" ${col.isAutoIncrement ? 'checked' : ''} />
-            <span>${t('sqlAutoInc', this.currentLang)}</span>
+            <span class="flag-label-text">${t('sqlAutoInc', this.currentLang)}</span>
           </label>
 
-          <label class="flag-check-label" title="Not Null">
+          <label class="flag-check-label flag-nn ${col.isNotNull ? 'active-flag' : ''}" title="Not Null">
             <input type="checkbox" class="col-nn-check" data-idx="${idx}" ${col.isNotNull ? 'checked' : ''} />
-            <span>${t('sqlNotNull', this.currentLang)}</span>
+            <span class="flag-label-text">${t('sqlNotNull', this.currentLang)}</span>
           </label>
 
-          <label class="flag-check-label" title="Unique">
+          <label class="flag-check-label flag-uq ${col.isUnique ? 'active-flag' : ''}" title="Unique">
             <input type="checkbox" class="col-uq-check" data-idx="${idx}" ${col.isUnique ? 'checked' : ''} />
-            <span>${t('sqlUnique', this.currentLang)}</span>
+            <span class="flag-label-text">${t('sqlUnique', this.currentLang)}</span>
           </label>
 
           <input
             type="text"
-            class="col-default-input code-text"
+            class="col-default-input code-text input-text"
             data-idx="${idx}"
-            placeholder="Default"
+            placeholder="Default e.g. 0"
             title="Default value or expression"
             value="${this.escapeHtml(col.defaultValue || '')}"
           />
@@ -270,21 +288,22 @@ export class SqlPlaygroundView {
 
         <!-- Optional Row 3: Foreign Key reference -->
         <div class="col-fk-row">
+          <span class="fk-indicator-badge">FK</span>
           <input
             type="text"
-            class="col-fk-table code-text"
+            class="col-fk-table code-text input-text"
             data-idx="${idx}"
             placeholder="FK Table (e.g. roles)"
             value="${this.escapeHtml(col.foreignKey?.targetTable || '')}"
           />
           <input
             type="text"
-            class="col-fk-col code-text"
+            class="col-fk-col code-text input-text"
             data-idx="${idx}"
             placeholder="FK Column (e.g. id)"
             value="${this.escapeHtml(col.foreignKey?.targetColumn || '')}"
           />
-          <select class="col-fk-on-del" data-idx="${idx}">
+          <select class="col-fk-on-del input-text" data-idx="${idx}">
             <option value="CASCADE" ${col.foreignKey?.onDelete === 'CASCADE' ? 'selected' : ''}>CASCADE</option>
             <option value="SET NULL" ${col.foreignKey?.onDelete === 'SET NULL' ? 'selected' : ''}>SET NULL</option>
             <option value="RESTRICT" ${col.foreignKey?.onDelete === 'RESTRICT' ? 'selected' : ''}>RESTRICT</option>
@@ -362,17 +381,41 @@ export class SqlPlaygroundView {
       if (pkCheck) {
         pkCheck.addEventListener('change', () => {
           col.isPrimaryKey = pkCheck.checked;
+          pkCheck.closest('.flag-check-label')?.classList.toggle('active-flag', col.isPrimaryKey);
           if (col.isPrimaryKey) {
             col.isNotNull = true;
-            if (nnCheck) nnCheck.checked = true;
+            if (nnCheck) {
+              nnCheck.checked = true;
+              nnCheck.closest('.flag-check-label')?.classList.add('active-flag');
+            }
           }
           this.updateCodeView();
         });
       }
 
-      if (autoCheck) autoCheck.addEventListener('change', () => { col.isAutoIncrement = autoCheck.checked; this.updateCodeView(); });
-      if (nnCheck) nnCheck.addEventListener('change', () => { col.isNotNull = nnCheck.checked; this.updateCodeView(); });
-      if (uqCheck) uqCheck.addEventListener('change', () => { col.isUnique = uqCheck.checked; this.updateCodeView(); });
+      if (autoCheck) {
+        autoCheck.addEventListener('change', () => {
+          col.isAutoIncrement = autoCheck.checked;
+          autoCheck.closest('.flag-check-label')?.classList.toggle('active-flag', col.isAutoIncrement);
+          this.updateCodeView();
+        });
+      }
+
+      if (nnCheck) {
+        nnCheck.addEventListener('change', () => {
+          col.isNotNull = nnCheck.checked;
+          nnCheck.closest('.flag-check-label')?.classList.toggle('active-flag', col.isNotNull);
+          this.updateCodeView();
+        });
+      }
+
+      if (uqCheck) {
+        uqCheck.addEventListener('change', () => {
+          col.isUnique = uqCheck.checked;
+          uqCheck.closest('.flag-check-label')?.classList.toggle('active-flag', col.isUnique);
+          this.updateCodeView();
+        });
+      }
       if (defInput) defInput.addEventListener('input', () => { col.defaultValue = defInput.value; this.updateCodeView(); });
 
       if (fkTable || fkCol) {
