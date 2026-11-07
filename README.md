@@ -2,11 +2,17 @@
 
 **DevShelf** is an offline-first, zero-bloat developer utility belt built natively for Visual Studio Code. It provides essential developer utilities right in your VS Code sidebar, with seamless bilingual support for **English (`LTR`)** and **Persian / فارسی (`RTL`)**.
 
+<div align="center">
+  <img src="assets/devshelf-demo.gif" alt="DevShelf (Kaarbox) Interactive Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.4);" />
+  <p><em>⚡ 19 Universal Developer Tools • Full-Page Hub & Spoke Navigation • 100% Offline-First • Native VS Code Theming</em></p>
+</div>
+
 ---
 
 ## Key Highlights
 
-- **Feature Cards Deck & Quick Navigator (v1.8.0):** Hyper-modern card-based navigation featuring a responsive 2-column card deck with distinct icon badges, high-contrast typography, and sub-labels. Includes 1-click category filtering (`All Tools [19]`, `Dev & Design [8]`, `Network & API [4]`, `Project & Ops [3]`, `System & Cleanup [4]`) and collapsible active tool summary banner.
+- **Full-Page Hub & Spoke Workspace (v1.8.0):** Hyper-modern full-screen tool catalog (`All Tools [19]`, `Dev & Design [8]`, `Network & API [4]`, `Project & Ops [3]`, `System & Cleanup [4]`). Clicking any card opens a spacious dedicated workspace with an instant **`← Back to Tools`** button, active tool badge, and bilingual explanatory guide banner.
+- **Tactile Modern UI/UX:** Smooth gradient shifts, glowing borders, and tactile feedback modeled after native VS Code controls, with zero jittery zoom animations.
 - **100% Offline-First:** Runs entirely inside your local VS Code environment without transmitting tokens, data, or source code over the network.
 - **Native VS Code Theming:** Built exclusively with native VS Code CSS variables (`var(--vscode-sideBar-background)`, `var(--vscode-input-background)`, `var(--vscode-editor-background)`, `var(--vscode-focusBorder)`, etc.). Adapts seamlessly to Light, Dark, High Contrast, and custom community themes.
 - **Minimalist Codicon Aesthetic:** Zero emoji clutter. Crisp, modern SVG Codicons matching VS Code's desktop design system.

@@ -142,6 +142,80 @@ body {
   filter: brightness(0.88);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--devshelf-radius-pill, 9999px);
+  background-color: var(--vscode-button-secondaryBackground, rgba(128, 128, 128, 0.12));
+  color: var(--vscode-foreground);
+  border: 1px solid var(--devshelf-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+  padding: 0;
+}
+
+.header-icon-link:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground, rgba(128, 128, 128, 0.22));
+  border-color: var(--vscode-focusBorder);
+  filter: brightness(1.15);
+  box-shadow: 0 0 8px rgba(56, 139, 253, 0.35);
+}
+
+.header-icon-link:active {
+  filter: brightness(0.85);
+}
+
+/* Hub Community & Marketplace Footer Links */
+.hub-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 6px 4px 6px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+}
+
+.hub-link-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 10.5px;
+  font-weight: 600;
+  border-radius: var(--devshelf-radius-pill, 9999px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border: 1px solid var(--devshelf-border, rgba(255, 255, 255, 0.12));
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hub-link-pill:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
+  border-color: var(--vscode-focusBorder, #388bfd);
+  color: var(--vscode-textLink-foreground, #388bfd);
+  filter: brightness(1.1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18), 0 0 10px rgba(56, 139, 253, 0.25);
+}
+
+.hub-link-pill:active {
+  filter: brightness(0.88);
+}
+
 /* ==========================================================================
    DEVELOPER POWER HUB & TOOL WORKSPACE (v1.8.0 Hub & Spoke Navigation)
    ========================================================================== */

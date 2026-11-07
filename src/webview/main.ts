@@ -189,6 +189,12 @@ class DevShelfApp {
           <span class="brand-badge">PRO</span>
         </div>
         <div class="header-actions">
+          <button id="btn-header-github" class="header-icon-link" title="GitHub: danyal031/DevPulse">
+            ${ICONS.github}
+          </button>
+          <button id="btn-header-marketplace" class="header-icon-link" title="VS Code Marketplace: DevShelf">
+            ${ICONS.marketplace}
+          </button>
           <button id="lang-toggle-btn" class="lang-toggle-btn" title="Toggle Language (English / فارسی)">
             ${ICONS.globe} <span id="lang-toggle-label">${this.currentLang === 'en' ? 'FA' : 'EN'}</span>
           </button>
@@ -243,6 +249,16 @@ class DevShelfApp {
         <!-- Large, High-Readability Hub Cards Grid -->
         <div class="hub-cards-grid" id="hub-cards-grid">
           ${this.renderHubCardsHtml()}
+        </div>
+
+        <!-- Hub Community & Marketplace Links -->
+        <div class="hub-footer-links">
+          <button id="hub-btn-github" class="hub-link-pill" title="GitHub: danyal031/DevPulse">
+            ${ICONS.github} <span>danyal031 / DevPulse</span>
+          </button>
+          <button id="hub-btn-marketplace" class="hub-link-pill" title="VS Code Marketplace: DevShelf">
+            ${ICONS.marketplace} <span>VS Code Marketplace</span>
+          </button>
         </div>
       </section>
 
@@ -379,6 +395,19 @@ class DevShelfApp {
     document.getElementById('btn-back-to-hub')?.addEventListener('click', () => {
       this.switchTab('hub');
     });
+
+    // GitHub & Marketplace External Links
+    const openGithub = () => {
+      vscode.postMessage({ type: 'openExternalUrl', url: 'https://github.com/danyal031/DevPulse' });
+    };
+    const openMarketplace = () => {
+      vscode.postMessage({ type: 'openExternalUrl', url: 'https://marketplace.visualstudio.com/items?itemName=danial031.devshelf' });
+    };
+
+    document.getElementById('btn-header-github')?.addEventListener('click', openGithub);
+    document.getElementById('btn-header-marketplace')?.addEventListener('click', openMarketplace);
+    document.getElementById('hub-btn-github')?.addEventListener('click', openGithub);
+    document.getElementById('hub-btn-marketplace')?.addEventListener('click', openMarketplace);
 
     // Hub Quick Search Input
     const searchInput = document.getElementById('hub-search-input') as HTMLInputElement;
