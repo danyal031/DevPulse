@@ -5997,5 +5997,700 @@ html[dir="rtl"] .search-clear-btn {
   margin-top: 2px;
 }
 
+/* =====================================================================
+   INTERNET SPEED TEST (OBSIDIAN GLASSMORPHISM & MOTION DESIGN)
+   ===================================================================== */
+.speedtest-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.speedtest-card {
+  position: relative;
+  background: #0b0f19;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px 12px 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+  overflow: hidden;
+}
+
+/* Phase Lighting & Ambient Auras */
+.speedtest-card.phase-ping {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.15), 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.speedtest-card.phase-download {
+  border-color: rgba(6, 182, 212, 0.45);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.2), 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.speedtest-card.phase-upload {
+  border-color: rgba(139, 92, 246, 0.45);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.2), 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.speedtest-card.phase-completed {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.15), 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.speedtest-card.phase-error {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.15), 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Top Telemetry Pill */
+.speed-telemetry-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 9999px;
+  padding: 5px 10px;
+  font-size: 10.5px;
+  margin-bottom: 8px;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.telem-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.telem-divider {
+  width: 1px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.telem-val {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.telem-proto-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.telem-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.telem-dot.pulse-emerald {
+  background-color: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+  animation: auraGlow 2s infinite ease-in-out;
+}
+
+@keyframes auraGlow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+  }
+  50% {
+    opacity: 0.4;
+    box-shadow: 0 0 2px rgba(16, 185, 129, 0.3);
+  }
+}
+
+/* Speed Gauge Stage */
+.speed-gauge-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.speed-gauge-svg {
+  display: block;
+  overflow: visible;
+  max-width: 320px;
+}
+
+.gauge-track-arc {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+
+.gauge-progress-arc {
+  fill: none;
+  stroke: url(#download-arc-gradient);
+  stroke-width: 11;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+}
+
+.gauge-tick-line {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1.5;
+}
+
+.gauge-tick-label {
+  font-family: var(--vscode-font-family, sans-serif);
+  font-size: 9px;
+  fill: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+}
+
+.gauge-leading-bead {
+  transition: fill 0.3s ease;
+}
+
+.gauge-needle-group {
+  transition: transform 0.05s linear;
+}
+
+.gauge-needle-stem {
+  stroke: #f1f5f9;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.gauge-needle-tip {
+  fill: #38bdf8;
+}
+
+.gauge-needle-pivot-outer {
+  fill: #1e293b;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1.5;
+}
+
+.gauge-needle-pivot-inner {
+  fill: #38bdf8;
+}
+
+/* Center Digital Readout */
+.speed-center-readout {
+  position: absolute;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.speed-phase-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 2px;
+}
+
+.speed-phase-badge.badge-ping {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.speed-phase-badge.badge-download {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.speed-phase-badge.badge-upload {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.speed-phase-badge.badge-completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.speed-phase-badge.badge-error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.speed-digital-number-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.speed-digital-value {
+  font-size: 36px;
+  font-weight: 800;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.25);
+}
+
+.speed-unit-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+.speed-status-subtext {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  text-align: center;
+  margin-top: 4px;
+  min-height: 16px;
+  line-height: 1.3;
+}
+
+/* Linear Progress Track */
+.speed-progress-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 6px 0 10px;
+}
+
+.speed-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #06b6d4, #3b82f6, #10b981);
+  transition: width 0.15s ease-out;
+}
+
+/* Waveform Sparkline Box */
+.speed-waveform-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 6px 10px 4px;
+  margin-bottom: 12px;
+}
+
+.waveform-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.waveform-title {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.waveform-live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #06b6d4;
+  box-shadow: 0 0 5px #06b6d4;
+  animation: auraGlow 1.5s infinite ease-in-out;
+}
+
+.speed-sparkline-svg {
+  display: block;
+  width: 100%;
+  height: 44px;
+  overflow: visible;
+}
+
+.sparkline-stroke {
+  fill: none;
+  stroke: #06b6d4;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.5));
+}
+
+/* 4-Metric Telemetry Grid */
+.speed-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.speed-metric-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 9px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.speed-metric-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.metric-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metric-icon-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-icon-box.cyan-glow {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+}
+
+.metric-icon-box.violet-glow {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+}
+
+.metric-icon-box.emerald-glow {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.metric-icon-box.amber-glow {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.metric-label {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+}
+
+.metric-body {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.metric-val {
+  font-size: 19px;
+  font-weight: 700;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-variant-numeric: tabular-nums;
+  color: #f8fafc;
+}
+
+.metric-unit {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 600;
+}
+
+.metric-accent-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0.6;
+}
+
+.metric-accent-line.down-line {
+  background: linear-gradient(90deg, #06b6d4, transparent);
+}
+
+.metric-accent-line.up-line {
+  background: linear-gradient(90deg, #8b5cf6, transparent);
+}
+
+.metric-accent-line.ping-line {
+  background: linear-gradient(90deg, #10b981, transparent);
+}
+
+.metric-accent-line.jitter-line {
+  background: linear-gradient(90deg, #f59e0b, transparent);
+}
+
+/* Primary Action Button (Tactile, No Scaling Jitter) */
+.speed-action-area {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-speed-action {
+  width: 100%;
+  height: 40px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, filter 0.2s ease;
+}
+
+.btn-speed-action:hover {
+  filter: brightness(1.15);
+}
+
+.btn-speed-action:active {
+  filter: brightness(0.9);
+}
+
+.btn-speed-action.is-cancel {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: #ffffff !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+.btn-speed-action.is-again {
+  background: linear-gradient(135deg, #0284c7, #0f766e) !important;
+  color: #ffffff !important;
+}
+
+/* Results History Drawer */
+.speed-history-drawer {
+  background: #0b0f19;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.speed-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s ease;
+}
+
+.speed-history-header:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.history-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--vscode-foreground, #f1f5f9);
+}
+
+.history-count-badge {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  border-radius: 9999px;
+  padding: 1px 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.history-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-clear-history-icon {
+  background: transparent;
+  border: none;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.btn-clear-history-icon:hover {
+  color: #ef4444;
+}
+
+.history-chevron-icon {
+  display: flex;
+  align-items: center;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  transition: transform 0.2s ease;
+}
+
+.history-chevron-icon.open {
+  transform: rotate(180deg);
+}
+
+.speed-history-content {
+  display: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.speed-history-content.open {
+  display: block;
+}
+
+.speed-empty-history {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px;
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground, #64748b);
+}
+
+.speed-history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.speed-history-row {
+  display: grid;
+  grid-template-columns: 46px 64px 1fr 60px;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 11px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.speed-history-row:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.history-col-time {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hist-time {
+  font-weight: 600;
+  font-size: 10.5px;
+  color: #f1f5f9;
+}
+
+.hist-date {
+  font-size: 9px;
+  color: var(--vscode-descriptionForeground, #64748b);
+}
+
+.history-col-server {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hist-colo-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.hist-city {
+  font-size: 8.5px;
+  color: var(--vscode-descriptionForeground, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60px;
+}
+
+.history-col-speed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hist-metric-mini {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.hist-metric-mini.hist-down {
+  color: #06b6d4;
+}
+
+.hist-metric-mini.hist-up {
+  color: #8b5cf6;
+}
+
+.hist-metric-mini small {
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+.history-col-latency {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.hist-ping {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.hist-ping small {
+  font-size: 8px;
+}
+
+.hist-jitter {
+  font-size: 8.5px;
+  color: var(--vscode-descriptionForeground, #64748b);
+}
+
+
 
 

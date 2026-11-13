@@ -60,6 +60,16 @@ import { CacheCleanerService } from '../src/services/cacheCleanerService';
 import { CommandCenterService } from '../src/services/commandCenterService';
 import { BundleRadarService, CURATED_ALTERNATIVES, DependencyItem } from '../src/services/bundleRadarService';
 import { ImportCostService } from '../src/services/importCostService';
+import {
+  calculateMedian,
+  calculateJitter,
+  calculateThroughputMbps,
+  speedToLogFraction,
+  speedToGaugeAngle,
+  parseCloudflareTrace,
+  createUploadPayload,
+  SpeedTestEngine
+} from '../src/utils/speedTestEngine';
 
 async function runTests() {
   console.log('--- RUNNING DEVSHELF UNIT TESTS ---');
@@ -1076,16 +1086,95 @@ f1e2d3c4b5a6   node:20        "docker-entrypoint.s…"   2 hours ago     Up 2 ho
     assert.ok((translations.fa as any)[k], `Missing FA bundle key: ${k}`);
   }
 
-  // 25. FULL 19-TOOL PARITY & BILINGUAL INTEGRITY
-  console.log('[Test 25] Full 19-Tool Parity & Bilingual Integrity');
-  const all19ToolTabKeys = [
+  // 25. HIGH-PRECISION INTERNET SPEED TEST ENGINE & CALCULATIONS
+  console.log('[Test 25] High-Precision Internet Speed Test Engine & Calculations');
+
+  // Verify Median Ping calculation
+  assert.strictEqual(calculateMedian([20, 10, 30]), 20);
+  assert.strictEqual(calculateMedian([10, 20, 30, 40]), 25);
+  assert.strictEqual(calculateMedian([45.2, 44.8, 46.1, 44.9, 45.0]), 45.0);
+  assert.strictEqual(calculateMedian([]), 0);
+
+  // Verify Jitter calculation (mean absolute delta between consecutive samples)
+  // Samples: [20, 24, 21, 23] -> deltas: |24-20|=4, |21-24|=3, |23-21|=2 -> sum=9 -> 9 / 3 = 3.0
+  assert.strictEqual(calculateJitter([20, 24, 21, 23]), 3.0);
+  assert.strictEqual(calculateJitter([15, 15, 15]), 0);
+  assert.strictEqual(calculateJitter([10]), 0);
+  assert.strictEqual(calculateJitter([]), 0);
+
+  // Verify Throughput calculation: (bytes * 8) / (elapsedSec * 1,000,000)
+  // 12,500,000 bytes in 1000ms = 100,000,000 bits / 1s = 100 Mbps
+  assert.strictEqual(calculateThroughputMbps(12_500_000, 1000), 100);
+  // 3,125,000 bytes in 500ms = 25,000,000 bits / 0.5s = 50 Mbps
+  assert.strictEqual(calculateThroughputMbps(3_125_000, 500), 50);
+  assert.strictEqual(calculateThroughputMbps(0, 1000), 0);
+  assert.strictEqual(calculateThroughputMbps(1000, 0), 0);
+
+  // Verify Logarithmic Angle and Scale Mapping
+  assert.strictEqual(speedToLogFraction(0), 0);
+  assert.strictEqual(speedToLogFraction(1000), 1);
+  assert.strictEqual(speedToGaugeAngle(0, 150, 240), 150);
+  assert.strictEqual(speedToGaugeAngle(1000, 150, 240), 390);
+  const midAngle = speedToGaugeAngle(50, 150, 240);
+  assert.ok(midAngle > 200 && midAngle < 350, `Mid angle ${midAngle} must be inside sweep`);
+
+  // Verify Cloudflare Trace Parsing & Colo Lookup
+  const sampleTrace = `fl=45f123\nh=speed.cloudflare.com\nip=178.23.45.67\nts=1710000000.123\nvisit_scheme=https\nuag=Mozilla/5.0\ncolo=FRA\nhttp=http/2\nloc=DE\ntls=TLSv1.3\nsni=plaintext\nwarp=off\ngateway=off\nrbi=off\nkex=X25519\n`;
+  const telem = parseCloudflareTrace(sampleTrace);
+  assert.strictEqual(telem.ip, '178.23.45.67');
+  assert.strictEqual(telem.colo, 'FRA');
+  assert.strictEqual(telem.coloCity, 'Frankfurt');
+  assert.strictEqual(telem.coloCountry, 'Germany');
+  assert.strictEqual(telem.protocol, 'HTTP/2');
+  assert.strictEqual(telem.loc, 'DE');
+
+  // Verify Dubai colo mapping
+  const dxbTrace = `colo=DXB\nip=94.200.10.5\nhttp=h3\n`;
+  const dxbTelem = parseCloudflareTrace(dxbTrace);
+  assert.strictEqual(dxbTelem.colo, 'DXB');
+  assert.strictEqual(dxbTelem.coloCity, 'Dubai');
+  assert.strictEqual(dxbTelem.coloCountry, 'United Arab Emirates');
+  assert.strictEqual(dxbTelem.protocol, 'H3');
+
+  // Verify Upload Payload generation
+  const payload = createUploadPayload(1024 * 64);
+  assert.strictEqual(payload.byteLength, 1024 * 64);
+  assert.ok(payload[0] !== undefined);
+
+  // Verify SpeedTestEngine instantiation and abort safety
+  const engine = new SpeedTestEngine();
+  engine.abort(); // should not throw
+
+  // Verify bilingual i18n keys for Speed Test
+  const speedTestKeys = [
+    'tabSpeedTest', 'subSpeedTest', 'guide_speedtest',
+    'speedTestStart', 'speedTestCancel', 'speedTestAgain',
+    'speedTestTesting', 'speedTestConnecting', 'speedTestPing',
+    'speedTestJitter', 'speedTestDownload', 'speedTestUpload',
+    'speedTestMs', 'speedTestMbps', 'speedTestServer',
+    'speedTestClientIp', 'speedTestProtocol', 'speedTestStatusIdle',
+    'speedTestStatusPing', 'speedTestStatusDownload', 'speedTestStatusUpload',
+    'speedTestStatusComplete', 'speedTestStatusError', 'speedTestStatusAborted',
+    'speedTestHistory', 'speedTestNoHistory', 'speedTestClearHistory',
+    'speedTestQualityExcellent', 'speedTestQualityGood', 'speedTestQualityFair',
+    'speedTestQualityPoor', 'speedTestWaveform', 'speedTestLatencySummary',
+    'speedTestBandwidthSummary'
+  ];
+  for (const sk of speedTestKeys) {
+    assert.ok((translations.en as any)[sk], `Missing EN SpeedTest key: ${sk}`);
+    assert.ok((translations.fa as any)[sk], `Missing FA SpeedTest key: ${sk}`);
+  }
+
+  // 26. FULL 20-TOOL PARITY & BILINGUAL INTEGRITY
+  console.log('[Test 26] Full 20-Tool Parity & Bilingual Integrity');
+  const all20ToolTabKeys = [
     'tabJson', 'tabJwt', 'tabPersian', 'tabPorts', 'tabGit', 'tabDocker',
     'tabApi', 'tabSql', 'tabLogs', 'tabCrypto', 'tabMock', 'tabTunnel',
     'tabSysMon', 'tabLoadTest', 'tabSnapshot', 'tabCommandCenter', 'tabCssDesigner', 'tabCleaner',
-    'tabBundleRadar'
+    'tabBundleRadar', 'tabSpeedTest'
   ];
-  assert.strictEqual(all19ToolTabKeys.length, 19, 'There must be exactly 19 developer tools');
-  for (const tabKey of all19ToolTabKeys) {
+  assert.strictEqual(all20ToolTabKeys.length, 20, 'There must be exactly 20 developer tools');
+  for (const tabKey of all20ToolTabKeys) {
     assert.ok((translations.en as any)[tabKey], `EN missing tab label: ${tabKey}`);
     assert.ok((translations.fa as any)[tabKey], `FA missing tab label: ${tabKey}`);
   }

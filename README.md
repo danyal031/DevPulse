@@ -4,14 +4,14 @@
 
 <div align="center">
   <img src="assets/devshelf-demo.gif" alt="DevShelf (Kaarbox) Interactive Demo" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.4);" />
-  <p><em>⚡ 19 Universal Developer Tools • Full-Page Hub & Spoke Navigation • 100% Offline-First • Native VS Code Theming</em></p>
+  <p><em>⚡ 20 Universal Developer Tools • Full-Page Hub & Spoke Navigation • 100% Offline-First • Native VS Code Theming</em></p>
 </div>
 
 ---
 
 ## Key Highlights
 
-- **Full-Page Hub & Spoke Workspace (v1.8.0):** Hyper-modern full-screen tool catalog (`All Tools [19]`, `Dev & Design [8]`, `Network & API [4]`, `Project & Ops [3]`, `System & Cleanup [4]`). Clicking any card opens a spacious dedicated workspace with an instant **`← Back to Tools`** button, active tool badge, and bilingual explanatory guide banner.
+- **Full-Page Hub & Spoke Workspace (v1.8.0):** Hyper-modern full-screen tool catalog (`All Tools [20]`, `Dev & Design [8]`, `Network & API [5]`, `Project & Ops [3]`, `System & Cleanup [4]`). Clicking any card opens a spacious dedicated workspace with an instant **`← Back to Tools`** button, active tool badge, and bilingual explanatory guide banner.
 - **Tactile Modern UI/UX:** Smooth gradient shifts, glowing borders, and tactile feedback modeled after native VS Code controls, with zero jittery zoom animations.
 - **100% Offline-First:** Runs entirely inside your local VS Code environment without transmitting tokens, data, or source code over the network.
 - **Native VS Code Theming:** Built exclusively with native VS Code CSS variables (`var(--vscode-sideBar-background)`, `var(--vscode-input-background)`, `var(--vscode-editor-background)`, `var(--vscode-focusBorder)`, etc.). Adapts seamlessly to Light, Dark, High Contrast, and custom community themes.
@@ -246,6 +246,21 @@ A full-featured Docker Desktop client alternative integrated directly into the V
   - Non-intrusive inline text decorations in active JS/TS/JSX/TSX files displaying live bundle gzip cost at the end of import statements (e.g., `⚡ 2.1 KB (gzip)` in green, or `⚠ 72.4 KB (gzip - bloated)` in red).
   - 1-click toggle pill directly inside the sidebar controls.
 
+### 20. High-Precision Internet Speed Test (بنچمارک سرعت اینترنت)
+- **Cloudflare Global Edge Telemetry:** High-precision internet performance benchmark measuring Ping, Jitter, Download, and Upload bandwidth using Cloudflare's worldwide low-latency edge nodes (`speed.cloudflare.com`).
+- **4-Stage Measurement Pipeline:**
+  1. **Telemetry & Connection Latency:** Automatically detects public Client IP, Edge Node Colocation (e.g., `FRA`, `DXB`, `LHR`, `IAD`), and HTTP protocol (`HTTP/2` or `HTTP/3`). Performs 8 sequential lightweight requests to `__down?bytes=0`, discards cold start, computes **Median Ping (ms)** and **Jitter (ms)** via mean absolute consecutive deltas.
+  2. **Multi-Stream Download Throughput:** 3 concurrent streams fetching 25MB chunks using `response.body.getReader()` over a fixed 8-second window with sub-100ms real-time Mbps telemetry emission.
+  3. **High-Frequency Upload Throughput:** 10MB chunked binary payload utilizing `XMLHttpRequest.upload.onprogress` for sub-second precision over an 8-second window.
+  4. **Abort Safety & Resilience:** Immediate graceful cancellation via `AbortController` and `xhr.abort()` with zero uncaught promise rejections.
+- **Obsidian Glassmorphism Motion Design:**
+  - Ambient aura lighting matching active phase (Slate/Emerald for Ping, Electric Cyan & Emerald for Download, Royal Violet & Amber for Upload).
+  - 240° SVG radial speedometer gauge with logarithmic tick distribution (`0, 5, 10, 25, 50, 100, 250, 500, 1000 Mbps`), smooth 60fps spring needle interpolation (`requestAnimationFrame`), and large tabular digital readout.
+  - Live animated SVG sparkline throughput waveform tracking speed stability over time.
+  - 4-metric telemetry grid (Download, Upload, Ping, Jitter) with quality indicators and accent lines.
+  - Tactile action button (`START TEST` / `CANCEL` / `TEST AGAIN`) with glowing border transitions and zero scale jitter.
+  - Collapsible test history drawer storing the last 10 runs with timestamps, server nodes, and 1-click history purge.
+
 ---
 
 ## Command Palette & Context Menu Contributions
@@ -253,6 +268,7 @@ A full-featured Docker Desktop client alternative integrated directly into the V
 | Command | Title | Context |
 | :--- | :--- | :--- |
 | `devshelf.openSidebar` | `DevShelf: Open Developer Swiss Army Knife` | Command Palette |
+| `devshelf.openSpeedTest` | `DevShelf: Open Internet Speed Test (Ping, Jitter, Download, Upload)` | Command Palette |
 | `devshelf.openBundleRadar` | `DevShelf: Open Bundle Size Radar & Package Diet` | Command Palette |
 | `devshelf.openSnapshotStudio` | `DevShelf: Open Code-to-Image & Snapshot Studio` | Command Palette |
 | `devshelf.openCommandCenter` | `DevShelf: Open 1-Click Project Command Center` | Command Palette |

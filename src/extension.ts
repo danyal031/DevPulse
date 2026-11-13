@@ -552,6 +552,14 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
+  // Command 27: Open Internet Speed Test (Download, Upload, Ping & Jitter)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('devshelf.openSpeedTest', () => {
+      vscode.commands.executeCommand('devshelf.sidebarView.focus');
+      sidebarProvider.switchTab('speedtest');
+    })
+  );
+
   // Initialize Import Cost Inline Preview Decorator
   ImportCostService.getInstance().init(context);
 }

@@ -26,6 +26,7 @@ export const translations = {
     tabCssDesigner: 'CSS & Design',
     tabCleaner: 'Cache Cleaner',
     tabBundleRadar: 'Bundle Radar',
+    tabSpeedTest: 'Speed Test',
 
     // Feature Cards Deck & Categories
     deckCatAll: 'All Tools',
@@ -36,7 +37,7 @@ export const translations = {
     exploreDeck: 'Explore Tools',
     collapseDeck: 'Collapse Deck',
     toolsDeck: 'Feature Cards Deck',
-    searchTools: 'Quick search 19 tools...',
+    searchTools: 'Quick search 20 tools...',
     clearSearch: 'Clear search',
     backToHub: 'Back to Tools',
     toolGuideTitle: 'Tool Guide & Overview',
@@ -62,6 +63,7 @@ export const translations = {
     guide_cssdesign: 'Frontend designer\'s dream toolkit. Explore interactive glassmorphism generators, color palette converters with nearest Tailwind CSS classes, px-to-rem units, and viewport previews.',
     guide_cleaner: 'Dev junk, node_modules, and hidden cache obliterator. Reclaim gigabytes of disk space by purging orphaned node_modules, build artifacts (dist, .next), and global caches.',
     guide_bundleradar: 'Bundle size telemetry and dependency weight analyzer. Visualizes node_modules weight breakdown with an interactive radial chart and suggests lightweight alternatives.',
+    guide_speedtest: 'High-precision internet performance benchmark measuring Ping, Jitter, Download, and Upload throughput using multi-stream Cloudflare edge telemetry and 60fps radial speedometer.',
     subJson: 'AST & Schema',
     subJwt: 'Claims & Expiry',
     subPersian: 'Jalali & ZWNJ',
@@ -81,6 +83,7 @@ export const translations = {
     subCssDesigner: 'Tailwind & Glassmorphism',
     subCleaner: 'Purge Cache & node_modules',
     subBundleRadar: 'Package Diet & Size Telemetry',
+    subSpeedTest: 'Ping & Bandwidth',
 
     // Common Actions
     copy: 'Copy',
@@ -694,7 +697,40 @@ export const translations = {
     bundleDevBadge: 'DEV',
     bundleProdBadge: 'PROD',
     bundleInlineDecoratorToggle: 'Inline Import Size Preview',
-    bundleNoWorkspaceNotice: 'Please open a workspace containing a package.json file.'
+    bundleNoWorkspaceNotice: 'Please open a workspace containing a package.json file.',
+
+    // Speed Test
+    speedTestStart: 'START SPEED TEST',
+    speedTestCancel: 'CANCEL TEST',
+    speedTestAgain: 'TEST AGAIN',
+    speedTestTesting: 'Testing...',
+    speedTestConnecting: 'Connecting to Cloudflare Edge...',
+    speedTestPing: 'Ping',
+    speedTestJitter: 'Jitter',
+    speedTestDownload: 'Download',
+    speedTestUpload: 'Upload',
+    speedTestMs: 'ms',
+    speedTestMbps: 'Mbps',
+    speedTestServer: 'Edge Server',
+    speedTestClientIp: 'Client IP',
+    speedTestProtocol: 'Protocol',
+    speedTestStatusIdle: 'Ready to benchmark connection',
+    speedTestStatusPing: 'Probing edge latency & jitter...',
+    speedTestStatusDownload: 'Testing download bandwidth (3 parallel streams)...',
+    speedTestStatusUpload: 'Testing upload throughput (binary stream)...',
+    speedTestStatusComplete: 'Speed test completed successfully',
+    speedTestStatusError: 'Connection test failed. Please check internet connection.',
+    speedTestStatusAborted: 'Speed test was cancelled by user',
+    speedTestHistory: 'Run History',
+    speedTestNoHistory: 'No speed tests recorded yet',
+    speedTestClearHistory: 'Clear History',
+    speedTestQualityExcellent: 'Excellent',
+    speedTestQualityGood: 'Good',
+    speedTestQualityFair: 'Fair',
+    speedTestQualityPoor: 'Poor',
+    speedTestWaveform: 'Real-Time Throughput Waveform',
+    speedTestLatencySummary: 'Latency & Stability',
+    speedTestBandwidthSummary: 'Bandwidth Throughput'
   },
   fa: {
     appName: 'دِوشلف (DevShelf)',
@@ -721,6 +757,7 @@ export const translations = {
     tabCssDesigner: 'طراحی CSS و فرانت',
     tabCleaner: 'پاک‌کننده کش و دیسک',
     tabBundleRadar: 'رادار حجم باندل',
+    tabSpeedTest: 'تست سرعت اینترنت',
 
     // Feature Cards Deck & Categories
     deckCatAll: 'همه ابزارها',
@@ -731,7 +768,7 @@ export const translations = {
     exploreDeck: 'مشاهده همه ابزارها',
     collapseDeck: 'بستن کارت‌ها',
     toolsDeck: 'کارت‌های دسترسی سریع',
-    searchTools: 'جستجوی سریع بین ۱۹ ابزار...',
+    searchTools: 'جستجوی سریع بین ۲۰ ابزار...',
     clearSearch: 'پاک کردن جستجو',
     backToHub: 'بازگشت به جعبه ابزار',
     toolGuideTitle: 'راهنما و عملکرد ابزار',
@@ -757,6 +794,7 @@ export const translations = {
     guide_cssdesign: 'جعبه‌ابزار فرانت‌اند و استایل CSS. ژنراتور لایو گلس‌مورفیسم، مبدل پالت رنگ به نزدیک‌ترین کلاس‌های Tailwind، تبدیل واحدهای px و rem، و پیش‌نمایش موبایل.',
     guide_cleaner: 'تمیزکننده هوشمند حافظه و کش‌های مخفی توسعه. آزادسازی گیگابایت‌ها فضای دیسک با حذف ایمن پوشه‌های node_modules مرده، بیلدها (dist, .next) و کش‌ها.',
     guide_bundleradar: 'رادار سنگینی وابستگی‌ها و تحلیل‌گر حجم باندل. رسم نمودار دایره‌ای وزن پکیج‌های پروژه، محاسبه حجم Minified و Gzipped، و پیشنهاد جایگزین‌های سبک‌تر.',
+    guide_speedtest: 'بنچمارک دقیق عملکرد اینترنت برای سنجش پینگ، جیتر، سرعت دانلود و آپلود با استفاده از لبه ابری کلودفلر و گیج عقربه‌ای ۶۰ فریم بر ثانیه.',
     subJson: 'تولید اسکیما و AST',
     subJwt: 'رمزگشایی و انقضا',
     subPersian: 'تاریخ جلالی و نیم‌فاصله',
@@ -776,6 +814,7 @@ export const translations = {
     subCssDesigner: 'رنگ، گلس و پریویو موبایل',
     subCleaner: 'پاکسازی کش و ماژول‌ها',
     subBundleRadar: 'کاهش وزن پکیج‌ها و تله‌متری باندل',
+    subSpeedTest: 'پینگ و پهنای باند',
 
     // Common Actions
     copy: 'کپی',
@@ -1389,7 +1428,40 @@ export const translations = {
     bundleDevBadge: 'DEV',
     bundleProdBadge: 'PROD',
     bundleInlineDecoratorToggle: 'پیش‌نمایش حجم ایمپورت در ادیتور',
-    bundleNoWorkspaceNotice: 'لطفاً یک ورک‌اسپیس حاوی فایل package.json را باز کنید.'
+    bundleNoWorkspaceNotice: 'لطفاً یک ورک‌اسپیس حاوی فایل package.json را باز کنید.',
+
+    // Speed Test
+    speedTestStart: 'شروع تست سرعت',
+    speedTestCancel: 'لغو تست',
+    speedTestAgain: 'تست مجدد',
+    speedTestTesting: 'در حال سنجش...',
+    speedTestConnecting: 'اتصال به نزدیک‌ترین سرور لبه...',
+    speedTestPing: 'پینگ (Ping)',
+    speedTestJitter: 'جیتر (Jitter)',
+    speedTestDownload: 'دانلود (Download)',
+    speedTestUpload: 'آپلود (Upload)',
+    speedTestMs: 'میلی‌ثانیه',
+    speedTestMbps: 'مگابیت/ثانیه',
+    speedTestServer: 'سرور لبه (Colo)',
+    speedTestClientIp: 'آدرس IP شما',
+    speedTestProtocol: 'پروتکل شبکه',
+    speedTestStatusIdle: 'آماده برای آغاز بنچمارک اتصال اینترنت',
+    speedTestStatusPing: 'در حال ارزیابی پینگ و پایداری سیگنال (Jitter)...',
+    speedTestStatusDownload: 'در حال سنجش سرعت دانلود (۳ استریم همزمان)...',
+    speedTestStatusUpload: 'در حال سنجش سرعت آپلود (استریم دیتای باینری)...',
+    speedTestStatusComplete: 'تست سرعت با موفقیت کامل انجام شد',
+    speedTestStatusError: 'خطا در ارتباط با سرور. لطفا اتصال اینترنت را چک کنید.',
+    speedTestStatusAborted: 'تست سرعت توسط کاربر لغو گردید',
+    speedTestHistory: 'تاریخچه نتایج تست',
+    speedTestNoHistory: 'هنوز هیچ تستی در تاریخچه ثبت نشده است',
+    speedTestClearHistory: 'پاکسازی تاریخچه',
+    speedTestQualityExcellent: 'عالی',
+    speedTestQualityGood: 'خوب',
+    speedTestQualityFair: 'متوسط',
+    speedTestQualityPoor: 'ضعیف',
+    speedTestWaveform: 'نمودار نوسان زنده پهنای باند',
+    speedTestLatencySummary: 'پایداری و تاخیر شبکه',
+    speedTestBandwidthSummary: 'ظرفیت پهنای باند و تبادل داده'
   }
 } as const;
 

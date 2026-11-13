@@ -19,6 +19,7 @@ import { CommandCenterView } from './components/CommandCenterView';
 import { CssDesignerView } from './components/CssDesignerView';
 import { CacheCleanerView } from './components/CacheCleanerView';
 import { BundleRadarView } from './components/BundleRadarView';
+import { SpeedTestView } from './components/SpeedTestView';
 
 declare function acquireVsCodeApi(): {
   postMessage(message: unknown): void;
@@ -48,11 +49,12 @@ const FEATURE_TOOLS: FeatureTool[] = [
   { id: 'cssdesign', category: 'dev', icon: ICONS.palette, titleKey: 'tabCssDesigner', subKey: 'subCssDesigner', guideKey: 'guide_cssdesign' },
   { id: 'bundleradar', category: 'dev', icon: ICONS.weight, titleKey: 'tabBundleRadar', subKey: 'subBundleRadar', guideKey: 'guide_bundleradar' },
 
-  // Network & API (4)
+  // Network & API (5)
   { id: 'api', category: 'network', icon: ICONS.send, titleKey: 'tabApi', subKey: 'subApi', guideKey: 'guide_api' },
   { id: 'mock', category: 'network', icon: ICONS.webhook, titleKey: 'tabMock', subKey: 'subMock', guideKey: 'guide_mock' },
   { id: 'tunnel', category: 'network', icon: ICONS.tunnel, titleKey: 'tabTunnel', subKey: 'subTunnel', guideKey: 'guide_tunnel' },
   { id: 'loadtest', category: 'network', icon: ICONS.speed, titleKey: 'tabLoadTest', subKey: 'subLoadtest', guideKey: 'guide_loadtest' },
+  { id: 'speedtest', category: 'network', icon: ICONS.gauge, titleKey: 'tabSpeedTest', subKey: 'subSpeedTest', guideKey: 'guide_speedtest' },
 
   // Project & Ops (3)
   { id: 'commandcenter', category: 'ops', icon: ICONS.playCircle, titleKey: 'tabCommandCenter', subKey: 'subCommandCenter', guideKey: 'guide_commandcenter' },
@@ -91,6 +93,7 @@ class DevShelfApp {
   private cssDesignerView!: CssDesignerView;
   private cleanerView!: CacheCleanerView;
   private bundleRadarView!: BundleRadarView;
+  private speedTestView!: SpeedTestView;
 
   constructor() {
     this.restoreState();
@@ -138,7 +141,8 @@ class DevShelfApp {
       commandCenterState: this.commandCenterView ? this.commandCenterView.getState() : undefined,
       cssDesignerState: this.cssDesignerView ? this.cssDesignerView.getState() : undefined,
       cleanerState: this.cleanerView ? this.cleanerView.getState() : undefined,
-      bundleRadarState: this.bundleRadarView ? this.bundleRadarView.getState() : undefined
+      bundleRadarState: this.bundleRadarView ? this.bundleRadarView.getState() : undefined,
+      speedTestState: this.speedTestView ? this.speedTestView.getState() : undefined
     });
   }
 
@@ -209,7 +213,7 @@ class DevShelfApp {
             <p class="hub-hero-desc" id="hub-hero-desc">${t('hubSubtitle', this.currentLang)}</p>
           </div>
           <div class="hub-stats-badge">
-            <span class="hub-count-num">19</span>
+            <span class="hub-count-num">20</span>
             <span class="hub-count-label" id="hub-count-label">${t('hubToolsCount', this.currentLang)}</span>
           </div>
         </div>
@@ -225,7 +229,7 @@ class DevShelfApp {
           <div class="hub-categories-bar" id="hub-categories-bar">
             <button class="hub-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
               <span>${t('deckCatAll', this.currentLang)}</span>
-              <span class="cat-count">19</span>
+              <span class="cat-count">20</span>
             </button>
             <button class="hub-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
               <span>${t('deckCatDev', this.currentLang)}</span>
@@ -233,7 +237,7 @@ class DevShelfApp {
             </button>
             <button class="hub-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
               <span>${t('deckCatNetwork', this.currentLang)}</span>
-              <span class="cat-count">4</span>
+              <span class="cat-count">5</span>
             </button>
             <button class="hub-cat-chip ${this.selectedCategory === 'ops' ? 'active' : ''}" data-cat="ops">
               <span>${t('deckCatOps', this.currentLang)}</span>
@@ -310,6 +314,7 @@ class DevShelfApp {
           <div id="view-cssdesign" class="view-panel"></div>
           <div id="view-cleaner" class="view-panel"></div>
           <div id="view-bundleradar" class="view-panel"></div>
+          <div id="view-speedtest" class="view-panel"></div>
         </main>
       </section>
     `;
@@ -337,6 +342,7 @@ class DevShelfApp {
     const cssDesignContainer = document.getElementById('view-cssdesign')!;
     const cleanerContainer = document.getElementById('view-cleaner')!;
     const bundleRadarContainer = document.getElementById('view-bundleradar')!;
+    const speedTestContainer = document.getElementById('view-speedtest')!;
 
     this.jsonView = new JsonTsZodView(jsonContainer, this.currentLang, postToHost);
     this.jwtView = new JwtView(jwtContainer, this.currentLang, postToHost);
@@ -357,6 +363,7 @@ class DevShelfApp {
     this.cssDesignerView = new CssDesignerView(cssDesignContainer, this.currentLang, postToHost);
     this.cleanerView = new CacheCleanerView(cleanerContainer, this.currentLang, postToHost);
     this.bundleRadarView = new BundleRadarView(bundleRadarContainer, this.currentLang, postToHost);
+    this.speedTestView = new SpeedTestView(speedTestContainer, this.currentLang, postToHost);
 
     const state = vscode.getState();
     if (state) {
@@ -378,6 +385,7 @@ class DevShelfApp {
       if (state.cssDesignerState) this.cssDesignerView.restoreState(state.cssDesignerState);
       if (state.cleanerState) this.cleanerView.restoreState(state.cleanerState);
       if (state.bundleRadarState) this.bundleRadarView.restoreState(state.bundleRadarState);
+      if (state.speedTestState) this.speedTestView.restoreState(state.speedTestState);
     }
   }
 
@@ -687,9 +695,9 @@ class DevShelfApp {
         el.innerHTML = `<span>${t(labelKey, this.currentLang)}</span><span class="cat-count">${count}</span>`;
       }
     };
-    setCatText('all', 'deckCatAll', 19);
+    setCatText('all', 'deckCatAll', 20);
     setCatText('dev', 'deckCatDev', 8);
-    setCatText('network', 'deckCatNetwork', 4);
+    setCatText('network', 'deckCatNetwork', 5);
     setCatText('ops', 'deckCatOps', 3);
     setCatText('system', 'deckCatSystem', 4);
 
@@ -734,6 +742,7 @@ class DevShelfApp {
     this.cssDesignerView.setLanguage(this.currentLang);
     this.cleanerView.setLanguage(this.currentLang);
     this.bundleRadarView.setLanguage(this.currentLang);
+    this.speedTestView.setLanguage(this.currentLang);
   }
 
   private switchTab(tabName: string) {

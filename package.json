@@ -2,7 +2,7 @@
   "name": "devshelf",
   "displayName": "DevShelf (دِوشلف)",
   "description": "Offline-first, high-utility developer Swiss Army Knife with seamless Persian (RTL) & English (LTR) bilingual support.",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "publisher": "danial031",
   "license": "MIT",
   "repository": {
@@ -66,6 +66,11 @@
     "package-diet",
     "import-cost",
     "dependency-analyzer",
+    "speed-test",
+    "bandwidth",
+    "ping",
+    "jitter",
+    "cloudflare-speed",
     "devshelf"
   ],
   "main": "./dist/extension.js",
@@ -96,7 +101,8 @@
     "onCommand:devshelf.openCssDesigner",
     "onCommand:devshelf.openCacheCleaner",
     "onCommand:devshelf.openMobilePreview",
-    "onCommand:devshelf.openBundleRadar"
+    "onCommand:devshelf.openBundleRadar",
+    "onCommand:devshelf.openSpeedTest"
   ],
   "contributes": {
     "viewsContainers": {
@@ -251,6 +257,11 @@
       {
         "command": "devshelf.openBundleRadar",
         "title": "Open Bundle Size Radar & Package Diet",
+        "category": "DevShelf"
+      },
+      {
+        "command": "devshelf.openSpeedTest",
+        "title": "Open Internet Speed Test (Ping, Jitter, Download, Upload)",
         "category": "DevShelf"
       }
     ],

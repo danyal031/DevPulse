@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "DevShelf (DevPulse) - Developer Swiss Army Knife & Speed Test",
+  "version": "1.7.3",
+  "description": "High-precision Internet Speed Test (Download, Upload, Ping & Jitter) and developer toolkit.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://speed.cloudflare.com/*"
+  ]
+}
