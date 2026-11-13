@@ -227,24 +227,29 @@ class DevShelfApp {
           </div>
 
           <div class="hub-categories-bar" id="hub-categories-bar">
-            <button class="hub-cat-chip ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all">
-              <span>${t('deckCatAll', this.currentLang)}</span>
+            <button class="hub-cat-chip chip-cat-all ${this.selectedCategory === 'all' ? 'active' : ''}" data-cat="all" title="${t('deckCatAll', this.currentLang)} (20)">
+              <span class="cat-chip-icon">${ICONS.apps}</span>
+              <span class="cat-chip-label">${t('deckCatAll', this.currentLang)}</span>
               <span class="cat-count">20</span>
             </button>
-            <button class="hub-cat-chip ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev">
-              <span>${t('deckCatDev', this.currentLang)}</span>
+            <button class="hub-cat-chip chip-cat-dev ${this.selectedCategory === 'dev' ? 'active' : ''}" data-cat="dev" title="${t('deckCatDev', this.currentLang)} (8)">
+              <span class="cat-chip-icon">${ICONS.palette}</span>
+              <span class="cat-chip-label">${t('deckCatDev', this.currentLang)}</span>
               <span class="cat-count">8</span>
             </button>
-            <button class="hub-cat-chip ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network">
-              <span>${t('deckCatNetwork', this.currentLang)}</span>
+            <button class="hub-cat-chip chip-cat-network ${this.selectedCategory === 'network' ? 'active' : ''}" data-cat="network" title="${t('deckCatNetwork', this.currentLang)} (5)">
+              <span class="cat-chip-icon">${ICONS.network}</span>
+              <span class="cat-chip-label">${t('deckCatNetwork', this.currentLang)}</span>
               <span class="cat-count">5</span>
             </button>
-            <button class="hub-cat-chip ${this.selectedCategory === 'ops' ? 'active' : ''}" data-cat="ops">
-              <span>${t('deckCatOps', this.currentLang)}</span>
+            <button class="hub-cat-chip chip-cat-ops ${this.selectedCategory === 'ops' ? 'active' : ''}" data-cat="ops" title="${t('deckCatOps', this.currentLang)} (3)">
+              <span class="cat-chip-icon">${ICONS.terminal}</span>
+              <span class="cat-chip-label">${t('deckCatOps', this.currentLang)}</span>
               <span class="cat-count">3</span>
             </button>
-            <button class="hub-cat-chip ${this.selectedCategory === 'system' ? 'active' : ''}" data-cat="system">
-              <span>${t('deckCatSystem', this.currentLang)}</span>
+            <button class="hub-cat-chip chip-cat-system ${this.selectedCategory === 'system' ? 'active' : ''}" data-cat="system" title="${t('deckCatSystem', this.currentLang)} (4)">
+              <span class="cat-chip-icon">${ICONS.cpu}</span>
+              <span class="cat-chip-label">${t('deckCatSystem', this.currentLang)}</span>
               <span class="cat-count">4</span>
             </button>
           </div>
@@ -689,10 +694,23 @@ class DevShelfApp {
     if (toolGuideTitle) toolGuideTitle.textContent = t('toolGuideTitle', this.currentLang);
 
     // Update Category Chips
+    const CAT_ICONS: Record<string, string> = {
+      all: ICONS.apps,
+      dev: ICONS.palette,
+      network: ICONS.network,
+      ops: ICONS.terminal,
+      system: ICONS.cpu
+    };
     const setCatText = (cat: string, labelKey: keyof typeof translations['en'], count: number) => {
       const el = document.querySelector(`.hub-cat-chip[data-cat="${cat}"]`);
       if (el) {
-        el.innerHTML = `<span>${t(labelKey, this.currentLang)}</span><span class="cat-count">${count}</span>`;
+        const icon = CAT_ICONS[cat] || '';
+        el.innerHTML = `
+          <span class="cat-chip-icon">${icon}</span>
+          <span class="cat-chip-label">${t(labelKey, this.currentLang)}</span>
+          <span class="cat-count">${count}</span>
+        `;
+        el.setAttribute('title', `${t(labelKey, this.currentLang)} (${count})`);
       }
     };
     setCatText('all', 'deckCatAll', 20);

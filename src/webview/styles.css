@@ -370,67 +370,150 @@ body {
   background-color: rgba(128, 128, 128, 0.2);
 }
 
-/* Hub Category Chips Filter Bar */
+/* Hub Category Chips Filter Bar (Responsive Flow & Zero Hidden Tabs) */
 .hub-categories-bar {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: stretch;
   gap: 5px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding: 1px 2px 3px 2px;
-}
-
-.hub-categories-bar::-webkit-scrollbar {
-  display: none;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 2px 0 4px 0;
 }
 
 .hub-cat-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  font-size: 10.5px;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 9px;
+  font-size: 11px;
   font-weight: 500;
   border-radius: var(--devshelf-radius-pill, 14px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-  color: var(--vscode-descriptionForeground);
-  border: 1px solid var(--devshelf-border, rgba(255, 255, 255, 0.1));
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  flex: 1 1 auto;
+  min-height: 29px;
+  box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   outline: none;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 3px rgba(0, 0, 0, 0.12);
   user-select: none;
 }
 
-.hub-cat-chip:hover {
-  color: var(--vscode-foreground);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
-  border-color: var(--vscode-focusBorder, #388bfd);
-  filter: brightness(1.1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+/* Category Codicons */
+.hub-cat-chip .cat-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  opacity: 0.75;
+  color: inherit;
+  flex-shrink: 0;
 }
 
-.hub-cat-chip.active {
-  color: #ffffff;
-  background: linear-gradient(180deg, var(--vscode-button-background, #0e639c) 0%, rgba(14, 99, 156, 0.92) 100%);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 8px rgba(0, 0, 0, 0.28), 0 0 12px rgba(56, 139, 253, 0.4);
-  font-weight: 600;
+.hub-cat-chip .cat-chip-icon svg {
+  width: 12px;
+  height: 12px;
 }
 
+.hub-cat-chip .cat-chip-label {
+  font-size: 10.5px;
+  line-height: 1;
+}
+
+/* Count Badge */
 .hub-cat-chip .cat-count {
   font-size: 8.5px;
   font-weight: 700;
   padding: 1px 5px;
-  border-radius: 8px;
-  background: rgba(128, 128, 128, 0.25);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--vscode-descriptionForeground, #94a3b8);
   line-height: 1.2;
 }
 
-.hub-cat-chip.active .cat-count {
-  background: rgba(255, 255, 255, 0.28);
+/* Hover States */
+.hub-cat-chip:hover {
+  color: var(--vscode-foreground, #f8fafc);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.18);
+  filter: brightness(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hub-cat-chip:hover .cat-chip-icon {
+  opacity: 1;
+}
+
+.hub-cat-chip:hover .cat-count {
+  background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
+}
+
+/* Category-specific Active States matching tool cards */
+.hub-cat-chip.chip-cat-all.active {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 14px rgba(2, 132, 199, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.hub-cat-chip.chip-cat-dev.active {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  border-color: rgba(167, 139, 250, 0.45);
+  box-shadow: 0 0 14px rgba(124, 58, 237, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.hub-cat-chip.chip-cat-network.active {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  border-color: rgba(45, 212, 191, 0.45);
+  box-shadow: 0 0 14px rgba(13, 148, 136, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.hub-cat-chip.chip-cat-ops.active {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  border-color: rgba(251, 191, 36, 0.45);
+  box-shadow: 0 0 14px rgba(217, 119, 6, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.hub-cat-chip.chip-cat-system.active {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 14px rgba(5, 150, 105, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.hub-cat-chip.active .cat-chip-icon {
+  opacity: 1;
+}
+
+.hub-cat-chip.active .cat-count {
+  background: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+}
+
+/* In narrower sidebars (<= 380px), make "All Tools" span the top, with 4 sub-categories in a neat 2x2 grid */
+@media (max-width: 380px) {
+  .hub-cat-chip.chip-cat-all {
+    flex-basis: 100%;
+    min-height: 30px;
+  }
+  .hub-cat-chip:not(.chip-cat-all) {
+    flex: 1 1 calc(50% - 4px);
+  }
 }
 
 /* Large, High-Readability Hub Cards Grid */
